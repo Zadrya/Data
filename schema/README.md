@@ -22,7 +22,7 @@ Exit code 0 means valid, 1 means schema violations (each printed with its JSON p
 
 These are stated in the descriptions of the schema and explained in the ADR:
 
-- **Dose classification.** A dose holds boundaries, not ranges: below `lightMin` is a threshold dose, from `lightMin` up to `commonMin` is light, then common, then strong, and from `heavyMin` up is heavy. A missing boundary means the two classes it would separate cannot be told apart.
+- **Dose classification.** A dose holds five boundaries, not ranges: below `thresholdMin` it has no class (below threshold), from `thresholdMin` up to `lightMin` it is a threshold dose, from `lightMin` up to `commonMin` it is light, then common, then strong, and from `heavyMin` up it is heavy. When a boundary is missing, the two classes it separates cannot be told apart, and the app shows the lower one up to the next known boundary.
 - **Units.** Exactly `µg` (micro sign U+00B5, never the Greek letter mu), `mg` and `g` are mass units the app may convert between. Every other value of `units` is opaque and is never converted.
 - **Tolerance.** `half` and `zero` carry the wording of the wiki in `text` and, when it is a time, a range in minutes in `min` and `max`. The app uses the numbers and never parses the text.
 - **References.** Interaction targets of kind `group` and the `crossTolerances` of a substance refer to groups by `id`, never by display name.

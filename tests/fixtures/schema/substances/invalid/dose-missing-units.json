@@ -25,7 +25,8 @@
         {
           "route": "sublingual",
           "dose": {
-            "lightMin": 15,
+            "thresholdMin": 15,
+            "lightMin": 25,
             "commonMin": 75,
             "strongMin": 150,
             "heavyMin": 300

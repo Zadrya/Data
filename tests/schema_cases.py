@@ -148,7 +148,8 @@ def _with_roa() -> Any:
         "route": "sublingual",
         "dose": {
             "units": "µg",
-            "lightMin": 15,
+            "thresholdMin": 15,
+            "lightMin": 25,
             "commonMin": 75,
             "strongMin": 150,
             "heavyMin": 300,
@@ -204,7 +205,8 @@ def _full() -> Any:
                 "route": "sublingual",
                 "dose": {
                     "units": "µg",
-                    "lightMin": 15,
+                    "thresholdMin": 15,
+                    "lightMin": 25,
                     "commonMin": 75,
                     "strongMin": 150,
                     "heavyMin": 300,
@@ -680,6 +682,18 @@ def substances_invalid() -> list[InvalidCase]:
             _put(r, [*_R, "dose", "units"], "\u03bcg"),
             f"{_RP}.dose.units",
             "not",
+        ),
+        case(
+            "dose-threshold-min-negative",
+            _put(r, [*_R, "dose", "thresholdMin"], -1),
+            f"{_RP}.dose.thresholdMin",
+            "minimum",
+        ),
+        case(
+            "dose-threshold-min-not-a-number",
+            _put(r, [*_R, "dose", "thresholdMin"], "15"),
+            f"{_RP}.dose.thresholdMin",
+            "type",
         ),
         case(
             "dose-light-min-negative",
