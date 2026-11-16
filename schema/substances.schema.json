@@ -1,0 +1,253 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/Zadrya/Data/main/schema/substances.schema.json",
+  "$comment": "Schema version 1.0.0. The versioning rules are in schema/README.md.",
+  "title": "Zadrya substance dataset",
+  "description": "The substance catalog built from PsychonautWiki. This schema checks shape only: cross-field invariants (increasing ranges, min not above max, existing references, symmetric interactions, unique names) are checked by the pipeline.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "datasetVersion",
+    "attribution",
+    "categories",
+    "substances"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "description": "Semantic version of the schema this document follows. This schema accepts major version 1 only.",
+      "type": "string",
+      "pattern": "^1\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+    },
+    "datasetVersion": {
+      "description": "Semantic version of the dataset content.",
+      "$ref": "#/$defs/semver"
+    },
+    "attribution": {
+      "description": "Sources the dataset is derived from, with their licenses. Never empty.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/attribution"
+      }
+    },
+    "categories": {
+      "description": "Categories a substance can belong to.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/category"
+      }
+    },
+    "substances": {
+      "description": "The substance catalog.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/substance"
+      }
+    }
+  },
+  "$defs": {
+    "semver": {
+      "description": "A semantic version of the form MAJOR.MINOR.PATCH, without pre-release or build metadata.",
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+    },
+    "text": {
+      "description": "A string with at least one character.",
+      "type": "string",
+      "minLength": 1
+    },
+    "slug": {
+      "description": "A lowercase token: letters and digits, with single hyphens between words.",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "attribution": {
+      "description": "One source of the dataset.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "url",
+        "license"
+      ],
+      "properties": {
+        "name": {
+          "description": "Name of the source.",
+          "$ref": "#/$defs/text"
+        },
+        "url": {
+          "description": "Address of the source, https only.",
+          "type": "string",
+          "pattern": "^https://[^\\s]+$"
+        },
+        "license": {
+          "description": "License of the source, as an SPDX identifier where one exists.",
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "category": {
+      "description": "A category of substances.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "description"
+      ],
+      "properties": {
+        "id": {
+          "description": "Stable identifier that substances refer to.",
+          "$ref": "#/$defs/slug"
+        },
+        "name": {
+          "description": "Display name.",
+          "$ref": "#/$defs/text"
+        },
+        "description": {
+          "description": "Short explanation of the category.",
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "substance": {
+      "description": "One substance of the catalog.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "aliases",
+        "url",
+        "categories",
+        "classes",
+        "crossTolerances",
+        "toxicities"
+      ],
+      "properties": {
+        "name": {
+          "description": "Canonical name, unique in the catalog. Ingestions store this name.",
+          "$ref": "#/$defs/text"
+        },
+        "aliases": {
+          "description": "Other names the substance is known by. May be empty.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/text"
+          }
+        },
+        "url": {
+          "description": "PsychonautWiki article of the substance, https only.",
+          "type": "string",
+          "pattern": "^https://psychonautwiki\\.org/wiki/[^\\s]+$"
+        },
+        "summary": {
+          "description": "Short description of the substance.",
+          "$ref": "#/$defs/text"
+        },
+        "categories": {
+          "description": "Identifiers of the categories the substance belongs to.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/slug"
+          }
+        },
+        "classes": {
+          "description": "Classes PsychonautWiki assigns to the substance.",
+          "$ref": "#/$defs/classes"
+        },
+        "tolerance": {
+          "description": "How tolerance builds up and fades. Absent when nothing is known.",
+          "$ref": "#/$defs/tolerance"
+        },
+        "crossTolerances": {
+          "description": "Classes or groups the substance shares tolerance with, as lowercase tokens.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/slug"
+          }
+        },
+        "addictionPotential": {
+          "description": "Free text describing the addiction potential.",
+          "$ref": "#/$defs/text"
+        },
+        "toxicities": {
+          "description": "Free text statements about toxicity. May be empty.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/text"
+          }
+        },
+        "effectsSummary": {
+          "description": "Free text overview of the effects.",
+          "$ref": "#/$defs/text"
+        },
+        "dosageRemark": {
+          "description": "Free text remark about dosing.",
+          "$ref": "#/$defs/text"
+        },
+        "generalRisks": {
+          "description": "Free text about the general risks.",
+          "$ref": "#/$defs/text"
+        },
+        "longtermRisks": {
+          "description": "Free text about the long-term risks.",
+          "$ref": "#/$defs/text"
+        },
+        "saferUse": {
+          "description": "Safer use advice, one item per piece of advice. Absent when there is none.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/text"
+          }
+        }
+      }
+    },
+    "classes": {
+      "description": "Psychoactive and chemical classes of a substance.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "psychoactive",
+        "chemical"
+      ],
+      "properties": {
+        "psychoactive": {
+          "description": "Psychoactive classes, for example Psychedelics. May be empty.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/text"
+          }
+        },
+        "chemical": {
+          "description": "Chemical classes, for example Lysergamides. May be empty.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/text"
+          }
+        }
+      }
+    },
+    "tolerance": {
+      "description": "Tolerance timeline in free text. At least one of the three is present.",
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "full": {
+          "description": "When full tolerance is reached.",
+          "$ref": "#/$defs/text"
+        },
+        "half": {
+          "description": "Time until tolerance falls to half.",
+          "$ref": "#/$defs/text"
+        },
+        "zero": {
+          "description": "Time until tolerance returns to baseline.",
+          "$ref": "#/$defs/text"
+        }
+      }
+    }
+  }
+}

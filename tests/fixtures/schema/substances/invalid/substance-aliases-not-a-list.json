@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "1.0.0",
+  "attribution": [
+    {
+      "name": "PsychonautWiki",
+      "url": "https://psychonautwiki.org",
+      "license": "CC-BY-SA-4.0"
+    }
+  ],
+  "categories": [],
+  "substances": [
+    {
+      "name": "LSD",
+      "aliases": "Acid",
+      "url": "https://psychonautwiki.org/wiki/LSD",
+      "categories": [],
+      "classes": {
+        "psychoactive": [],
+        "chemical": []
+      },
+      "crossTolerances": [],
+      "toxicities": []
+    }
+  ]
+}
