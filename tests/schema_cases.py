@@ -185,8 +185,8 @@ def _full() -> Any:
         ],
         "tolerance": {
             "full": "almost immediately after ingestion",
-            "half": "3 days",
-            "zero": "5 days",
+            "half": {"text": "3 days", "min": 4320, "max": 4320},
+            "zero": {"text": "1-2 weeks", "min": 10080, "max": 20160},
         },
         "crossTolerances": ["psychedelic", "5-ht2a-agonist"],
         "interactions": {
@@ -212,6 +212,7 @@ def _full() -> Any:
         "name": "1P-LSD",
         "url": "https://psychonautwiki.org/wiki/1P-LSD",
         "categories": ["psychedelic", "research-chemical"],
+        "tolerance": {"zero": {"text": "unknown, probably like LSD"}},
     }
     document["substances"] = [lsd, other]
     return document
@@ -513,9 +514,63 @@ def substances_invalid() -> list[InvalidCase]:
             "additionalProperties",
         ),
         case(
-            "tolerance-zero-not-a-string",
-            _put(s, [*_S, "tolerance"], {"zero": 5}),
+            "tolerance-full-not-a-string",
+            _put(s, [*_S, "tolerance"], {"full": {"text": "1 day"}}),
+            f"{_SP}.tolerance.full",
+            "type",
+        ),
+        case(
+            "tolerance-half-not-an-object",
+            _put(s, [*_S, "tolerance"], {"half": "3 days"}),
+            f"{_SP}.tolerance.half",
+            "type",
+        ),
+        case(
+            "tolerance-zero-not-an-object",
+            _put(s, [*_S, "tolerance"], {"zero": 7200}),
             f"{_SP}.tolerance.zero",
+            "type",
+        ),
+        case(
+            "tolerance-time-missing-text",
+            _put(s, [*_S, "tolerance"], {"zero": {"min": 7200, "max": 7200}}),
+            f"{_SP}.tolerance.zero",
+            "required",
+        ),
+        case(
+            "tolerance-time-unknown-property",
+            _put(s, [*_S, "tolerance"], {"zero": {"text": "5 days", "units": "days"}}),
+            f"{_SP}.tolerance.zero",
+            "additionalProperties",
+        ),
+        case(
+            "tolerance-time-text-empty",
+            _put(s, [*_S, "tolerance"], {"zero": {"text": ""}}),
+            f"{_SP}.tolerance.zero.text",
+            "pattern",
+        ),
+        case(
+            "tolerance-time-min-without-max",
+            _put(s, [*_S, "tolerance"], {"zero": {"text": "5 days", "min": 7200}}),
+            f"{_SP}.tolerance.zero",
+            "dependentRequired",
+        ),
+        case(
+            "tolerance-time-max-without-min",
+            _put(s, [*_S, "tolerance"], {"zero": {"text": "5 days", "max": 7200}}),
+            f"{_SP}.tolerance.zero",
+            "dependentRequired",
+        ),
+        case(
+            "tolerance-time-min-negative",
+            _put(s, [*_S, "tolerance"], {"zero": {"text": "5 days", "min": -1, "max": 7200}}),
+            f"{_SP}.tolerance.zero.min",
+            "minimum",
+        ),
+        case(
+            "tolerance-time-max-not-a-number",
+            _put(s, [*_S, "tolerance"], {"zero": {"text": "5 days", "min": 7200, "max": "7200"}}),
+            f"{_SP}.tolerance.zero.max",
             "type",
         ),
         case(

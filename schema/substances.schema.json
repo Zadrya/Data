@@ -294,22 +294,52 @@
       }
     },
     "tolerance": {
-      "description": "Tolerance timeline in free text. At least one of the three is present.",
+      "description": "Tolerance timeline. At least one of the three is present.",
       "type": "object",
       "additionalProperties": false,
       "minProperties": 1,
       "properties": {
         "full": {
-          "description": "When full tolerance is reached.",
+          "description": "When full tolerance is reached, in the wording of the wiki.",
           "$ref": "#/$defs/text"
         },
         "half": {
           "description": "Time until tolerance falls to half.",
-          "$ref": "#/$defs/text"
+          "$ref": "#/$defs/toleranceTime"
         },
         "zero": {
           "description": "Time until tolerance returns to baseline.",
+          "$ref": "#/$defs/toleranceTime"
+        }
+      }
+    },
+    "toleranceTime": {
+      "description": "A time in the tolerance timeline: the wording of the wiki and, when it can be read as a time, the same as a range in minutes. The app draws from the numbers and never parses the text. For example \"5 days\" is 7200 and 7200, and \"1-2 weeks\" is 10080 and 20160.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "text"
+      ],
+      "dependentRequired": {
+        "min": [
+          "max"
+        ],
+        "max": [
+          "min"
+        ]
+      },
+      "properties": {
+        "text": {
+          "description": "The wording of the wiki.",
           "$ref": "#/$defs/text"
+        },
+        "min": {
+          "description": "Lower bound in minutes. Present exactly when max is.",
+          "$ref": "#/$defs/nonNegative"
+        },
+        "max": {
+          "description": "Upper bound in minutes. Present exactly when min is.",
+          "$ref": "#/$defs/nonNegative"
         }
       }
     },

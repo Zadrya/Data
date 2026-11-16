@@ -29,7 +29,10 @@
       },
       "toxicities": [],
       "tolerance": {
-        "zero": 5
+        "zero": {
+          "text": "5 days",
+          "min": 7200
+        }
       }
     }
   ]

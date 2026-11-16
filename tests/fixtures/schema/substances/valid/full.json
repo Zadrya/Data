@@ -134,8 +134,16 @@
       ],
       "tolerance": {
         "full": "almost immediately after ingestion",
-        "half": "3 days",
-        "zero": "5 days"
+        "half": {
+          "text": "3 days",
+          "min": 4320,
+          "max": 4320
+        },
+        "zero": {
+          "text": "1-2 weeks",
+          "min": 10080,
+          "max": 20160
+        }
       },
       "crossTolerances": [
         "psychedelic",
@@ -201,7 +209,12 @@
         "unsafe": [],
         "uncertain": []
       },
-      "toxicities": []
+      "toxicities": [],
+      "tolerance": {
+        "zero": {
+          "text": "unknown, probably like LSD"
+        }
+      }
     }
   ]
 }

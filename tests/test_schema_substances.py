@@ -32,6 +32,7 @@ REQUIRED = {
         "toxicities",
     ],
     "classes": ["psychoactive", "chemical"],
+    "toleranceTime": ["text"],
     "interactions": ["dangerous", "unsafe", "uncertain"],
     "interactionTarget": ["kind", "name"],
     "roa": ["route"],
