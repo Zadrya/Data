@@ -32,4 +32,16 @@ the terms.
    Text:          CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/)
    Semantic data: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
 
+3. PsychonautWiki API and wiki (planned inputs, no snapshot committed yet)
+
+   The fetch command reads two services of PsychonautWiki. Their content is
+   the PsychonautWiki content of point 2, under the same licenses.
+   GraphQL API: https://api.psychonautwiki.org/ (substance data)
+   Wiki API:    https://psychonautwiki.org/w/api.php (whether a page exists,
+                its title and its last revision; no page text)
+   A snapshot of their answers is not part of this repository yet. When one
+   is added, its fetch date and the revision of every page are recorded in
+   the snapshot itself. tests/fixtures/api/ holds a few recorded answers,
+   trimmed, as test fixtures.
+
 The full license texts are in LICENSES/.
