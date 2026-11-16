@@ -121,6 +121,7 @@
         "url",
         "categories",
         "classes",
+        "roas",
         "crossTolerances",
         "toxicities"
       ],
@@ -155,6 +156,13 @@
         "classes": {
           "description": "Classes PsychonautWiki assigns to the substance.",
           "$ref": "#/$defs/classes"
+        },
+        "roas": {
+          "description": "Routes of administration with their dose and duration data.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/roa"
+          }
         },
         "tolerance": {
           "description": "How tolerance builds up and fades. Absent when nothing is known.",
@@ -246,6 +254,171 @@
         "zero": {
           "description": "Time until tolerance returns to baseline.",
           "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "roa": {
+      "description": "One route of administration of a substance.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "route"
+      ],
+      "properties": {
+        "route": {
+          "description": "The route of administration.",
+          "enum": [
+            "oral",
+            "sublingual",
+            "buccal",
+            "insufflated",
+            "rectal",
+            "transdermal",
+            "subcutaneous",
+            "intramuscular",
+            "intravenous",
+            "smoked",
+            "inhaled"
+          ]
+        },
+        "dose": {
+          "description": "Dose ranges for this route. Absent when unknown.",
+          "$ref": "#/$defs/dose"
+        },
+        "duration": {
+          "description": "Duration of each phase for this route. Absent when unknown.",
+          "$ref": "#/$defs/duration"
+        },
+        "bioavailability": {
+          "description": "Bioavailability for this route. Absent when unknown.",
+          "$ref": "#/$defs/bioavailability"
+        }
+      }
+    },
+    "dose": {
+      "description": "Dose classification for one route, in the given units.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "units"
+      ],
+      "properties": {
+        "units": {
+          "description": "Units of every number in this object, as PsychonautWiki writes them (for example mg).",
+          "$ref": "#/$defs/text"
+        },
+        "threshold": {
+          "description": "Lowest dose with a noticeable effect.",
+          "type": "number",
+          "minimum": 0
+        },
+        "light": {
+          "description": "Range of a light dose.",
+          "$ref": "#/$defs/doseRange"
+        },
+        "common": {
+          "description": "Range of a common dose.",
+          "$ref": "#/$defs/doseRange"
+        },
+        "strong": {
+          "description": "Range of a strong dose.",
+          "$ref": "#/$defs/doseRange"
+        },
+        "heavy": {
+          "description": "Dose from which the dose is heavy.",
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "doseRange": {
+      "description": "A closed dose range.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "min",
+        "max"
+      ],
+      "properties": {
+        "min": {
+          "description": "Lower bound.",
+          "type": "number",
+          "minimum": 0
+        },
+        "max": {
+          "description": "Upper bound.",
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "duration": {
+      "description": "Duration of each phase, in minutes. At least one phase is present.",
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "onset": {
+          "description": "Time until the first effects.",
+          "$ref": "#/$defs/durationRange"
+        },
+        "comeup": {
+          "description": "Time from the first effects to the peak.",
+          "$ref": "#/$defs/durationRange"
+        },
+        "peak": {
+          "description": "Length of the peak.",
+          "$ref": "#/$defs/durationRange"
+        },
+        "offset": {
+          "description": "Time the effects take to fade after the peak.",
+          "$ref": "#/$defs/durationRange"
+        },
+        "total": {
+          "description": "Total length of the experience.",
+          "$ref": "#/$defs/durationRange"
+        },
+        "afterglow": {
+          "description": "Length of the after effects.",
+          "$ref": "#/$defs/durationRange"
+        }
+      }
+    },
+    "durationRange": {
+      "description": "A duration range in minutes. Each bound is optional, at least one is present.",
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "min": {
+          "description": "Lower bound in minutes.",
+          "type": "number",
+          "minimum": 0
+        },
+        "max": {
+          "description": "Upper bound in minutes.",
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "bioavailability": {
+      "description": "Bioavailability in percent. Each bound is optional, at least one is present.",
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "min": {
+          "description": "Lower bound in percent.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "max": {
+          "description": "Upper bound in percent.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
         }
       }
     }

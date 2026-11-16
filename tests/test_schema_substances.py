@@ -43,6 +43,35 @@ INVALID_FIXTURES = {
     "toxicities-not-a-list": ("$.substances[0].toxicities", "type"),
     "safer-use-not-a-list": ("$.substances[0].saferUse", "type"),
     "safer-use-empty": ("$.substances[0].saferUse", "minItems"),
+    "roa-missing-route": ("$.substances[0].roas[0]", "required"),
+    "roa-unknown-property": ("$.substances[0].roas[0]", "additionalProperties"),
+    "roa-route-not-in-the-list": ("$.substances[0].roas[0].route", "enum"),
+    "dose-missing-units": ("$.substances[0].roas[0].dose", "required"),
+    "dose-unknown-property-light-min": ("$.substances[0].roas[0].dose", "additionalProperties"),
+    "dose-units-empty": ("$.substances[0].roas[0].dose.units", "minLength"),
+    "dose-threshold-negative": ("$.substances[0].roas[0].dose.threshold", "minimum"),
+    "dose-heavy-not-a-number": ("$.substances[0].roas[0].dose.heavy", "type"),
+    "dose-heavy-negative": ("$.substances[0].roas[0].dose.heavy", "minimum"),
+    "dose-range-missing-max": ("$.substances[0].roas[0].dose.light", "required"),
+    "dose-range-unknown-property": ("$.substances[0].roas[0].dose.light", "additionalProperties"),
+    "dose-range-min-negative": ("$.substances[0].roas[0].dose.light.min", "minimum"),
+    "dose-range-max-not-a-number": ("$.substances[0].roas[0].dose.light.max", "type"),
+    "duration-empty": ("$.substances[0].roas[0].duration", "minProperties"),
+    "duration-unknown-phase": ("$.substances[0].roas[0].duration", "additionalProperties"),
+    "duration-range-empty": ("$.substances[0].roas[0].duration.onset", "minProperties"),
+    "duration-range-unknown-property-units": (
+        "$.substances[0].roas[0].duration.onset",
+        "additionalProperties",
+    ),
+    "duration-range-min-negative": ("$.substances[0].roas[0].duration.onset.min", "minimum"),
+    "duration-range-max-not-a-number": ("$.substances[0].roas[0].duration.onset.max", "type"),
+    "bioavailability-empty": ("$.substances[0].roas[0].bioavailability", "minProperties"),
+    "bioavailability-unknown-property": (
+        "$.substances[0].roas[0].bioavailability",
+        "additionalProperties",
+    ),
+    "bioavailability-min-negative": ("$.substances[0].roas[0].bioavailability.min", "minimum"),
+    "bioavailability-max-above-100": ("$.substances[0].roas[0].bioavailability.max", "maximum"),
 }
 # Required keys of the top level ("") and of every definition, pinned here so
 # that a key cannot become optional without a test changing.
@@ -56,10 +85,14 @@ REQUIRED = {
         "url",
         "categories",
         "classes",
+        "roas",
         "crossTolerances",
         "toxicities",
     ],
     "classes": ["psychoactive", "chemical"],
+    "roa": ["route"],
+    "dose": ["units"],
+    "doseRange": ["min", "max"],
 }
 
 
