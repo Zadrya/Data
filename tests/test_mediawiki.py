@@ -15,6 +15,7 @@ from zadrya_data.mediawiki import (
     WikiFormatError,
     WikiPage,
     fetch_pages,
+    is_utc_timestamp,
     parse_answer,
 )
 
@@ -163,6 +164,38 @@ LSD: list[str | int] = ["query", "pages", 3]
             _edit(["query", "pages"], []),
             "$.query.pages: no page for the requested title 'LSD'",
         ),
+        (
+            _edit([*LSD, "ns"], 14),
+            "$.query.pages[3].ns: expected the article namespace 0, found 14",
+        ),
+        (_edit([*LSD, "ns"], "0"), "$.query.pages[3].ns: expected an integer, found str"),
+        (
+            _edit([*LSD, "pageid"], 0),
+            "$.query.pages[3].pageid: expected a positive integer, found 0",
+        ),
+        (
+            _edit([*LSD, "revisions", 0, "revid"], -5),
+            "$.query.pages[3].revisions[0].revid: expected a positive integer, found -5",
+        ),
+        (
+            _edit([*LSD, "revisions", 0, "timestamp"], "2025-12-11 08:07:17"),
+            "$.query.pages[3].revisions[0].timestamp: expected an ISO 8601 UTC time, "
+            "found '2025-12-11 08:07:17'",
+        ),
+        (
+            _edit([*LSD, "revisions", 0, "timestamp"], "2025-02-30T08:07:17Z"),
+            "$.query.pages[3].revisions[0].timestamp: expected an ISO 8601 UTC time, "
+            "found '2025-02-30T08:07:17Z'",
+        ),
+        (
+            _edit([*LSD, "missing"], True),
+            "$.query.pages[3]: a missing page cannot have an id or revisions",
+        ),
+        (_edit(["query", "pages", 0, "missing"], False), "$.query.pages[0].missing: expected true"),
+        (
+            _edit(["query", "pages", 0, "title"], "LSD"),
+            "$.query.pages[3]: second page titled 'LSD'",
+        ),
     ],
 )
 def test_an_answer_of_another_shape_fails_with_the_path(answer: object, message: str) -> None:
@@ -172,16 +205,48 @@ def test_an_answer_of_another_shape_fails_with_the_path(answer: object, message:
     assert str(error.value) == message
 
 
-def test_a_redirect_loop_ends() -> None:
+def test_a_redirect_loop_fails() -> None:
     answer = {
         "batchcomplete": True,
         "query": {
             "redirects": [{"from": "A", "to": "B"}, {"from": "B", "to": "A"}],
-            "pages": [
-                {"ns": 0, "title": "A", "missing": True},
-                {"ns": 0, "title": "B", "missing": True},
-            ],
+            "pages": [{"ns": 0, "title": "A", "missing": True}],
         },
     }
 
-    assert [page.exists for page in parse_answer(answer, ["A"])] == [False]
+    with pytest.raises(WikiFormatError) as error:
+        parse_answer(answer, ["A"])
+
+    assert str(error.value) == "$.query.redirects: more than 5 redirects from 'A'"
+
+
+def test_a_page_nobody_asked_for_fails() -> None:
+    with pytest.raises(WikiFormatError) as error:
+        parse_answer(_answer(), [title for title in WIKI_TITLES if title != "1,4-Butanediol"])
+
+    assert str(error.value) == "$.query.pages: a page nobody asked for, '1,4-Butanediol'"
+
+
+@pytest.mark.parametrize("title", ["LSD|Acid", " LSD", "LSD ", ""])
+def test_a_title_that_would_break_the_title_list_is_refused_before_sending(title: str) -> None:
+    client, seen = replay(lambda request: httpx.Response(200, json=_answer()))
+
+    with pytest.raises(WikiFormatError, match="cannot be sent in a list of titles"):
+        fetch_pages(client, ["LSD", title])
+
+    assert seen == []
+
+
+@pytest.mark.parametrize(
+    ("text", "valid"),
+    [
+        ("2025-12-11T08:07:17Z", True),
+        ("2025-12-11T08:07:17+00:00", False),
+        ("2025-12-11T08:07:17Z\n", False),
+        ("2025-13-11T08:07:17Z", False),
+        ("2025-12-11T24:00:00Z", False),
+        ("2025-12-11", False),
+    ],
+)
+def test_timestamps_are_iso_8601_utc(text: str, valid: bool) -> None:
+    assert is_utc_timestamp(text) is valid
