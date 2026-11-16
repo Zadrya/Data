@@ -13,9 +13,11 @@ import json
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
+from urllib.parse import parse_qs
 
 import httpx
 
+from zadrya_data import graphql, mediawiki
 from zadrya_data.http import PoliteClient
 
 FIXTURES = Path(__file__).parent / "fixtures" / "api"
@@ -50,3 +52,19 @@ def replay(
 
     client = PoliteClient(httpx.MockTransport(handle), sleep=lambda seconds: None)
     return client, seen
+
+
+def api_handler(request: httpx.Request) -> httpx.Response:
+    """Answer the GraphQL query with the recording, and any wiki lookup with missing pages."""
+    if str(request.url) == graphql.ENDPOINT:
+        return httpx.Response(200, json=recorded("graphql.json"))
+    assert str(request.url) == mediawiki.ENDPOINT
+    titles = parse_qs(request.content.decode())["titles"][0].split("|")
+    pages: list[dict[str, object]] = []
+    for number, title in enumerate(titles):
+        if title == "Oxazepam":
+            pages.append({"ns": 0, "title": title, "missing": True})
+        else:
+            revision = {"revid": 1000 + number, "parentid": 1, "timestamp": "2026-01-01T00:00:00Z"}
+            pages.append({"pageid": number + 1, "ns": 0, "title": title, "revisions": [revision]})
+    return httpx.Response(200, json={"batchcomplete": True, "query": {"pages": pages}})
