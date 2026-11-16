@@ -80,20 +80,10 @@
           "route": "sublingual",
           "dose": {
             "units": "µg",
-            "threshold": 15,
-            "light": {
-              "min": 25,
-              "max": 75
-            },
-            "common": {
-              "min": 75,
-              "max": 150
-            },
-            "strong": {
-              "min": 150,
-              "max": 300
-            },
-            "heavy": 300
+            "lightMin": 15,
+            "commonMin": 75,
+            "strongMin": 150,
+            "heavyMin": 300
           },
           "duration": {
             "onset": {
@@ -129,7 +119,8 @@
         {
           "route": "oral",
           "dose": {
-            "units": "µg"
+            "units": "µg",
+            "commonMin": 100.5
           },
           "duration": {
             "onset": {
@@ -141,6 +132,12 @@
           },
           "bioavailability": {
             "max": 80
+          }
+        },
+        {
+          "route": "smoked",
+          "dose": {
+            "units": "mg THC"
           }
         },
         {

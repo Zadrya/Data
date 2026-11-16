@@ -432,7 +432,7 @@
           ]
         },
         "dose": {
-          "description": "Dose ranges for this route. Absent when unknown.",
+          "description": "Dose boundaries for this route. Absent when nothing is known, not even the units.",
           "$ref": "#/$defs/dose"
         },
         "duration": {
@@ -446,7 +446,7 @@
       }
     },
     "dose": {
-      "description": "Dose classification for one route, in the given units.",
+      "description": "Dose boundaries for one route, in the given units. A dose below lightMin is a threshold dose; from lightMin up to, but not including, commonMin it is light; from commonMin up to strongMin it is common; from strongMin up to heavyMin it is strong; from heavyMin up it is heavy. A missing boundary means the two classes it would separate cannot be told apart. A dose with units and no boundary only says which unit the wiki uses.",
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -454,46 +454,27 @@
       ],
       "properties": {
         "units": {
-          "description": "Units of every number in this object, as PsychonautWiki writes them (for example mg).",
-          "$ref": "#/$defs/text"
+          "description": "Units of every boundary, as text. Exactly three spellings are mass units that the app may convert between: µg (with the micro sign U+00B5), mg and g. Every other value is opaque and is never converted. The Greek letter mu (U+03BC) is rejected, so micrograms have one spelling.",
+          "$ref": "#/$defs/text",
+          "not": {
+            "type": "string",
+            "pattern": "\\u03bc"
+          }
         },
-        "threshold": {
-          "description": "Lowest dose with a noticeable effect.",
+        "lightMin": {
+          "description": "Lowest light dose. Below it a dose is a threshold dose.",
           "$ref": "#/$defs/nonNegative"
         },
-        "light": {
-          "description": "Range of a light dose.",
-          "$ref": "#/$defs/doseRange"
-        },
-        "common": {
-          "description": "Range of a common dose.",
-          "$ref": "#/$defs/doseRange"
-        },
-        "strong": {
-          "description": "Range of a strong dose.",
-          "$ref": "#/$defs/doseRange"
-        },
-        "heavy": {
-          "description": "Dose from which the dose is heavy.",
-          "$ref": "#/$defs/nonNegative"
-        }
-      }
-    },
-    "doseRange": {
-      "description": "A closed dose range.",
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "min",
-        "max"
-      ],
-      "properties": {
-        "min": {
-          "description": "Lower bound.",
+        "commonMin": {
+          "description": "Lowest common dose.",
           "$ref": "#/$defs/nonNegative"
         },
-        "max": {
-          "description": "Upper bound.",
+        "strongMin": {
+          "description": "Lowest strong dose.",
+          "$ref": "#/$defs/nonNegative"
+        },
+        "heavyMin": {
+          "description": "Lowest heavy dose.",
           "$ref": "#/$defs/nonNegative"
         }
       }

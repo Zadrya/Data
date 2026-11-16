@@ -32,13 +32,13 @@ def test_validate_accepts_a_valid_dataset(capsys: pytest.CaptureFixture[str]) ->
 def test_validate_reports_every_violation_with_its_path(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    path = FIXTURES / "substances" / "invalid" / "dose-heavy-negative.json"
+    path = FIXTURES / "substances" / "invalid" / "dose-heavy-min-negative.json"
 
     assert main(["validate", str(path)]) == 1
 
     captured = capsys.readouterr()
     assert captured.out == ""
-    assert f"{path}: $.substances[0].roas[0].dose.heavy: " in captured.err
+    assert f"{path}: $.substances[0].roas[0].dose.heavyMin: " in captured.err
     assert "(minimum)" in captured.err
     assert "1 violation(s) of the substances schema" in captured.err
 
