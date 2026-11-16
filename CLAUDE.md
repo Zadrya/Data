@@ -27,7 +27,8 @@ Local tools (Homebrew): `uv`, `lefthook actionlint yamllint markdownlint-cli2 zi
 
 - Tests never touch the network and must keep coverage at 90 % or higher (`pyproject.toml`).
 - `uv.lock` is committed and CI installs with `--locked`: after changing dependencies run `uv lock` and commit the lock file in the same commit.
-- The schemas in `schema/` are the only copy: `src/zadrya_data/schemas/` holds symbolic links to them, which the build resolves into the wheel. A new schema file needs its link. Every schema rule has an invalid fixture named after it in `tests/fixtures/schema/`, listed in the table of its test file (`schema/README.md`).
+- The schemas in `schema/` are the only copy: `src/zadrya_data/schemas/` holds symbolic links to them, which the build resolves into the wheel. A new schema file needs its link.
+- Schema fixtures are generated: edit `tests/schema_cases.py`, run `uv run python -m tests.schema_cases` and commit the files. A mutation test (`tests/test_schema_mutations.py`, about 10 seconds) fails when removing one constraint of a schema changes no fixture result, so a new rule needs a fixture that breaks it. Python and Dart read regular expressions differently: end every pattern with `$(?![\s\S])` and avoid `\s` (`schema/README.md`).
 - Data derived from PsychonautWiki is CC BY-SA 4.0 (text) and CC BY 4.0 (semantic data), while code is GPL-3.0-or-later. Keep `REUSE.toml` accurate when data files are added.
 - Actions must be pinned by full commit SHA: the organization enforces it and unpinned workflows do not start.
 - The shared scripts in `scripts/` and the base workflows are duplicated in all four Zadrya repositories on purpose, so that each repository can run `make ci` on its own. When you change one, change it in all four.

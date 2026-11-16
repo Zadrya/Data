@@ -16,7 +16,18 @@ uv run zadrya-data validate dataset/substances.json
 uv run zadrya-data validate --schema manifest manifest.json
 ```
 
-Exit code 0 means valid, 1 means schema violations (each printed with its JSON path) and 2 means the file cannot be read as JSON. Format assertions are on, so `date` must be a real calendar day.
+Exit code 0 means valid, 1 means schema violations (each printed with its JSON path) and 2 means the file cannot be read as strict JSON: `NaN`, `Infinity`, a number out of range such as `1e999`, a repeated key in one object and nesting that is too deep are all refused. Format assertions are on, so `date` must be a real calendar day.
+
+## Conventions the app must follow
+
+These are stated in the descriptions of the schema and explained in the ADR:
+
+- **Dose classification.** A dose holds boundaries, not ranges: below `lightMin` is a threshold dose, from `lightMin` up to `commonMin` is light, then common, then strong, and from `heavyMin` up is heavy. A missing boundary means the two classes it would separate cannot be told apart.
+- **Units.** Exactly `µg` (micro sign U+00B5, never the Greek letter mu), `mg` and `g` are mass units the app may convert between. Every other value of `units` is opaque and is never converted.
+- **Tolerance.** `half` and `zero` carry the wording of the wiki in `text` and, when it is a time, a range in minutes in `min` and `max`. The app uses the numbers and never parses the text.
+- **References.** Interaction targets of kind `group` and the `crossTolerances` of a substance refer to groups by `id`, never by display name.
+- **Text.** No empty or padded strings and no control characters. Only `effectsSummary`, `dosageRemark`, `generalRisks` and `longtermRisks` may contain line feeds, between paragraphs.
+- **Patterns.** Every pattern ends with `$(?![\s\S])` and avoids `\s` where Python and ECMA 262 disagree, so the Python validator and the app accept the same strings.
 
 ## Versioning
 
@@ -37,5 +48,6 @@ Until the first signed dataset release, version 1.0.0 may still change in place:
 ## For contributors
 
 - Every key has a `description`, and every object rejects unknown keys. Tests enforce both.
-- Each rule has one invalid fixture in `tests/fixtures/schema/<schema>/invalid/`, named after the rule it breaks, and the test table says which JSON path and keyword must reject it.
+- The fixture documents are defined in `tests/schema_cases.py`, each invalid one with the JSON path and the keyword that must reject it. The files in `tests/fixtures/schema/` are generated from it: after a change run `uv run python -m tests.schema_cases` and commit the result. A test fails when the files are out of date.
+- What the tests guarantee, exactly: each invalid fixture breaks one rule and nothing else, and removing any single constraint from a schema changes the result of at least one fixture. "Constraint" means the keywords `$ref`, `additionalProperties`, `const`, `enum`, `format`, `items`, `maximum`, `minItems`, `minProperties`, `minimum`, `not`, `oneOf`, `pattern` and `type`, each entry of a `required` list and each entry of a `dependentRequired` map (`tests/test_schema_mutations.py`). They do not guarantee that every string a pattern should reject is rejected, nor that Python and ECMA 262 agree on every pattern: the patterns were checked once by hand in Node, and a new pattern needs the same check.
 - The files here are the only copy. `src/zadrya_data/schemas/` holds symbolic links to them, which the build resolves so that the installed package carries the schemas.
