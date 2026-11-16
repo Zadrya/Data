@@ -20,3 +20,11 @@ SPDX-FileCopyrightText = [
   "PsychonautWiki contributors",
 ]
 SPDX-License-Identifier = "GPL-3.0-or-later AND CC-BY-SA-4.0 AND CC-BY-4.0"
+
+# Recorded answers of the PsychonautWiki API and wiki, trimmed, used as test
+# fixtures: text under CC BY-SA 4.0 and semantic data under CC BY 4.0.
+[[annotations]]
+path = "tests/fixtures/api/**"
+precedence = "override"
+SPDX-FileCopyrightText = "PsychonautWiki contributors"
+SPDX-License-Identifier = "CC-BY-SA-4.0 AND CC-BY-4.0"

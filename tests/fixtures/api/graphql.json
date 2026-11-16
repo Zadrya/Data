@@ -1,0 +1,719 @@
+{
+  "data": {
+    "substances": [
+      {
+        "name": "2C-x",
+        "url": "https://psychonautwiki.org/wiki/2C-x",
+        "featured": null,
+        "summary": "The general structure for a 2C-x compound Substituted dimethoxyphenethylamines (also known as 2C-x) is the general name for the family of psychedelic phenethylamines originally studied by Alexander Shulgin. Shulgin first synthesized most of the 2C-x chemicals in the 1970s and later published his findings in his book PiHKAL. He also coined the term 2C, being an acronym for the 2 carbon atoms between the benzene ring and the amino group. The 2C-x chemicals vary in effect from being totally inactive to fully psychedelic. Some of the most popular members of this group include 2C-B, 2C-E, and 2C-I.",
+        "systematicName": null,
+        "commonNames": null,
+        "addictionPotential": null,
+        "toxicity": null,
+        "crossTolerances": null,
+        "class": null,
+        "tolerance": null,
+        "roas": null,
+        "uncertainInteractions": [
+          {
+            "name": "5-meo-xxt"
+          },
+          {
+            "name": "amphetamines"
+          },
+          {
+            "name": "Cannabis"
+          },
+          {
+            "name": "Cocaine"
+          },
+          {
+            "name": "maois"
+          },
+          {
+            "name": "nbomes"
+          }
+        ],
+        "unsafeInteractions": [
+          {
+            "name": "Tramadol"
+          }
+        ],
+        "dangerousInteractions": [
+          {
+            "name": "amt"
+          }
+        ]
+      },
+      {
+        "name": "Ayahuasca",
+        "url": "https://psychonautwiki.org/wiki/Ayahuasca",
+        "featured": true,
+        "summary": "Ayahuasca Ayahuasca cooking in the Loreto region of Peru",
+        "systematicName": null,
+        "commonNames": [
+          "Ayahuasca",
+          "Aya",
+          "Caapi",
+          "Cipó",
+          "Hoasca",
+          "Vegetal",
+          "Yagé",
+          "Yajé",
+          "Natem",
+          "Shori"
+        ],
+        "addictionPotential": "not habit-forming",
+        "toxicity": [
+          "LD50 is around 50 times a regular dose"
+        ],
+        "crossTolerances": null,
+        "class": {
+          "chemical": null,
+          "psychoactive": [
+            "Psychedelic"
+          ]
+        },
+        "tolerance": null,
+        "roas": [
+          {
+            "name": "oral",
+            "dose": null,
+            "duration": {
+              "onset": {
+                "min": 20.0,
+                "max": 60.0,
+                "units": "minutes"
+              },
+              "comeup": null,
+              "peak": {
+                "min": 1.0,
+                "max": 2.0,
+                "units": "hours"
+              },
+              "offset": {
+                "min": 1.0,
+                "max": 2.0,
+                "units": "hours"
+              },
+              "total": {
+                "min": 5.0,
+                "max": 10.0,
+                "units": "hours"
+              },
+              "afterglow": {
+                "min": 1.0,
+                "max": 8.0,
+                "units": "hours"
+              },
+              "duration": null
+            },
+            "bioavailability": null
+          }
+        ],
+        "uncertainInteractions": null,
+        "unsafeInteractions": null,
+        "dangerousInteractions": null
+      },
+      {
+        "name": "Clonidine",
+        "url": "https://psychonautwiki.org/wiki/Clonidine",
+        "featured": null,
+        "summary": "Summary sheet: Clonidine Clonidine",
+        "systematicName": null,
+        "commonNames": [
+          "Catapres",
+          "Catapres-TTS",
+          "Kapvay",
+          "Nexiclon XR"
+        ],
+        "addictionPotential": "not addictive and has a low potential for abuse",
+        "toxicity": null,
+        "crossTolerances": null,
+        "class": {
+          "chemical": [
+            "Imidazoline",
+            "Arylaminoimidazoline"
+          ],
+          "psychoactive": [
+            "Depressant"
+          ]
+        },
+        "tolerance": null,
+        "roas": [
+          {
+            "name": "oral",
+            "dose": {
+              "units": "μg",
+              "threshold": 25.0,
+              "heavy": 300.0,
+              "light": {
+                "min": 50.0,
+                "max": 75.0
+              },
+              "common": {
+                "min": 75.0,
+                "max": 100.0
+              },
+              "strong": {
+                "min": 100.0,
+                "max": 300.0
+              }
+            },
+            "duration": {
+              "onset": {
+                "min": 15.0,
+                "max": 45.0,
+                "units": "minutes"
+              },
+              "comeup": null,
+              "peak": {
+                "min": 60.0,
+                "max": 90.0,
+                "units": "minutes"
+              },
+              "offset": {
+                "min": 6.0,
+                "max": 8.0,
+                "units": "hours"
+              },
+              "total": {
+                "min": 6.0,
+                "max": 8.0,
+                "units": "hours"
+              },
+              "afterglow": null,
+              "duration": null
+            },
+            "bioavailability": null
+          }
+        ],
+        "uncertainInteractions": [
+          {
+            "name": "Stimulants"
+          }
+        ],
+        "unsafeInteractions": null,
+        "dangerousInteractions": [
+          {
+            "name": "Depressants"
+          },
+          {
+            "name": "Dissociatives"
+          }
+        ]
+      },
+      {
+        "name": "Diphenidine",
+        "url": "https://psychonautwiki.org/wiki/Diphenidine",
+        "featured": true,
+        "summary": "Not to be confused with Diphenhydramine (also known as \"DPH\"). Summary sheet: Diphenidine",
+        "systematicName": null,
+        "commonNames": [
+          "Diphenidine"
+        ],
+        "addictionPotential": "moderately addictive with a high potential for abuse",
+        "toxicity": [
+          "exact toxic dosage is unknown"
+        ],
+        "crossTolerances": [
+          "dissociative"
+        ],
+        "class": {
+          "chemical": [
+            "Diarylethylamines"
+          ],
+          "psychoactive": [
+            "Dissociatives"
+          ]
+        },
+        "tolerance": {
+          "full": "develops with prolonged and repeated use",
+          "half": "3 - 7 days",
+          "zero": "1 - 2 weeks"
+        },
+        "roas": [
+          {
+            "name": "oral",
+            "dose": {
+              "units": "mg",
+              "threshold": 30.0,
+              "heavy": 130.0,
+              "light": {
+                "min": 40.0,
+                "max": 65.0
+              },
+              "common": {
+                "min": 65.0,
+                "max": 100.0
+              },
+              "strong": {
+                "min": 100.0,
+                "max": 130.0
+              }
+            },
+            "duration": {
+              "onset": {
+                "min": 15.0,
+                "max": 30.0,
+                "units": "minutes"
+              },
+              "comeup": null,
+              "peak": null,
+              "offset": null,
+              "total": {
+                "min": 2.0,
+                "max": 5.0,
+                "units": "hours"
+              },
+              "afterglow": {
+                "min": 4.0,
+                "max": 24.0,
+                "units": "hours"
+              },
+              "duration": null
+            },
+            "bioavailability": null
+          },
+          {
+            "name": "rectal",
+            "dose": {
+              "units": "mg",
+              "threshold": 5.0,
+              "heavy": 80.0,
+              "light": {
+                "min": 10.0,
+                "max": 20.0
+              },
+              "common": {
+                "min": 20.0,
+                "max": 40.0
+              },
+              "strong": {
+                "min": 40.0,
+                "max": 80.0
+              }
+            },
+            "duration": {
+              "onset": {
+                "min": 10.0,
+                "max": 30.0,
+                "units": "minutes"
+              },
+              "comeup": null,
+              "peak": null,
+              "offset": null,
+              "total": {
+                "min": 5.0,
+                "max": 7.0,
+                "units": "hours"
+              },
+              "afterglow": null,
+              "duration": null
+            },
+            "bioavailability": null
+          },
+          {
+            "name": "smoked",
+            "dose": {
+              "units": "mg",
+              "threshold": null,
+              "heavy": 55.0,
+              "light": {
+                "min": null,
+                "max": 20.0
+              },
+              "common": {
+                "min": 20.0,
+                "max": 40.0
+              },
+              "strong": {
+                "min": 40.0,
+                "max": 55.0
+              }
+            },
+            "duration": {
+              "onset": {
+                "min": 30.0,
+                "max": 90.0,
+                "units": "seconds"
+              },
+              "comeup": null,
+              "peak": {
+                "min": 0.5,
+                "max": 2.0,
+                "units": "hours"
+              },
+              "offset": {
+                "min": 20.0,
+                "max": 40.0,
+                "units": "minutes"
+              },
+              "total": {
+                "min": 1.0,
+                "max": 3.0,
+                "units": "hours"
+              },
+              "afterglow": {
+                "min": 2.0,
+                "max": 5.0,
+                "units": "hours"
+              },
+              "duration": null
+            },
+            "bioavailability": null
+          }
+        ],
+        "uncertainInteractions": null,
+        "unsafeInteractions": null,
+        "dangerousInteractions": [
+          {
+            "name": "Stimulants"
+          },
+          {
+            "name": "Depressants"
+          }
+        ]
+      },
+      {
+        "name": "LSD",
+        "url": "https://psychonautwiki.org/wiki/LSD",
+        "featured": true,
+        "summary": "Summary sheet: LSD LSD",
+        "systematicName": null,
+        "commonNames": [
+          "LSD",
+          "LSD-25",
+          "Lucy",
+          "L",
+          "Acid",
+          "Cid",
+          "Tabs",
+          "Blotter"
+        ],
+        "addictionPotential": "non-addictive with a low abuse potential",
+        "toxicity": [
+          "extremely low toxicity relative to dose"
+        ],
+        "crossTolerances": [
+          "psychedelics"
+        ],
+        "class": {
+          "chemical": [
+            "Lysergamides"
+          ],
+          "psychoactive": [
+            "Psychedelic"
+          ]
+        },
+        "tolerance": {
+          "full": "almost immediately after ingestion",
+          "half": null,
+          "zero": "5 days"
+        },
+        "roas": [
+          {
+            "name": "sublingual",
+            "dose": {
+              "units": "µg",
+              "threshold": 15.0,
+              "heavy": 300.0,
+              "light": {
+                "min": 15.0,
+                "max": 75.0
+              },
+              "common": {
+                "min": 75.0,
+                "max": 150.0
+              },
+              "strong": {
+                "min": 150.0,
+                "max": 300.0
+              }
+            },
+            "duration": {
+              "onset": {
+                "min": 15.0,
+                "max": 30.0,
+                "units": "minutes"
+              },
+              "comeup": {
+                "min": 45.0,
+                "max": 90.0,
+                "units": "minutes"
+              },
+              "peak": {
+                "min": 3.0,
+                "max": 5.0,
+                "units": "hours"
+              },
+              "offset": {
+                "min": 3.0,
+                "max": 5.0,
+                "units": "hours"
+              },
+              "total": {
+                "min": 8.0,
+                "max": 12.0,
+                "units": "hours"
+              },
+              "afterglow": {
+                "min": 12.0,
+                "max": 48.0,
+                "units": "hours"
+              },
+              "duration": null
+            },
+            "bioavailability": {
+              "min": 71.0,
+              "max": 71.0
+            }
+          }
+        ],
+        "uncertainInteractions": [
+          {
+            "name": "Cannabis"
+          },
+          {
+            "name": "Stimulants"
+          }
+        ],
+        "unsafeInteractions": [
+          {
+            "name": "Tramadol"
+          },
+          {
+            "name": "Deliriants"
+          },
+          {
+            "name": "Tricyclic antidepressants"
+          },
+          {
+            "name": "Ritonavir"
+          }
+        ],
+        "dangerousInteractions": [
+          {
+            "name": "Lithium"
+          }
+        ]
+      },
+      {
+        "name": "MDAI",
+        "url": "https://psychonautwiki.org/wiki/MDAI",
+        "featured": true,
+        "summary": "Summary sheet: MDAI MDAI",
+        "systematicName": null,
+        "commonNames": [
+          "MDAI"
+        ],
+        "addictionPotential": "somewhat habit-forming with a low potential for abuse",
+        "toxicity": [
+          "exact toxic dosage is unknown"
+        ],
+        "crossTolerances": [
+          "entactogens"
+        ],
+        "class": {
+          "chemical": [
+            "Aminoindane"
+          ],
+          "psychoactive": [
+            "Entactogen"
+          ]
+        },
+        "tolerance": {
+          "full": "develops with prolonged and repeated use",
+          "half": "3 - 7 days",
+          "zero": "1 - 2 weeks"
+        },
+        "roas": [
+          {
+            "name": "oral",
+            "dose": {
+              "units": "mg",
+              "threshold": 40.0,
+              "heavy": 300.0,
+              "light": {
+                "min": 40.0,
+                "max": 100.0
+              },
+              "common": {
+                "min": 100.0,
+                "max": 175.0
+              },
+              "strong": {
+                "min": 175.0,
+                "max": 300.0
+              }
+            },
+            "duration": {
+              "onset": {
+                "min": 20.0,
+                "max": 40.0,
+                "units": "minutes"
+              },
+              "comeup": {
+                "min": 30.0,
+                "max": 60.0,
+                "units": "minutes"
+              },
+              "peak": {
+                "min": 2.0,
+                "max": 2.5,
+                "units": "hours"
+              },
+              "offset": {
+                "min": 1.0,
+                "max": 2.0,
+                "units": "hours"
+              },
+              "total": {
+                "min": null,
+                "max": null,
+                "units": "hours"
+              },
+              "afterglow": null,
+              "duration": {
+                "min": 4.0,
+                "max": 6.0,
+                "units": null
+              }
+            },
+            "bioavailability": null
+          }
+        ],
+        "uncertainInteractions": [
+          {
+            "name": "Alcohol"
+          },
+          {
+            "name": "MXE"
+          },
+          {
+            "name": "Dissociatives"
+          }
+        ],
+        "unsafeInteractions": [
+          {
+            "name": "DXM"
+          },
+          {
+            "name": "MDMA"
+          },
+          {
+            "name": "Stimulants"
+          }
+        ],
+        "dangerousInteractions": [
+          {
+            "name": "25x-NBOMe"
+          },
+          {
+            "name": "25x-NBOH"
+          },
+          {
+            "name": "Tramadol"
+          },
+          {
+            "name": "SNRIs"
+          },
+          {
+            "name": "MAOIs"
+          },
+          {
+            "name": "Serotonin releasers"
+          },
+          {
+            "name": "SSRIs"
+          },
+          {
+            "name": "5-HTP"
+          }
+        ]
+      },
+      {
+        "name": "Phenylpiracetam",
+        "url": "https://psychonautwiki.org/wiki/Phenylpiracetam",
+        "featured": true,
+        "summary": "Summary sheet: Phenylpiracetam Phenylpiracetam",
+        "systematicName": null,
+        "commonNames": [
+          "Phenylpiracetam",
+          "Phenotropil",
+          "Carphedon"
+        ],
+        "addictionPotential": "non-addictive with a low potential for abuse",
+        "toxicity": [
+          "safe even when high doses are consumed for a long period of time",
+          "exact toxic dosage is unknown"
+        ],
+        "crossTolerances": [
+          "racetam",
+          "nootropic"
+        ],
+        "class": {
+          "chemical": [
+            "Racetams"
+          ],
+          "psychoactive": [
+            "Stimulants",
+            "Nootropic"
+          ]
+        },
+        "tolerance": {
+          "full": "develops with prolonged and repeated use",
+          "half": "3 - 7 days",
+          "zero": "1 - 2 weeks"
+        },
+        "roas": [
+          {
+            "name": "oral",
+            "dose": {
+              "units": "mg",
+              "threshold": 50.0,
+              "heavy": 400.0,
+              "light": {
+                "min": 50.0,
+                "max": 100.0
+              },
+              "common": {
+                "min": 100.0,
+                "max": 200.0
+              },
+              "strong": {
+                "min": 200.0,
+                "max": 400.0
+              }
+            },
+            "duration": {
+              "onset": {
+                "min": 30.0,
+                "max": 60.0,
+                "units": "minutes"
+              },
+              "comeup": null,
+              "peak": {
+                "min": null,
+                "max": null,
+                "units": "hour"
+              },
+              "offset": null,
+              "total": {
+                "min": 2.0,
+                "max": 3.0,
+                "units": "hours"
+              },
+              "afterglow": null,
+              "duration": null
+            },
+            "bioavailability": null
+          }
+        ],
+        "uncertainInteractions": null,
+        "unsafeInteractions": null,
+        "dangerousInteractions": null
+      }
+    ]
+  }
+}
