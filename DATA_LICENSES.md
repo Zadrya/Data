@@ -25,7 +25,7 @@ In `REUSE.toml` the file is annotated `GPL-3.0-or-later AND CC-BY-SA-4.0 AND CC-
 
 ### PsychonautWiki
 
-The substance information in the base file was written by the contributors of [PsychonautWiki](https://psychonautwiki.org).
+The substance information in the base file was written by the contributors of [PsychonautWiki](https://psychonautwiki.org). Its terms are on the wiki page [Copyrights](https://psychonautwiki.org/wiki/Copyrights) (read on 2026-11-16, revision 145652).
 
 | Content | License |
 | --- | --- |
@@ -37,3 +37,10 @@ Both licenses require attribution, which the dataset carries in its `attribution
 ## Derived data
 
 The dataset this repository builds is derived from the inputs above. Its annotation in `REUSE.toml` is added together with the first dataset file, so that no file ever falls back to the default annotation for code.
+
+## Open questions
+
+These are recorded as facts to resolve, not as decisions.
+
+1. **Text that may descend from "Disregard Everything I Say".** The [Copyrights](https://psychonautwiki.org/wiki/Copyrights) page says: "Original articles from "Disregard Everything I Say" are probably licensed for any purpose other than commercial use: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)". It also says: "Personal experience report stories and personal user information, not including semantic data, are subject to their owner's copyright" and "File contributions, including, but not limited to images, are subject to their owner's copyright; additional terms may apply". Whether any summary or safer use text in the base file descends from those original articles is not established. The base file has no key that holds experience reports or files.
+2. **License of the derived dataset.** The owner decides it before the first dataset file lands in this repository. Until then no file of the dataset is committed and `REUSE.toml` has no annotation for it.
