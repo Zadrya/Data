@@ -1,0 +1,86 @@
+{
+  "batchcomplete": true,
+  "query": {
+    "normalized": [
+      {
+        "fromencoded": false,
+        "from": "lsd",
+        "to": "Lsd"
+      }
+    ],
+    "redirects": [
+      {
+        "from": "Lsd",
+        "to": "LSD"
+      },
+      {
+        "from": "DXM",
+        "to": "Dextromethorphan"
+      },
+      {
+        "from": "Acid",
+        "to": "LSD"
+      }
+    ],
+    "pages": [
+      {
+        "ns": 0,
+        "title": "No such page xyz",
+        "missing": true
+      },
+      {
+        "ns": 0,
+        "title": "Oxazepam",
+        "missing": true
+      },
+      {
+        "pageid": 163,
+        "ns": 0,
+        "title": "Dextromethorphan",
+        "revisions": [
+          {
+            "revid": 170322,
+            "parentid": 168731,
+            "timestamp": "2026-10-14T02:03:46Z"
+          }
+        ]
+      },
+      {
+        "pageid": 7289,
+        "ns": 0,
+        "title": "LSD",
+        "revisions": [
+          {
+            "revid": 169966,
+            "parentid": 169799,
+            "timestamp": "2025-12-11T08:07:17Z"
+          }
+        ]
+      },
+      {
+        "pageid": 8765,
+        "ns": 0,
+        "title": "1,4-Butanediol",
+        "revisions": [
+          {
+            "revid": 165585,
+            "parentid": 164778,
+            "timestamp": "2025-01-30T23:24:03Z"
+          }
+        ]
+      },
+      {
+        "pageid": 10807,
+        "ns": 0,
+        "title": "Βk-2C-B",
+        "revisions": [
+          {
+            "revid": 163529,
+            "parentid": 152498,
+            "timestamp": "2024-08-18T09:49:34Z"
+          }
+        ]
+      }
+    ]
+  }
+}
