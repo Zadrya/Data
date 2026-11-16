@@ -8,14 +8,30 @@ that a substance was renamed or lost its page. Only ``action=query`` is used: no
 text is read.
 """
 
+import re
 from collections.abc import Iterable
 from dataclasses import dataclass
+from datetime import datetime
 
 from zadrya_data.http import PoliteClient
 
 ENDPOINT = "https://psychonautwiki.org/w/api.php"
 TITLES_PER_REQUEST = 50
 MAX_REDIRECTS = 5
+
+
+_TIMESTAMP = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z")
+
+
+def is_utc_timestamp(text: str) -> bool:
+    """Tell whether the text is an ISO 8601 UTC time of the form ``2025-12-11T08:07:17Z``."""
+    if _TIMESTAMP.fullmatch(text) is None:
+        return False
+    try:
+        datetime.strptime(text, "%Y-%m-%dT%H:%M:%SZ")
+    except ValueError:
+        return False
+    return True
 
 
 class WikiFormatError(ValueError):
@@ -37,6 +53,9 @@ class WikiPage:
 def fetch_pages(client: PoliteClient, titles: Iterable[str]) -> tuple[WikiPage, ...]:
     """Look up every title, 50 per request, and return one page per title, sorted by title."""
     wanted = sorted(set(titles))
+    for title in wanted:
+        if "|" in title or title.strip() != title or not title:
+            raise WikiFormatError(f"the title {title!r} cannot be sent in a list of titles")
     pages: list[WikiPage] = []
     for start in range(0, len(wanted), TITLES_PER_REQUEST):
         batch = wanted[start : start + TITLES_PER_REQUEST]
@@ -66,11 +85,12 @@ def parse_answer(answer: object, titles: Iterable[str]) -> list[WikiPage]:
     )
     normalized = _renames(query.get("normalized", []), "$.query.normalized", ("fromencoded",))
     redirects = _renames(query.get("redirects", []), "$.query.redirects", ("tofragment",))
-    by_title = {
-        page.title: page
-        for index, item in enumerate(_list(query["pages"], "$.query.pages"))
-        for page in [_page(item, f"$.query.pages[{index}]")]
-    }
+    by_title: dict[str, WikiPage] = {}
+    for index, item in enumerate(_list(query["pages"], "$.query.pages")):
+        page = _page(item, f"$.query.pages[{index}]")
+        if page.title in by_title:
+            raise WikiFormatError(f"$.query.pages[{index}]: second page titled '{page.title}'")
+        by_title[page.title] = page
 
     pages = []
     for requested in titles:
@@ -79,6 +99,10 @@ def parse_answer(answer: object, titles: Iterable[str]) -> list[WikiPage]:
             if title not in redirects:
                 break
             title = redirects[title]
+        else:
+            raise WikiFormatError(
+                f"$.query.redirects: more than {MAX_REDIRECTS} redirects from '{requested}'"
+            )
         if title not in by_title:
             raise WikiFormatError(f"$.query.pages: no page for the requested title '{requested}'")
         found = by_title[title]
@@ -92,6 +116,9 @@ def parse_answer(answer: object, titles: Iterable[str]) -> list[WikiPage]:
                 timestamp=found.timestamp,
             )
         )
+    unasked = sorted(set(by_title) - {page.title for page in pages})
+    if unasked:
+        raise WikiFormatError(f"$.query.pages: a page nobody asked for, '{unasked[0]}'")
     return pages
 
 
@@ -100,7 +127,14 @@ def _page(value: object, path: str) -> WikiPage:
         value, path, required=("ns", "title"), optional=("pageid", "missing", "revisions")
     )
     title = _text(page["title"], f"{path}.title")
-    if page.get("missing") is True:
+    namespace = _integer(page["ns"], f"{path}.ns")
+    if namespace != 0:
+        raise WikiFormatError(f"{path}.ns: expected the article namespace 0, found {namespace}")
+    if "missing" in page:
+        if page["missing"] is not True:
+            raise WikiFormatError(f"{path}.missing: expected true")
+        if "pageid" in page or "revisions" in page:
+            raise WikiFormatError(f"{path}: a missing page cannot have an id or revisions")
         return WikiPage(title, title, False, None, None, None)
     revisions = _list(page.get("revisions"), f"{path}.revisions")
     if len(revisions) != 1:
@@ -108,13 +142,18 @@ def _page(value: object, path: str) -> WikiPage:
     revision = _object(
         revisions[0], f"{path}.revisions[0]", required=("revid", "parentid", "timestamp")
     )
+    timestamp = _text(revision["timestamp"], f"{path}.revisions[0].timestamp")
+    if not is_utc_timestamp(timestamp):
+        raise WikiFormatError(
+            f"{path}.revisions[0].timestamp: expected an ISO 8601 UTC time, found '{timestamp}'"
+        )
     return WikiPage(
         requested=title,
         title=title,
         exists=True,
-        page_id=_integer(page.get("pageid"), f"{path}.pageid"),
-        revision_id=_integer(revision["revid"], f"{path}.revisions[0].revid"),
-        timestamp=_text(revision["timestamp"], f"{path}.revisions[0].timestamp"),
+        page_id=_positive(page.get("pageid"), f"{path}.pageid"),
+        revision_id=_positive(revision["revid"], f"{path}.revisions[0].revid"),
+        timestamp=timestamp,
     )
 
 
@@ -158,3 +197,10 @@ def _integer(value: object, path: str) -> int:
     if isinstance(value, bool) or not isinstance(value, int):
         raise WikiFormatError(f"{path}: expected an integer, found {type(value).__name__}")
     return value
+
+
+def _positive(value: object, path: str) -> int:
+    number = _integer(value, path)
+    if number <= 0:
+        raise WikiFormatError(f"{path}: expected a positive integer, found {number}")
+    return number
