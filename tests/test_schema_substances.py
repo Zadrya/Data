@@ -38,7 +38,6 @@ REQUIRED = {
     "interactionTarget": ["kind", "name"],
     "roa": ["route"],
     "dose": ["units"],
-    "doseRange": ["min", "max"],
 }
 
 

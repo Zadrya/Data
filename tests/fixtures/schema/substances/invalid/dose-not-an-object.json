@@ -24,15 +24,7 @@
       "roas": [
         {
           "route": "sublingual",
-          "dose": {
-            "units": "µg",
-            "threshold": 15,
-            "light": {
-              "min": 25,
-              "max": 75
-            },
-            "heavy": -300
-          },
+          "dose": 75,
           "duration": {
             "onset": {
               "min": 15,
