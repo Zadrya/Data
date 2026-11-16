@@ -76,3 +76,37 @@ def test_validate_rejects_an_unknown_schema_name() -> None:
         main(["validate", "--schema", "release", "dataset.json"])
 
     assert exit_info.value.code == 2
+
+
+@pytest.mark.parametrize(
+    ("text", "reason"),
+    [
+        ('{"heavy": NaN}', "NaN is not a JSON number"),
+        ('{"heavy": Infinity}', "Infinity is not a JSON number"),
+        ('{"heavy": 1e999}', "the number 1e999 is out of range"),
+        ('{"name": "LSD", "name": "LSA"}', "the key 'name' appears twice in one object"),
+        ("[" * 100_000, "the document is nested too deeply"),
+        ("\ufeff{}", "not valid JSON"),
+    ],
+)
+def test_validate_refuses_text_that_is_not_strict_json(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], text: str, reason: str
+) -> None:
+    path = tmp_path / "dataset.json"
+    path.write_text(text, encoding="utf-8")
+
+    assert main(["validate", str(path)]) == 2
+
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert f"error: cannot read {path} as strict JSON: {reason}" in captured.err
+
+
+def test_validate_refuses_bytes_that_are_not_utf_8(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    path = tmp_path / "dataset.json"
+    path.write_bytes(b'{"name": "\xff"}')
+
+    assert main(["validate", str(path)]) == 2
+    assert "error: cannot read" in capsys.readouterr().err

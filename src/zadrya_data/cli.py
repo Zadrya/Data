@@ -2,13 +2,13 @@
 """Command line entry point: ``zadrya-data <command>``."""
 
 import argparse
-import json
 import sys
 from collections.abc import Sequence
 from pathlib import Path
 
 from zadrya_data import __version__
 from zadrya_data.schema import SchemaName, validate
+from zadrya_data.strict_json import loads
 
 EXIT_OK = 0
 EXIT_INVALID = 1
@@ -28,7 +28,8 @@ def build_parser() -> argparse.ArgumentParser:
         "validate",
         help="check a JSON document against its schema",
         description="Check a JSON document against its schema. Exit code 0: valid, "
-        "1: schema violations, 2: the file cannot be read as JSON.",
+        "1: schema violations, 2: the file cannot be read as strict JSON (no NaN or "
+        "Infinity, no number out of range, no repeated key).",
     )
     validate_parser.add_argument("path", type=Path, help="the JSON document to check")
     validate_parser.add_argument(
@@ -44,9 +45,9 @@ def build_parser() -> argparse.ArgumentParser:
 def run_validate(path: Path, schema: SchemaName) -> int:
     """Validate one file, report every violation on stderr and return the exit code."""
     try:
-        document: object = json.loads(path.read_text(encoding="utf-8"))
+        document = loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as error:
-        print(f"error: cannot read {path} as JSON: {error}", file=sys.stderr)
+        print(f"error: cannot read {path} as strict JSON: {error}", file=sys.stderr)
         return EXIT_UNREADABLE
 
     violations = validate(document, schema)
