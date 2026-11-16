@@ -5,3 +5,9 @@
 node_modules/
 lefthook-local.yml
 .claude/settings.local.json
+.venv/
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+.coverage
+dist/

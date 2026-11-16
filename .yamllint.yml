@@ -5,6 +5,7 @@ ignore: |
   .fvm/
   build/
   node_modules/
+  .venv/
 
 rules:
   document-start: disable
