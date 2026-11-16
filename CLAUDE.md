@@ -35,3 +35,4 @@ Local tools (Homebrew): `uv`, `lefthook actionlint yamllint markdownlint-cli2 zi
 - Dependency review (license allowlist in `.github/workflows/licenses.yml`) only runs in CI, so `make ci` cannot tell you that a new dependency has a license outside the list.
 - Dependabot pull requests fail the `authorship` check by design: re-commit the bump as Sklyvan on a branch and close the Dependabot pull request (see `Application/docs/adr/0002-dependabot-and-authorship.md`).
 - Before every push: `git log --format='%an <%ae>%n%B' origin/main..HEAD`.
+- `sources/` holds vendored inputs: stored byte for byte, pinned by hash in a test (`tests/test_base_file.py`) and never edited. Every new external input needs its source address, commit and license in `NOTICE` and `DATA_LICENSES.md`, and its annotation in `REUSE.toml`, in the same pull request.
