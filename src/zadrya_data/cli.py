@@ -84,7 +84,7 @@ def run_fetch(output: Path, base: Path) -> int:
         with make_client() as client:
             data, pages = fetch_raw(client, base_names)
             requests = client.request_count
-        snapshot = write_snapshot(output, data, pages, datetime.now(UTC).date())
+        snapshot = write_snapshot(output, data, pages, base_names, datetime.now(UTC).date())
     except (
         OSError,
         BaseFormatError,
