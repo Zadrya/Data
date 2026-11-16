@@ -7,7 +7,6 @@ The Zadrya substance dataset and the Python pipeline that builds, validates and 
 - `make setup`: install the git hooks (lefthook), once per clone.
 - `make check`: lint, license metadata and tests. Run before every commit.
 - `make ci`: everything CI runs, including authorship and commitlint. Run before opening a pull request.
-
 - `uv run zadrya-data --help`: the pipeline command line. Python 3.12 and all dependencies are managed by `uv` (`uv sync`); never use a global `pip` or `python`.
 - `uv run pytest tests/test_cli.py`: run one test file. `uv run black .` formats, `uv run mypy` type-checks (strict).
 
@@ -32,6 +31,7 @@ Local tools (Homebrew): `uv`, `lefthook actionlint yamllint markdownlint-cli2 zi
 - Actions must be pinned by full commit SHA: the organization enforces it and unpinned workflows do not start.
 - The shared scripts in `scripts/` and the base workflows are duplicated in all four Zadrya repositories on purpose, so that each repository can run `make ci` on its own. When you change one, change it in all four.
 - The `authorship` and `commitlint` checks run the scripts from the pull request head, so a pull request that edits `scripts/check-*.sh`, the `Makefile` or those workflows validates itself: review such diffs with extra care.
-- Tool versions are pinned in `scripts/install-ci-tools.sh` and the `Makefile`, and Dependabot does not track them: bump them by hand.
+- Tool versions are pinned in `scripts/install-ci-tools.sh` and the `Makefile`, and Dependabot does not track them: bump them by hand. The same goes for uv: its version and checksum in `.github/workflows/ci.yml` (twice) and the `uv_build` range in `pyproject.toml`.
+- Dependency review (license allowlist in `.github/workflows/licenses.yml`) only runs in CI, so `make ci` cannot tell you that a new dependency has a license outside the list.
 - Dependabot pull requests fail the `authorship` check by design: re-commit the bump as Sklyvan on a branch and close the Dependabot pull request (see `Application/docs/adr/0002-dependabot-and-authorship.md`).
 - Before every push: `git log --format='%an <%ae>%n%B' origin/main..HEAD`.
