@@ -1,0 +1,4 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Vendored inputs are stored byte for byte: no line ending conversion, on any
+# platform. A test pins the SHA-256 of the base file.
+sources/** -text linguist-vendored

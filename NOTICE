@@ -1,0 +1,31 @@
+Zadrya Data
+Copyright (C) Zadrya contributors
+
+The code in this repository is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version. See LICENSE.
+
+This repository includes and builds on the following external inputs. The
+license of each file is recorded in REUSE.toml, and DATA_LICENSES.md explains
+the terms.
+
+1. PsychonautWiki Journal (Android), Substances.json
+
+   File:       sources/base/Substances.json (vendored untouched)
+   Repository: https://github.com/isaakhanimann/psychonautwiki-journal-android
+   Tag:        v11.11
+   Commit:     73f013752cea2f05558c1ed091cdccd3dfcde62b
+   Path:       app/src/main/assets/Substances.json
+   Source URL: https://raw.githubusercontent.com/isaakhanimann/psychonautwiki-journal-android/73f013752cea2f05558c1ed091cdccd3dfcde62b/app/src/main/assets/Substances.json
+   SHA-256:    a2300bea9bf8013fc97c4279eeb7393f1800766ec55455ac117502a1208a666f
+   License:    GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+
+2. PsychonautWiki
+
+   The base file above holds content of PsychonautWiki
+   (https://psychonautwiki.org), written by its contributors.
+   Text:          CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/)
+   Semantic data: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+
+The full license texts are in LICENSES/.
