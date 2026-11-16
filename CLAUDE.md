@@ -21,7 +21,7 @@ Local tools (Homebrew): `uv`, `lefthook actionlint yamllint markdownlint-cli2 zi
 - **Language.** Everything is in English. Use commas, colons or parentheses instead of the em dash (`make lint` fails on U+2014).
 - **Secrets.** Only in environment variables or GitHub Secrets, never in the repository, the chat or logs.
 - **Licenses.** Original code carries the SPDX header `GPL-3.0-or-later`. Files without a comment syntax are covered by `REUSE.toml`.
-- **Signing key.** The private Ed25519 key is never generated, read or handled by Claude. The signing script reads its path from an environment variable, and CI uses the `DATASET_SIGNING_KEY` secret.
+- **Signing key.** The private Ed25519 key is never generated, read or handled by Claude. Signing reads its path from the environment variable `ZADRYA_SIGNING_KEY_FILE` (and the password of an encrypted key from `ZADRYA_SIGNING_KEY_PASSWORD`), and CI uses the `DATASET_SIGNING_KEY` secret. No private key is ever committed, not even a test key.
 - **No release without review.** Every dataset change is opened as a pull request with a readable diff, and only Sklyvan approves a release.
 
 ## Gotchas
@@ -40,5 +40,9 @@ Local tools (Homebrew): `uv`, `lefthook actionlint yamllint markdownlint-cli2 zi
 - Dependency review (license allowlist in `.github/workflows/licenses.yml`) only runs in CI, so `make ci` cannot tell you that a new dependency has a license outside the list.
 - Dependabot pull requests fail the `authorship` check by design: re-commit the bump as Sklyvan on a branch and close the Dependabot pull request (see `Application/docs/adr/0002-dependabot-and-authorship.md`).
 - Tests and scripts that create a git repository must first clear the variables git exports to hooks (`unset $(git rev-parse --local-env-vars)`): git exports `GIT_INDEX_FILE` to every pre-commit hook, and in a linked worktree or a submodule it also exports `GIT_DIR`, which makes every git command act on the real repository. `scripts/test-hooks-isolation.sh` guards the hook tests against this.
+- Signing lives in three library modules (`docs/adr/0003-dataset-signature.md`): `signing.py` (Ed25519, the strict `substances.json.sig` format, key loading), `manifest.py` (build, deterministic bytes, checks) and `release_check.py` (`verify_release`, the full acceptance check in the order the app uses: signature, hash, schemas, consistency). Commands and workflows must call these and never reimplement a step.
+- Pinned public keys live in `keys/` (`keys/README.md`): one canonical PEM per key, at most two. With no key there (the state until the owner provides one), every verification fails with `NoPinnedKeysError`, on purpose.
+- Tests create their own throwaway keys in memory with `cryptography` (`Ed25519PrivateKey.generate()`), and write them only under `tmp_path`. `tests/test_no_private_keys.py` fails when any tracked or new file contains the header of a PEM private key, so never spell that header out in code or documentation. The committed vectors in `tests/test_signing.py` are public material only.
+- Errors about the private key never include its content and are raised with `from None`: keep it that way when touching `load_private_key`.
 - Before every push: `git log --format='%an <%ae>%n%B' origin/main..HEAD`.
 - `sources/` holds vendored inputs: stored byte for byte, pinned by hash in a test (`tests/test_base_file.py`) and never edited. Every new external input needs its source address, commit and license in `NOTICE` and `DATA_LICENSES.md`, and its annotation in `REUSE.toml`, in the same pull request.
