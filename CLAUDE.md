@@ -8,7 +8,10 @@ The Zadrya substance dataset and the Python pipeline that builds, validates and 
 - `make check`: lint, license metadata and tests. Run before every commit.
 - `make ci`: everything CI runs, including authorship and commitlint. Run before opening a pull request.
 
-Local tools (Homebrew): `lefthook actionlint yamllint markdownlint-cli2 zizmor reuse shellcheck`, plus Node for commitlint.
+- `uv run zadrya-data --help`: the pipeline command line. Python 3.12 and all dependencies are managed by `uv` (`uv sync`); never use a global `pip` or `python`.
+- `uv run pytest tests/test_cli.py`: run one test file. `uv run black .` formats, `uv run mypy` type-checks (strict).
+
+Local tools (Homebrew): `uv`, `lefthook actionlint yamllint markdownlint-cli2 zizmor reuse shellcheck`, plus Node for commitlint.
 
 ## Rules
 
@@ -23,7 +26,8 @@ Local tools (Homebrew): `lefthook actionlint yamllint markdownlint-cli2 zizmor r
 
 ## Gotchas
 
-- There is no pipeline yet: it is created in Phase 1 (Python 3.12 through `uv`, pytest, Black, mypy).
+- Tests never touch the network and must keep coverage at 90 % or higher (`pyproject.toml`).
+- `uv.lock` is committed and CI installs with `--locked`: after changing dependencies run `uv lock` and commit the lock file in the same commit.
 - Data derived from PsychonautWiki is CC BY-SA 4.0 (text) and CC BY 4.0 (semantic data), while code is GPL-3.0-or-later. Keep `REUSE.toml` accurate when data files are added.
 - Actions must be pinned by full commit SHA: the organization enforces it and unpinned workflows do not start.
 - The shared scripts in `scripts/` and the base workflows are duplicated in all four Zadrya repositories on purpose, so that each repository can run `make ci` on its own. When you change one, change it in all four.
