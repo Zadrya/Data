@@ -10,3 +10,4 @@ ignores:
   - .fvm/**
   - build/**
   - node_modules/**
+  - .venv/**
