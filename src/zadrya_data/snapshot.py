@@ -3,7 +3,8 @@
 
 A snapshot is a directory with three files:
 
-- ``graphql.json``: the ``data`` member of the GraphQL answer, unchanged.
+- ``graphql.json``: the ``data`` member of the GraphQL answer, with every value as
+  received and the substances ordered by name.
 - ``mediawiki.json``: one record per looked up title (existence, canonical title,
   last revision).
 - ``snapshot.json``: where and when the two were fetched, the exact query and counts.
@@ -18,6 +19,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
+from typing import cast
 
 from zadrya_data import graphql, mediawiki
 from zadrya_data.graphql import ApiSubstance
@@ -54,6 +56,19 @@ def dump_json(document: object) -> str:
     return text + "\n"
 
 
+def sort_substances(data: dict[str, object]) -> dict[str, object]:
+    """Return the data with its substances ordered by name, in code point order.
+
+    The order of the API is an artefact of its backend. Code point order of the name
+    (plain string comparison, no locale, no case folding) is the same everywhere:
+    digits, then capitals, then lower case, then letters outside ASCII.
+    """
+    names = [substance.name for substance in graphql.parse_data(data)]
+    entries = cast(list[object], data["substances"])  # parse_data accepts nothing else
+    ordered = [entry for _, entry in sorted(zip(names, entries), key=lambda pair: pair[0])]
+    return {**data, "substances": ordered}
+
+
 def fetch_raw(
     client: PoliteClient, base_names: Iterable[str]
 ) -> tuple[dict[str, object], tuple[WikiPage, ...]]:
@@ -68,6 +83,7 @@ def write_snapshot(
 ) -> Snapshot:
     """Write the three files, read them back as a check and return what was read."""
     pages = tuple(pages)
+    data = sort_substances(data)
     substances = graphql.parse_data(data)
     info = {
         "formatVersion": FORMAT_VERSION,
