@@ -21,19 +21,22 @@ check: lint licenses test ## Fast checks, run before every commit
 
 ci: check authorship commitlint ## Everything CI runs, run before opening a pull request
 
-lint: ## Lint workflows, YAML, Markdown and shell scripts
+lint: ## Lint workflows, YAML, Markdown, shell scripts and Python
 	actionlint
 	zizmor --no-progress .github/workflows
 	yamllint --strict .
 	markdownlint-cli2 "**/*.md"
 	shellcheck scripts/*.sh .lefthook/*/*.sh
 	scripts/check-no-em-dash.sh
+	uv run --locked black --check .
+	uv run --locked mypy
 
 licenses: ## Check that every file has license information (REUSE)
 	reuse lint
 
 test: ## Run the tests
 	scripts/test-hooks.sh
+	uv run --locked pytest
 
 authorship: ## Check author, committer and attribution lines of BASE..HEAD
 	scripts/check-authorship.sh $(BASE)..HEAD
