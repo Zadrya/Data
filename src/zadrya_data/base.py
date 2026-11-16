@@ -4,12 +4,14 @@
 The loader mirrors the file exactly. It changes no value (names, units, numbers and
 their int or float type stay as written) and keeps the difference between a key
 that is absent (``None``) and a list that is empty. Anything it does not know
-(an unknown key, a missing required key, a value of another type) raises
+(an unknown or repeated key, a missing required key, a value of another type, a
+number that is not finite) raises
 ``BaseFormatError`` with the path of the offending value, so a different base file
 can never be read by accident. Normalization happens elsewhere.
 """
 
 import json
+import math
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
@@ -176,6 +178,8 @@ class _Object:
             return None
         if isinstance(value, bool) or not isinstance(value, (int, float)):
             raise BaseFormatError(f"{self._path}.{key}: expected a number, found {_kind(value)}")
+        if not math.isfinite(value):
+            raise BaseFormatError(f"{self._path}.{key}: expected a finite number, found {value}")
         return value
 
     def texts(self, key: str) -> tuple[str, ...]:
@@ -352,10 +356,31 @@ def parse_base(document: object) -> BaseFile:
     return base
 
 
+def _reject_constant(constant: str) -> object:
+    raise ValueError(f"{constant} is not a JSON number")
+
+
+def _reject_duplicate_keys(pairs: list[tuple[str, object]]) -> dict[str, object]:
+    document: dict[str, object] = {}
+    for key, value in pairs:
+        if key in document:
+            raise ValueError(f"duplicate key '{key}'")
+        document[key] = value
+    return document
+
+
 def load_base(path: Path) -> BaseFile:
-    """Read a base file from disk, or raise ``BaseFormatError``."""
+    """Read a base file from disk, or raise ``BaseFormatError``.
+
+    Stricter than plain ``json.loads``: ``NaN`` and ``Infinity`` are rejected, and so
+    is an object with the same key twice, where the last value would win silently.
+    """
     try:
-        document: object = json.loads(path.read_text(encoding="utf-8"))
+        document: object = json.loads(
+            path.read_text(encoding="utf-8"),
+            parse_constant=_reject_constant,
+            object_pairs_hook=_reject_duplicate_keys,
+        )
     except ValueError as error:
         raise BaseFormatError(f"{path}: not valid JSON: {error}") from error
     return parse_base(document)
