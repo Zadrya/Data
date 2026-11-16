@@ -335,17 +335,26 @@ def test_constants_that_are_not_json_numbers_fail(tmp_path: Path, number: str, r
         load_base(path)
 
 
-def test_a_float_out_of_range_fails_with_the_path(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    ("number", "reason"),
+    [
+        ("1e999", "the number 1e999 is out of range"),
+        ("9007199254740992", "the integer 9007199254740992 is outside the safe range of a double"),
+        ("1" + "0" * 399, "is outside the safe range of a double"),
+    ],
+)
+def test_numbers_that_other_parsers_read_differently_fail(
+    tmp_path: Path, number: str, reason: str
+) -> None:
     path = tmp_path / "Substances.json"
     text = (FIXTURES / "minimal.json").read_text(encoding="utf-8")
-    path.write_text(text.replace('"max": 45', '"max": 1e999'), encoding="utf-8")
+    path.write_text(text.replace('"max": 45', f'"max": {number}'), encoding="utf-8")
 
     with pytest.raises(BaseFormatError) as error:
         load_base(path)
 
-    assert str(error.value) == (
-        "$.substances[0].roas[1].bioavailability.max: expected a finite number, found inf"
-    )
+    assert str(error.value).startswith(f"{path}: ")
+    assert reason in str(error.value)
 
 
 def test_a_repeated_key_fails_instead_of_keeping_the_last_value(tmp_path: Path) -> None:
@@ -353,7 +362,7 @@ def test_a_repeated_key_fails_instead_of_keeping_the_last_value(tmp_path: Path) 
     text = (FIXTURES / "minimal.json").read_text(encoding="utf-8")
     path.write_text(text.replace('"max": 45', '"max": 45, "max": 90'), encoding="utf-8")
 
-    with pytest.raises(BaseFormatError, match="duplicate key 'max'"):
+    with pytest.raises(BaseFormatError, match="the key 'max' appears twice in one object"):
         load_base(path)
 
 
