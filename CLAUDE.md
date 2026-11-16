@@ -24,7 +24,7 @@ Local tools (Homebrew): `lefthook actionlint yamllint markdownlint-cli2 zizmor r
 ## Gotchas
 
 - There is no pipeline yet: it is created in Phase 1 (Python 3.12 through `uv`, pytest, Black, mypy).
-- Data derived from PsychonautWiki is CC BY-SA 4.0, while code is GPL-3.0-or-later. Keep `REUSE.toml` accurate when data files are added.
+- Data derived from PsychonautWiki is CC BY-SA 4.0 (text) and CC BY 4.0 (semantic data), while code is GPL-3.0-or-later. Keep `REUSE.toml` accurate when data files are added.
 - Actions must be pinned by full commit SHA: the organization enforces it and unpinned workflows do not start.
 - The shared scripts in `scripts/` and the base workflows are duplicated in all four Zadrya repositories on purpose, so that each repository can run `make ci` on its own. When you change one, change it in all four.
 - The `authorship` and `commitlint` checks run the scripts from the pull request head, so a pull request that edits `scripts/check-*.sh`, the `Makefile` or those workflows validates itself: review such diffs with extra care.

@@ -16,4 +16,4 @@ make ci      # before opening a pull request
 
 ## License
 
-Code: GPL-3.0-or-later, see [LICENSE](LICENSE). Data derived from [PsychonautWiki](https://psychonautwiki.org): CC BY-SA 4.0.
+Code: GPL-3.0-or-later, see [LICENSE](LICENSE). Data derived from [PsychonautWiki](https://psychonautwiki.org): CC BY-SA 4.0 for text and CC BY 4.0 for semantic data. The exact terms per file are recorded when the dataset is added.
