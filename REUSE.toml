@@ -10,13 +10,13 @@ SPDX-FileCopyrightText = "Zadrya contributors"
 SPDX-License-Identifier = "GPL-3.0-or-later"
 
 # The base file is vendored untouched from PsychonautWiki Journal v11.11
-# (GPL-3.0) and holds PsychonautWiki content: text under CC BY-SA 4.0 and
+# (GPL-3.0-or-later, as its README states) and holds PsychonautWiki content: text under CC BY-SA 4.0 and
 # semantic data under CC BY 4.0. See NOTICE and DATA_LICENSES.md.
 [[annotations]]
 path = "sources/base/Substances.json"
 precedence = "override"
 SPDX-FileCopyrightText = [
-  "isaakhanimann/psychonautwiki-journal-android contributors",
+  "Isaak Hanimann",
   "PsychonautWiki contributors",
 ]
-SPDX-License-Identifier = "GPL-3.0-only AND CC-BY-SA-4.0 AND CC-BY-4.0"
+SPDX-License-Identifier = "GPL-3.0-or-later AND CC-BY-SA-4.0 AND CC-BY-4.0"
