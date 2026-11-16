@@ -15,12 +15,13 @@ The code of this repository is GPL-3.0-or-later. The data is not ours: it comes 
 | Path in the repository | `app/src/main/assets/Substances.json` |
 | Source address | <https://raw.githubusercontent.com/isaakhanimann/psychonautwiki-journal-android/73f013752cea2f05558c1ed091cdccd3dfcde62b/app/src/main/assets/Substances.json> |
 | SHA-256 | `a2300bea9bf8013fc97c4279eeb7393f1800766ec55455ac117502a1208a666f` |
-| License of the repository | [GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.html) |
+| Copyright | Isaak Hanimann |
+| License of the repository | [GPL-3.0-or-later](https://www.gnu.org/licenses/gpl-3.0.html) |
 | License of the content | PsychonautWiki content, see below |
 
 The file is the curated starting point of the dataset. It is never edited: `tests/test_base_file.py` pins its SHA-256, and `.gitattributes` turns off line ending conversion under `sources/`.
 
-In `REUSE.toml` the file is annotated `GPL-3.0-only AND CC-BY-SA-4.0 AND CC-BY-4.0`: the repository it comes from is under the GPL, version 3, and what it holds is PsychonautWiki content. `GPL-3.0-only` is the conservative reading of "GPL-3.0", since we have no statement from its authors that later versions apply.
+In `REUSE.toml` the file is annotated `GPL-3.0-or-later AND CC-BY-SA-4.0 AND CC-BY-4.0`. The first part is what the repository states: its [`README.md` at that commit](https://github.com/isaakhanimann/psychonautwiki-journal-android/blob/73f013752cea2f05558c1ed091cdccd3dfcde62b/README.md), section "License", opens with "Copyright (C) 2022 Isaak Hanimann." and says the app is free software under the GNU General Public License, "either version 3 of the License, or (at your option) any later version". The other two parts are the licenses of the PsychonautWiki content the file holds.
 
 ### PsychonautWiki
 
