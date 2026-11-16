@@ -18,7 +18,7 @@
     "schemaVersion": {
       "description": "Semantic version of the schema this document follows. This schema accepts major version 1 only.",
       "type": "string",
-      "pattern": "^1\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+      "pattern": "^1\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$(?![\\s\\S])"
     },
     "datasetVersion": {
       "description": "Semantic version of the dataset content.",
@@ -58,7 +58,7 @@
     "semver": {
       "description": "A semantic version of the form MAJOR.MINOR.PATCH, without pre-release or build metadata.",
       "type": "string",
-      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$(?![\\s\\S])"
     },
     "text": {
       "description": "A string with at least one character.",
@@ -68,7 +68,7 @@
     "slug": {
       "description": "A lowercase token: letters and digits, with single hyphens between words.",
       "type": "string",
-      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$(?![\\s\\S])"
     },
     "attribution": {
       "description": "One source of the dataset.",
@@ -85,9 +85,9 @@
           "$ref": "#/$defs/text"
         },
         "url": {
-          "description": "Address of the source, https only.",
+          "description": "Address of the source: https only, printable ASCII (anything else percent-encoded).",
           "type": "string",
-          "pattern": "^https://[^\\s]+$"
+          "pattern": "^https://[!-~]+$(?![\\s\\S])"
         },
         "license": {
           "description": "License of the source, as an SPDX identifier where one exists.",
@@ -174,9 +174,9 @@
           }
         },
         "url": {
-          "description": "PsychonautWiki article of the substance, https only.",
+          "description": "PsychonautWiki article of the substance: https only, printable ASCII (anything else percent-encoded).",
           "type": "string",
-          "pattern": "^https://psychonautwiki\\.org/wiki/[^\\s]+$"
+          "pattern": "^https://psychonautwiki\\.org/wiki/[!-~]+$(?![\\s\\S])"
         },
         "summary": {
           "description": "Short description of the substance.",
