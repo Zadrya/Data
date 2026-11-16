@@ -29,7 +29,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="check a JSON document against its schema",
         description="Check a JSON document against its schema. Exit code 0: valid, "
         "1: schema violations, 2: the file cannot be read as strict JSON (no NaN or "
-        "Infinity, no number out of range, no repeated key).",
+        "Infinity, no number out of range, no integer above 2**53 - 1, no repeated key).",
     )
     validate_parser.add_argument("path", type=Path, help="the JSON document to check")
     validate_parser.add_argument(

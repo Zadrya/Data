@@ -84,6 +84,14 @@ def test_validate_rejects_an_unknown_schema_name() -> None:
         ('{"heavy": NaN}', "NaN is not a JSON number"),
         ('{"heavy": Infinity}', "Infinity is not a JSON number"),
         ('{"heavy": 1e999}', "the number 1e999 is out of range"),
+        (
+            '{"heavy": 9007199254740992}',
+            "the integer 9007199254740992 is outside the safe range of a double",
+        ),
+        (
+            '{"heavy": 1' + "0" * 399 + "}",
+            "the integer 1" + "0" * 399 + " is outside the safe range of a double",
+        ),
         ('{"name": "LSD", "name": "LSA"}', "the key 'name' appears twice in one object"),
         ("[" * 100_000, "the document is nested too deeply"),
         ("\ufeff{}", "not valid JSON"),
