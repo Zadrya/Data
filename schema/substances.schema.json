@@ -75,6 +75,17 @@
       "type": "string",
       "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$(?![\\s\\S])"
     },
+    "nonNegative": {
+      "description": "A number that is zero or more.",
+      "type": "number",
+      "minimum": 0
+    },
+    "percent": {
+      "description": "A number from 0 to 100.",
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
     "attribution": {
       "description": "One source of the dataset.",
       "type": "object",
@@ -410,8 +421,7 @@
         },
         "threshold": {
           "description": "Lowest dose with a noticeable effect.",
-          "type": "number",
-          "minimum": 0
+          "$ref": "#/$defs/nonNegative"
         },
         "light": {
           "description": "Range of a light dose.",
@@ -427,8 +437,7 @@
         },
         "heavy": {
           "description": "Dose from which the dose is heavy.",
-          "type": "number",
-          "minimum": 0
+          "$ref": "#/$defs/nonNegative"
         }
       }
     },
@@ -443,13 +452,11 @@
       "properties": {
         "min": {
           "description": "Lower bound.",
-          "type": "number",
-          "minimum": 0
+          "$ref": "#/$defs/nonNegative"
         },
         "max": {
           "description": "Upper bound.",
-          "type": "number",
-          "minimum": 0
+          "$ref": "#/$defs/nonNegative"
         }
       }
     },
@@ -493,13 +500,11 @@
       "properties": {
         "min": {
           "description": "Lower bound in minutes.",
-          "type": "number",
-          "minimum": 0
+          "$ref": "#/$defs/nonNegative"
         },
         "max": {
           "description": "Upper bound in minutes.",
-          "type": "number",
-          "minimum": 0
+          "$ref": "#/$defs/nonNegative"
         }
       }
     },
@@ -511,15 +516,11 @@
       "properties": {
         "min": {
           "description": "Lower bound in percent.",
-          "type": "number",
-          "minimum": 0,
-          "maximum": 100
+          "$ref": "#/$defs/percent"
         },
         "max": {
           "description": "Upper bound in percent.",
-          "type": "number",
-          "minimum": 0,
-          "maximum": 100
+          "$ref": "#/$defs/percent"
         }
       }
     }
