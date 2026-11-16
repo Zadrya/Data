@@ -265,6 +265,19 @@ def _full() -> Any:
     return document
 
 
+_ROUTES = (
+    "oral",
+    "sublingual",
+    "buccal",
+    "insufflated",
+    "rectal",
+    "transdermal",
+    "subcutaneous",
+    "intramuscular",
+    "intravenous",
+    "smoked",
+    "inhaled",
+)
 _S: list[Step] = ["substances", 0]
 _R: list[Step] = [*_S, "roas", 0]
 _T: list[Step] = [*_S, "interactions", "unsafe", 0]
@@ -278,6 +291,9 @@ def substances_valid() -> dict[str, Any]:
     return {
         "minimal": _minimal(),
         "minimal-substance": _with_substance(),
+        "every-route": _put(
+            _with_substance(), [*_S, "roas"], [{"route": route} for route in _ROUTES]
+        ),
         "full": _full(),
     }
 
