@@ -294,6 +294,10 @@ def _without(path: list[str | int]) -> Any:
             "$.substances[0].roas[1].dose.lightMin: expected a number, found a string",
         ),
         (
+            _set(["substances", 0, "roas", 1, "dose", "lightMin"], float("nan")),
+            "$.substances[0].roas[1].dose.lightMin: expected a finite number, found nan",
+        ),
+        (
             _set(["substances", 0, "roas", 1, "bioavailability", "max"], False),
             "$.substances[0].roas[1].bioavailability.max: expected a number, found a boolean",
         ),
@@ -311,4 +315,43 @@ def test_a_file_that_is_not_json_fails(tmp_path: Path) -> None:
     path.write_text('{"categories": [', encoding="utf-8")
 
     with pytest.raises(BaseFormatError, match="not valid JSON"):
+        load_base(path)
+
+
+@pytest.mark.parametrize(
+    ("number", "reason"),
+    [
+        ("NaN", "NaN is not a JSON number"),
+        ("Infinity", "Infinity is not a JSON number"),
+        ("-Infinity", "-Infinity is not a JSON number"),
+    ],
+)
+def test_constants_that_are_not_json_numbers_fail(tmp_path: Path, number: str, reason: str) -> None:
+    path = tmp_path / "Substances.json"
+    text = (FIXTURES / "minimal.json").read_text(encoding="utf-8")
+    path.write_text(text.replace('"max": 45', f'"max": {number}'), encoding="utf-8")
+
+    with pytest.raises(BaseFormatError, match=reason):
+        load_base(path)
+
+
+def test_a_float_out_of_range_fails_with_the_path(tmp_path: Path) -> None:
+    path = tmp_path / "Substances.json"
+    text = (FIXTURES / "minimal.json").read_text(encoding="utf-8")
+    path.write_text(text.replace('"max": 45', '"max": 1e999'), encoding="utf-8")
+
+    with pytest.raises(BaseFormatError) as error:
+        load_base(path)
+
+    assert str(error.value) == (
+        "$.substances[0].roas[1].bioavailability.max: expected a finite number, found inf"
+    )
+
+
+def test_a_repeated_key_fails_instead_of_keeping_the_last_value(tmp_path: Path) -> None:
+    path = tmp_path / "Substances.json"
+    text = (FIXTURES / "minimal.json").read_text(encoding="utf-8")
+    path.write_text(text.replace('"max": 45', '"max": 45, "max": 90'), encoding="utf-8")
+
+    with pytest.raises(BaseFormatError, match="duplicate key 'max'"):
         load_base(path)
