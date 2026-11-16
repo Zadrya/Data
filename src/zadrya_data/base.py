@@ -10,11 +10,12 @@ number that is not finite) raises
 can never be read by accident. Normalization happens elsewhere.
 """
 
-import json
 import math
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
+
+from zadrya_data.strict_json import StrictJsonError, loads
 
 
 class BaseFormatError(ValueError):
@@ -356,31 +357,14 @@ def parse_base(document: object) -> BaseFile:
     return base
 
 
-def _reject_constant(constant: str) -> object:
-    raise ValueError(f"{constant} is not a JSON number")
-
-
-def _reject_duplicate_keys(pairs: list[tuple[str, object]]) -> dict[str, object]:
-    document: dict[str, object] = {}
-    for key, value in pairs:
-        if key in document:
-            raise ValueError(f"duplicate key '{key}'")
-        document[key] = value
-    return document
-
-
 def load_base(path: Path) -> BaseFile:
     """Read a base file from disk, or raise ``BaseFormatError``.
 
-    Stricter than plain ``json.loads``: ``NaN`` and ``Infinity`` are rejected, and so
-    is an object with the same key twice, where the last value would win silently.
+    The file is read as strict JSON (``zadrya_data.strict_json``): ``NaN``, ``Infinity``,
+    numbers out of range, integers above 2**53 - 1 and repeated keys are rejected.
     """
     try:
-        document: object = json.loads(
-            path.read_text(encoding="utf-8"),
-            parse_constant=_reject_constant,
-            object_pairs_hook=_reject_duplicate_keys,
-        )
-    except ValueError as error:
-        raise BaseFormatError(f"{path}: not valid JSON: {error}") from error
+        document = loads(path.read_text(encoding="utf-8"))
+    except StrictJsonError as error:
+        raise BaseFormatError(f"{path}: {error}") from error
     return parse_base(document)
