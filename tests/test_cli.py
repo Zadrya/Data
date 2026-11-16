@@ -3,11 +3,15 @@
 
 from pathlib import Path
 
+import httpx
 import pytest
 
 from tests.schema_cases import FIXTURES
 from zadrya_data import __version__
+from tests.api_fixtures import api_handler, replay
+from zadrya_data import cli
 from zadrya_data.cli import main
+from zadrya_data.snapshot import load_snapshot
 
 
 def test_version_flag_prints_the_package_version(capsys: pytest.CaptureFixture[str]) -> None:
@@ -118,3 +122,71 @@ def test_validate_refuses_bytes_that_are_not_utf_8(
 
     assert main(["validate", str(path)]) == 2
     assert "error: cannot read" in capsys.readouterr().err
+
+
+BASE_FIXTURE = Path(__file__).parent / "fixtures" / "base" / "minimal.json"
+
+
+def test_fetch_writes_a_snapshot_without_touching_the_network(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    client, seen = replay(api_handler)
+    monkeypatch.setattr(cli, "make_client", lambda: client)
+    output = tmp_path / "snapshot"
+
+    assert main(["fetch", "--output", str(output), "--base", str(BASE_FIXTURE)]) == 0
+
+    snapshot = load_snapshot(output)
+    assert len(snapshot.substances) == 7
+    assert "Examplamine" in [page.requested for page in snapshot.pages]
+    assert sorted(path.name for path in output.iterdir()) == [
+        "graphql.json",
+        "mediawiki.json",
+        "snapshot.json",
+    ]
+    assert len(seen) == 2
+    assert capsys.readouterr().out.strip() == (
+        f"{output}: 7 API entries (1 without routes, 8 routes), "
+        "8 wiki titles (0 missing, 0 redirected), 2 requests"
+    )
+
+
+def test_fetch_writes_nothing_when_a_request_fails(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    client, _ = replay(lambda request: httpx.Response(404))
+    monkeypatch.setattr(cli, "make_client", lambda: client)
+    output = tmp_path / "snapshot"
+
+    assert main(["fetch", "--output", str(output), "--base", str(BASE_FIXTURE)]) == 1
+
+    assert not output.exists()
+    assert (
+        "error: fetch failed: https://api.psychonautwiki.org/: HTTP 404" in capsys.readouterr().err
+    )
+
+
+def test_fetch_fails_before_any_request_when_the_base_file_is_missing(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    client, seen = replay(api_handler)
+    monkeypatch.setattr(cli, "make_client", lambda: client)
+
+    assert (
+        main(["fetch", "--output", str(tmp_path / "s"), "--base", str(tmp_path / "no.json")]) == 1
+    )
+
+    assert seen == []
+    assert "error: fetch failed" in capsys.readouterr().err
+
+
+def test_fetch_requires_an_output_directory() -> None:
+    with pytest.raises(SystemExit) as exit_info:
+        main(["fetch"])
+
+    assert exit_info.value.code == 2
+
+
+def test_the_real_client_is_the_polite_one() -> None:
+    with cli.make_client() as client:
+        assert client.request_count == 0

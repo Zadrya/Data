@@ -3,16 +3,25 @@
 
 import argparse
 import sys
+from datetime import UTC, datetime
 from collections.abc import Sequence
 from pathlib import Path
 
 from zadrya_data import __version__
+from zadrya_data.base import BaseFormatError, load_base
+from zadrya_data.graphql import ApiFormatError, ApiQueryError
+from zadrya_data.http import FetchError, PoliteClient
+from zadrya_data.mediawiki import WikiFormatError
 from zadrya_data.schema import SchemaName, validate
+from zadrya_data.snapshot import SnapshotError, fetch_raw, write_snapshot
 from zadrya_data.strict_json import loads
 
 EXIT_OK = 0
 EXIT_INVALID = 1
 EXIT_UNREADABLE = 2
+EXIT_FETCH_FAILED = 1
+
+DEFAULT_BASE = Path("sources/base/Substances.json")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -39,7 +48,63 @@ def build_parser() -> argparse.ArgumentParser:
         default=SchemaName.SUBSTANCES,
         help="which schema to check against (default: %(default)s)",
     )
+
+    fetch_parser = commands.add_parser(
+        "fetch",
+        help="download a raw snapshot of the PsychonautWiki data (the only network use)",
+        description="Download a raw snapshot from the PsychonautWiki GraphQL API and the "
+        "wiki into a directory: graphql.json, mediawiki.json and snapshot.json. This is "
+        "the only command that uses the network: about a dozen requests, at most one per "
+        "second. Exit code 0: written, 1: the fetch failed.",
+    )
+    fetch_parser.add_argument(
+        "--output", type=Path, required=True, help="directory to write the snapshot to"
+    )
+    fetch_parser.add_argument(
+        "--base",
+        type=Path,
+        default=DEFAULT_BASE,
+        help="the base file whose substance names are looked up too (default: %(default)s)",
+    )
     return parser
+
+
+def make_client() -> PoliteClient:
+    """Return the client that ``fetch`` uses. Tests replace it with one that replays answers."""
+    return PoliteClient()
+
+
+def run_fetch(output: Path, base: Path) -> int:
+    """Fetch a snapshot into the output directory and return the exit code.
+
+    Nothing is written unless every request succeeded and every answer was understood.
+    """
+    try:
+        base_names = [substance.name for substance in load_base(base).substances]
+        with make_client() as client:
+            data, pages = fetch_raw(client, base_names)
+            requests = client.request_count
+        snapshot = write_snapshot(output, data, pages, datetime.now(UTC).date())
+    except (
+        OSError,
+        BaseFormatError,
+        FetchError,
+        ApiQueryError,
+        ApiFormatError,
+        WikiFormatError,
+        SnapshotError,
+    ) as error:
+        print(f"error: fetch failed: {error}", file=sys.stderr)
+        return EXIT_FETCH_FAILED
+
+    counts = snapshot.counts
+    print(
+        f"{output}: {counts['substances']} API entries "
+        f"({counts['substancesWithoutRoutes']} without routes, {counts['routes']} routes), "
+        f"{counts['titles']} wiki titles ({counts['pagesMissing']} missing, "
+        f"{counts['pagesRedirected']} redirected), {requests} requests"
+    )
+    return EXIT_OK
 
 
 def run_validate(path: Path, schema: SchemaName) -> int:
@@ -67,5 +132,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     arguments = parser.parse_args(argv)
     if arguments.command == "validate":
         return run_validate(arguments.path, arguments.schema)
+    if arguments.command == "fetch":
+        return run_fetch(arguments.output, arguments.base)
     parser.print_help()
     return EXIT_OK
