@@ -30,7 +30,7 @@
     "sha256": {
       "description": "SHA-256 of the exact bytes of substances.json, as 64 lowercase hexadecimal characters.",
       "type": "string",
-      "pattern": "^[0-9a-f]{64}$"
+      "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"
     },
     "date": {
       "description": "Release date as an ISO 8601 calendar date (YYYY-MM-DD).",
@@ -50,7 +50,7 @@
     "semver": {
       "description": "A semantic version of the form MAJOR.MINOR.PATCH, without pre-release or build metadata.",
       "type": "string",
-      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$(?![\\s\\S])"
     },
     "text": {
       "description": "A string with at least one character.",
@@ -72,9 +72,9 @@
           "$ref": "#/$defs/text"
         },
         "url": {
-          "description": "Address of the source, https only.",
+          "description": "Address of the source: https only, printable ASCII (anything else percent-encoded).",
           "type": "string",
-          "pattern": "^https://[^\\s]+$"
+          "pattern": "^https://[!-~]+$(?![\\s\\S])"
         },
         "license": {
           "description": "License of the source, as an SPDX identifier where one exists.",
