@@ -11,6 +11,7 @@ import pytest
 from tests.api_fixtures import recorded, replay
 from zadrya_data.graphql import (
     ENDPOINT,
+    LIMIT,
     QUERY,
     ApiClasses,
     ApiDose,
@@ -47,7 +48,8 @@ def test_fetch_posts_the_query_and_returns_the_data_member_unchanged() -> None:
 
 
 def test_query_asks_for_every_substance_in_one_request() -> None:
-    assert "substances(limit: 2000)" in QUERY
+    assert LIMIT == 2000
+    assert f"substances(limit: {LIMIT})" in QUERY
     for field in ("systematicName", "bioavailability", "dangerousInteractions", "afterglow"):
         assert field in QUERY
 
@@ -144,6 +146,7 @@ def test_errors_next_to_data_fail_too() -> None:
         ([], "$: expected an object, found a list"),
         ({"data": None}, "$.data: expected an object, found null"),
         ({"data": {"substances": []}, "extensions": {}}, "$: unknown key(s) 'extensions'"),
+        ({"data": {"substances": []}}, "$.substances: the list is empty"),
         ({"data": {"substances": None}}, "$.substances: expected a list, found null"),
         ({"data": {}}, "$: missing key 'substances'"),
     ],
@@ -263,3 +266,32 @@ def test_errors_without_messages_are_shown_as_received() -> None:
         fetch_data(client)
 
     assert str(error.value) == "the API answered with errors: [{'code': 500}]"
+
+
+def test_an_answer_as_long_as_the_limit_may_be_cut_off() -> None:
+    entry = _data()["substances"][0]
+    data = {"substances": [entry | {"name": f"Substance {number}"} for number in range(LIMIT)]}
+
+    with pytest.raises(ApiFormatError) as error:
+        parse_data(data)
+
+    assert str(error.value) == (
+        "$.substances: 2000 entries reach the limit of the query (2000), "
+        "so the answer may be cut off"
+    )
+    assert len(parse_data({"substances": data["substances"][:-1]})) == LIMIT - 1
+
+
+@pytest.mark.parametrize(
+    ("name", "message"),
+    [
+        ("MDAI", "$.substances[5].name: second entry named 'MDAI'"),
+        ("", "$.substances[4].name: the name is empty"),
+        ("  ", "$.substances[4].name: the name is empty"),
+    ],
+)
+def test_duplicate_and_empty_names_fail(name: str, message: str) -> None:
+    with pytest.raises(ApiFormatError) as error:
+        parse_data(_edit([*LSD, "name"], name))
+
+    assert str(error.value) == message
