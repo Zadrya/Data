@@ -39,6 +39,21 @@
       "members": []
     }
   ],
+  "crossToleranceGroups": [
+    {
+      "id": "psychedelics",
+      "name": "Psychedelics",
+      "members": [
+        "LSD",
+        "1P-LSD"
+      ]
+    },
+    {
+      "id": "5-ht2a-agonists",
+      "name": "5-HT2A agonists",
+      "members": []
+    }
+  ],
   "substances": [
     {
       "name": "LSD",
@@ -146,8 +161,8 @@
         }
       },
       "crossTolerances": [
-        "psychedelic",
-        "5-ht2a-agonist"
+        "psychedelics",
+        "5-ht2a-agonists"
       ],
       "interactions": {
         "dangerous": [
