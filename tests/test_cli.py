@@ -180,6 +180,41 @@ def test_fetch_fails_before_any_request_when_the_base_file_is_missing(
     assert "error: fetch failed" in capsys.readouterr().err
 
 
+def test_fetch_keeps_the_previous_snapshot_when_a_later_fetch_fails(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    output = tmp_path / "snapshot"
+    monkeypatch.setattr(cli, "make_client", lambda: replay(api_handler)[0])
+    assert main(["fetch", "--output", str(output), "--base", str(BASE_FIXTURE)]) == 0
+    before = {path.name: path.read_bytes() for path in output.iterdir()}
+
+    monkeypatch.setattr(cli, "make_client", lambda: replay(lambda r: httpx.Response(404))[0])
+    assert main(["fetch", "--output", str(output), "--base", str(BASE_FIXTURE)]) == 1
+
+    assert {path.name: path.read_bytes() for path in output.iterdir()} == before
+    assert sorted(path.name for path in tmp_path.iterdir()) == ["snapshot"]
+
+
+def test_fetch_refuses_to_replace_a_directory_that_is_not_a_snapshot(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    (tmp_path / "notes.txt").write_text("keep me", encoding="utf-8")
+    monkeypatch.setattr(cli, "make_client", lambda: replay(api_handler)[0])
+
+    assert main(["fetch", "--output", str(tmp_path), "--base", str(BASE_FIXTURE)]) == 1
+
+    assert (tmp_path / "notes.txt").read_text(encoding="utf-8") == "keep me"
+    assert "which is not a snapshot file" in capsys.readouterr().err
+
+
+def test_fetch_help_states_the_number_of_requests(capsys: pytest.CaptureFixture[str]) -> None:
+    with pytest.raises(SystemExit):
+        main(["fetch", "--help"])
+
+    text = " ".join(capsys.readouterr().out.split())
+    assert "nine requests today" in text and "dozen" not in text
+
+
 def test_fetch_requires_an_output_directory() -> None:
     with pytest.raises(SystemExit) as exit_info:
         main(["fetch"])

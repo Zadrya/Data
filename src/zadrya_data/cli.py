@@ -54,8 +54,9 @@ def build_parser() -> argparse.ArgumentParser:
         help="download a raw snapshot of the PsychonautWiki data (the only network use)",
         description="Download a raw snapshot from the PsychonautWiki GraphQL API and the "
         "wiki into a directory: graphql.json, mediawiki.json and snapshot.json. This is "
-        "the only command that uses the network: about a dozen requests, at most one per "
-        "second. Exit code 0: written, 1: the fetch failed.",
+        "the only command that uses the network: nine requests today, at most one per "
+        "second. The directory is replaced only when the new snapshot is complete. "
+        "Exit code 0: written, 1: the fetch failed and the directory is as it was.",
     )
     fetch_parser.add_argument(
         "--output", type=Path, required=True, help="directory to write the snapshot to"
