@@ -494,7 +494,7 @@
       }
     },
     "dose": {
-      "description": "Dose boundaries for one route, in the given units. A dose below lightMin is a threshold dose; from lightMin up to, but not including, commonMin it is light; from commonMin up to strongMin it is common; from strongMin up to heavyMin it is strong; from heavyMin up it is heavy. A missing boundary means the two classes it would separate cannot be told apart. A dose with units and no boundary only says which unit the wiki uses.",
+      "description": "Dose boundaries for one route, in the given units. A dose below thresholdMin is below threshold and has no class; from thresholdMin up to, but not including, lightMin it is a threshold dose; from lightMin up to commonMin it is light; from commonMin up to strongMin it is common; from strongMin up to heavyMin it is strong; from heavyMin up it is heavy. When a boundary is missing, the two classes it separates cannot be told apart, and the app shows the lower one up to the next known boundary. A dose with units and no boundary only says which unit the wiki uses.",
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -509,8 +509,12 @@
             "pattern": "\\u03bc"
           }
         },
+        "thresholdMin": {
+          "description": "Lowest dose with a noticeable effect (the threshold of the wiki). Below it a dose has no class.",
+          "$ref": "#/$defs/nonNegative"
+        },
         "lightMin": {
-          "description": "Lowest light dose. Below it a dose is a threshold dose.",
+          "description": "Lowest light dose.",
           "$ref": "#/$defs/nonNegative"
         },
         "commonMin": {

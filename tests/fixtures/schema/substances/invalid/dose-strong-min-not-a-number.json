@@ -26,7 +26,8 @@
           "route": "sublingual",
           "dose": {
             "units": "µg",
-            "lightMin": 15,
+            "thresholdMin": 15,
+            "lightMin": 25,
             "commonMin": 75,
             "strongMin": "75",
             "heavyMin": 300
