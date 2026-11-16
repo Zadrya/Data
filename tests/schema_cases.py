@@ -36,6 +36,35 @@ class InvalidCase:
     rule: str
 
 
+def _kebab(key: str) -> str:
+    return "".join(f"-{letter.lower()}" if letter.isupper() else letter for letter in key)
+
+
+def _missing(
+    prefix: str, document: Any, path: Sequence[Step], json_path: str, keys: Sequence[str]
+) -> list[InvalidCase]:
+    """One case per required key of the object at the path, with that key removed."""
+    return [
+        InvalidCase(
+            f"{prefix}-missing-{_kebab(key)}", _cut(document, [*path, key]), json_path, "required"
+        )
+        for key in keys
+    ]
+
+
+def _wrong_type(
+    document: Any, members: Sequence[tuple[str, Sequence[Step], str]], value: object = 7
+) -> list[InvalidCase]:
+    """One case per member, with a value of a JSON type no member accepts (a number).
+
+    For a member that is itself a number, pass a string as the value.
+    """
+    return [
+        InvalidCase(f"{name}-wrong-type", _put(document, path, value), json_path, "type")
+        for name, path, json_path in members
+    ]
+
+
 def _put(document: Any, path: Sequence[Step], value: object) -> Any:
     """Return a copy of the document with the value at the path set."""
     result = copy.deepcopy(document)
@@ -263,8 +292,7 @@ def substances_invalid() -> list[InvalidCase]:
         _with_roa(),
         _with_target(),
     )
-    return [
-        case("top-level-missing-substances", _cut(m, ["substances"]), "$", "required"),
+    cases = [
         case(
             "top-level-unknown-property",
             _put(m, ["generatedAt"], "2026-11-16"),
@@ -345,12 +373,6 @@ def substances_invalid() -> list[InvalidCase]:
             "pattern",
         ),
         case("attribution-empty", _put(m, ["attribution"], []), "$.attribution", "minItems"),
-        case(
-            "attribution-missing-license",
-            _cut(m, ["attribution", 0, "license"]),
-            "$.attribution[0]",
-            "required",
-        ),
         case(
             "attribution-unknown-property",
             _put(m, ["attribution", 0, "author"], "Someone"),
@@ -454,12 +476,6 @@ def substances_invalid() -> list[InvalidCase]:
             "pattern",
         ),
         case(
-            "category-missing-description",
-            _cut(c, ["categories", 0, "description"]),
-            "$.categories[0]",
-            "required",
-        ),
-        case(
             "category-unknown-property-color",
             _put(c, ["categories", 0, "color"], 4288423856),
             "$.categories[0]",
@@ -471,7 +487,6 @@ def substances_invalid() -> list[InvalidCase]:
             "$.categories[0].id",
             "pattern",
         ),
-        case("substance-missing-name", _cut(s, [*_S, "name"]), _SP, "required"),
         case(
             "substance-unknown-property-is-approved",
             _put(s, [*_S, "isApproved"], True),
@@ -508,12 +523,6 @@ def substances_invalid() -> list[InvalidCase]:
             _put(s, [*_S, "categories"], ["Psychedelic"]),
             f"{_SP}.categories[0]",
             "pattern",
-        ),
-        case(
-            "classes-missing-chemical",
-            _cut(s, [*_S, "classes", "chemical"]),
-            f"{_SP}.classes",
-            "required",
         ),
         case(
             "classes-unknown-property",
@@ -589,12 +598,6 @@ def substances_invalid() -> list[InvalidCase]:
             _put(s, [*_S, "tolerance"], {"zero": {"text": "5 days", "min": 7200, "max": "7200"}}),
             f"{_SP}.tolerance.zero.max",
             "type",
-        ),
-        case(
-            "cross-tolerance-group-missing-name",
-            _cut(x, ["crossToleranceGroups", 0, "name"]),
-            "$.crossToleranceGroups[0]",
-            "required",
         ),
         case(
             "cross-tolerance-group-unknown-property",
@@ -782,12 +785,6 @@ def substances_invalid() -> list[InvalidCase]:
             "maximum",
         ),
         case(
-            "interaction-group-missing-members",
-            _cut(g, ["interactionGroups", 0, "members"]),
-            "$.interactionGroups[0]",
-            "required",
-        ),
-        case(
             "interaction-group-unknown-property",
             _put(g, ["interactionGroups", 0, "description"], "Stimulants."),
             "$.interactionGroups[0]",
@@ -804,12 +801,6 @@ def substances_invalid() -> list[InvalidCase]:
             _put(g, ["interactionGroups", 0, "members"], "Amphetamine"),
             "$.interactionGroups[0].members",
             "type",
-        ),
-        case(
-            "interactions-missing-uncertain",
-            _cut(t, [*_S, "interactions", "uncertain"]),
-            f"{_SP}.interactions",
-            "required",
         ),
         case(
             "interactions-unknown-severity",
@@ -876,6 +867,210 @@ def substances_invalid() -> list[InvalidCase]:
             "pattern",
         ),
     ]
+    cases += _missing(
+        "top-level",
+        m,
+        [],
+        "$",
+        [
+            "schemaVersion",
+            "datasetVersion",
+            "attribution",
+            "categories",
+            "interactionGroups",
+            "crossToleranceGroups",
+            "substances",
+        ],
+    )
+    cases += _missing(
+        "attribution", m, ["attribution", 0], "$.attribution[0]", ["name", "url", "license"]
+    )
+    cases += _missing(
+        "category", c, ["categories", 0], "$.categories[0]", ["id", "name", "description"]
+    )
+    cases += _missing(
+        "interaction-group",
+        g,
+        ["interactionGroups", 0],
+        "$.interactionGroups[0]",
+        ["id", "name", "members"],
+    )
+    cases += _missing(
+        "substance",
+        s,
+        _S,
+        _SP,
+        [
+            "name",
+            "aliases",
+            "url",
+            "categories",
+            "classes",
+            "roas",
+            "crossTolerances",
+            "interactions",
+            "toxicities",
+        ],
+    )
+    cases += _missing(
+        "classes", s, [*_S, "classes"], f"{_SP}.classes", ["psychoactive", "chemical"]
+    )
+    cases += _missing(
+        "interactions",
+        s,
+        [*_S, "interactions"],
+        f"{_SP}.interactions",
+        ["dangerous", "unsafe", "uncertain"],
+    )
+    cases += _wrong_type(
+        m,
+        [
+            ("schema-version", ["schemaVersion"], "$.schemaVersion"),
+            ("dataset-version", ["datasetVersion"], "$.datasetVersion"),
+            ("attribution-list", ["attribution"], "$.attribution"),
+            ("attribution", ["attribution", 0], "$.attribution[0]"),
+            ("attribution-name", ["attribution", 0, "name"], "$.attribution[0].name"),
+            ("attribution-url", ["attribution", 0, "url"], "$.attribution[0].url"),
+            ("attribution-license", ["attribution", 0, "license"], "$.attribution[0].license"),
+            ("categories", ["categories"], "$.categories"),
+            ("interaction-groups", ["interactionGroups"], "$.interactionGroups"),
+            ("substances", ["substances"], "$.substances"),
+        ],
+    )
+    cases += _wrong_type(m, [("substance", ["substances"], "$.substances[0]")], [7])
+    cases += _wrong_type(
+        c,
+        [
+            ("category", ["categories", 0], "$.categories[0]"),
+            ("category-id", ["categories", 0, "id"], "$.categories[0].id"),
+            ("category-name", ["categories", 0, "name"], "$.categories[0].name"),
+            (
+                "category-description",
+                ["categories", 0, "description"],
+                "$.categories[0].description",
+            ),
+        ],
+    )
+    cases += _wrong_type(
+        g,
+        [
+            ("interaction-group", ["interactionGroups", 0], "$.interactionGroups[0]"),
+            (
+                "interaction-group-name",
+                ["interactionGroups", 0, "name"],
+                "$.interactionGroups[0].name",
+            ),
+        ],
+    )
+    cases += _wrong_type(
+        g,
+        [
+            (
+                "interaction-group-member",
+                ["interactionGroups", 0, "members"],
+                "$.interactionGroups[0].members[0]",
+            )
+        ],
+        [7],
+    )
+    cases += _wrong_type(
+        s,
+        [
+            ("substance-url", [*_S, "url"], f"{_SP}.url"),
+            ("substance-categories", [*_S, "categories"], f"{_SP}.categories"),
+            ("substance-classes", [*_S, "classes"], f"{_SP}.classes"),
+            (
+                "classes-psychoactive",
+                [*_S, "classes", "psychoactive"],
+                f"{_SP}.classes.psychoactive",
+            ),
+            ("classes-chemical", [*_S, "classes", "chemical"], f"{_SP}.classes.chemical"),
+            ("substance-roas", [*_S, "roas"], f"{_SP}.roas"),
+            ("substance-tolerance", [*_S, "tolerance"], f"{_SP}.tolerance"),
+            ("substance-cross-tolerances", [*_S, "crossTolerances"], f"{_SP}.crossTolerances"),
+            ("substance-interactions", [*_S, "interactions"], f"{_SP}.interactions"),
+            (
+                "interactions-dangerous",
+                [*_S, "interactions", "dangerous"],
+                f"{_SP}.interactions.dangerous",
+            ),
+            ("interactions-unsafe", [*_S, "interactions", "unsafe"], f"{_SP}.interactions.unsafe"),
+            (
+                "interactions-uncertain",
+                [*_S, "interactions", "uncertain"],
+                f"{_SP}.interactions.uncertain",
+            ),
+            ("addiction-potential", [*_S, "addictionPotential"], f"{_SP}.addictionPotential"),
+            ("effects-summary", [*_S, "effectsSummary"], f"{_SP}.effectsSummary"),
+            ("dosage-remark", [*_S, "dosageRemark"], f"{_SP}.dosageRemark"),
+            ("general-risks", [*_S, "generalRisks"], f"{_SP}.generalRisks"),
+            ("longterm-risks", [*_S, "longtermRisks"], f"{_SP}.longtermRisks"),
+        ],
+    )
+    cases += _wrong_type(
+        s,
+        [
+            ("alias", [*_S, "aliases"], f"{_SP}.aliases[0]"),
+            (
+                "psychoactive-class",
+                [*_S, "classes", "psychoactive"],
+                f"{_SP}.classes.psychoactive[0]",
+            ),
+            ("chemical-class", [*_S, "classes", "chemical"], f"{_SP}.classes.chemical[0]"),
+            ("roa", [*_S, "roas"], f"{_SP}.roas[0]"),
+            ("toxicity", [*_S, "toxicities"], f"{_SP}.toxicities[0]"),
+            ("safer-use-item", [*_S, "saferUse"], f"{_SP}.saferUse[0]"),
+        ],
+        [7],
+    )
+    cases += [
+        case(
+            f"interactions-{severity}-target-without-name",
+            _put(s, [*_S, "interactions", severity], [{"kind": "other"}]),
+            f"{_SP}.interactions.{severity}[0]",
+            "required",
+        )
+        for severity in ("dangerous", "unsafe", "uncertain")
+    ]
+    route_members: list[tuple[str, Sequence[Step], str]] = [
+        ("duration", [*_R, "duration"], f"{_RP}.duration"),
+        ("bioavailability", [*_R, "bioavailability"], f"{_RP}.bioavailability"),
+    ]
+    route_members += [
+        (f"duration-{phase}", [*_R, "duration", phase], f"{_RP}.duration.{phase}")
+        for phase in ("onset", "comeup", "peak", "offset", "total", "afterglow")
+    ]
+    cases += _wrong_type(r, route_members)
+    cases += _wrong_type(
+        r,
+        [
+            ("bioavailability-min", [*_R, "bioavailability", "min"], f"{_RP}.bioavailability.min"),
+            ("bioavailability-max", [*_R, "bioavailability", "max"], f"{_RP}.bioavailability.max"),
+            ("duration-range-min", [*_R, "duration", "onset", "min"], f"{_RP}.duration.onset.min"),
+        ],
+        "15",
+    )
+    cases += [
+        case(
+            "bioavailability-min-above-100",
+            _put(r, [*_R, "bioavailability", "min"], 100.5),
+            f"{_RP}.bioavailability.min",
+            "maximum",
+        ),
+        case(
+            "bioavailability-max-negative",
+            _put(r, [*_R, "bioavailability", "max"], -0.5),
+            f"{_RP}.bioavailability.max",
+            "minimum",
+        ),
+        case(
+            "duration-range-max-negative",
+            _put(r, [*_R, "duration", "onset", "max"], -30),
+            f"{_RP}.duration.onset.max",
+            "minimum",
+        ),
+    ]
+    return cases
 
 
 # ---- manifest.json
@@ -909,8 +1104,7 @@ def manifest_invalid() -> list[InvalidCase]:
     case = InvalidCase
     m = _manifest()
     sha256: str = m["sha256"]
-    return [
-        case("missing-sha256", _cut(m, ["sha256"]), "$", "required"),
+    cases = [
         case(
             "unknown-property",
             _put(m, ["signature"], "c2lnbmF0dXJl"),
@@ -957,12 +1151,6 @@ def manifest_invalid() -> list[InvalidCase]:
         case("date-not-a-calendar-day", _put(m, ["date"], "2026-02-30"), "$.date", "format"),
         case("attribution-empty", _put(m, ["attribution"], []), "$.attribution", "minItems"),
         case(
-            "attribution-missing-license",
-            _cut(m, ["attribution", 0, "license"]),
-            "$.attribution[0]",
-            "required",
-        ),
-        case(
             "attribution-unknown-property",
             _put(m, ["attribution", 0, "author"], "Someone"),
             "$.attribution[0]",
@@ -1005,6 +1193,32 @@ def manifest_invalid() -> list[InvalidCase]:
             "pattern",
         ),
     ]
+    cases += _missing(
+        "top-level",
+        m,
+        [],
+        "$",
+        ["datasetVersion", "schemaVersion", "minAppVersion", "sha256", "date", "attribution"],
+    )
+    cases += _missing(
+        "attribution", m, ["attribution", 0], "$.attribution[0]", ["name", "url", "license"]
+    )
+    cases += [case("top-level-not-an-object", [m], "$", "type")]
+    cases += _wrong_type(
+        m,
+        [
+            ("dataset-version", ["datasetVersion"], "$.datasetVersion"),
+            ("schema-version", ["schemaVersion"], "$.schemaVersion"),
+            ("min-app-version", ["minAppVersion"], "$.minAppVersion"),
+            ("date", ["date"], "$.date"),
+            ("attribution-list", ["attribution"], "$.attribution"),
+            ("attribution", ["attribution", 0], "$.attribution[0]"),
+            ("attribution-name", ["attribution", 0, "name"], "$.attribution[0].name"),
+            ("attribution-url", ["attribution", 0, "url"], "$.attribution[0].url"),
+            ("attribution-license", ["attribution", 0, "license"], "$.attribution[0].license"),
+        ],
+    )
+    return cases
 
 
 # ---- files

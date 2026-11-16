@@ -25,12 +25,7 @@
       "crossTolerances": [],
       "interactions": {
         "dangerous": [],
-        "unsafe": [
-          {
-            "kind": "other",
-            "name": "Ritonavir"
-          }
-        ]
+        "unsafe": []
       },
       "toxicities": []
     }

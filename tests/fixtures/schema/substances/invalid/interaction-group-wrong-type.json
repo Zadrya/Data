@@ -9,12 +9,9 @@
     }
   ],
   "categories": [],
-  "interactionGroups": [],
-  "crossToleranceGroups": [
-    {
-      "id": "psychedelics",
-      "members": []
-    }
+  "interactionGroups": [
+    7
   ],
+  "crossToleranceGroups": [],
   "substances": []
 }
