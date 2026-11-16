@@ -11,6 +11,7 @@
     "datasetVersion",
     "attribution",
     "categories",
+    "interactionGroups",
     "substances"
   ],
   "properties": {
@@ -36,6 +37,13 @@
       "type": "array",
       "items": {
         "$ref": "#/$defs/category"
+      }
+    },
+    "interactionGroups": {
+      "description": "Named groups of substances that interaction targets of kind group refer to.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/interactionGroup"
       }
     },
     "substances": {
@@ -111,6 +119,33 @@
         }
       }
     },
+    "interactionGroup": {
+      "description": "A named group of substances, such as a pharmacological class, that an interaction can target as a whole.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "members"
+      ],
+      "properties": {
+        "id": {
+          "description": "Stable identifier of the group.",
+          "$ref": "#/$defs/slug"
+        },
+        "name": {
+          "description": "Display name. Interaction targets of kind group refer to this name.",
+          "$ref": "#/$defs/text"
+        },
+        "members": {
+          "description": "Canonical names of the catalog substances in the group. May be empty when no catalog substance belongs to it.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/text"
+          }
+        }
+      }
+    },
     "substance": {
       "description": "One substance of the catalog.",
       "type": "object",
@@ -123,6 +158,7 @@
         "classes",
         "roas",
         "crossTolerances",
+        "interactions",
         "toxicities"
       ],
       "properties": {
@@ -174,6 +210,10 @@
           "items": {
             "$ref": "#/$defs/slug"
           }
+        },
+        "interactions": {
+          "description": "Known interactions, by severity.",
+          "$ref": "#/$defs/interactions"
         },
         "addictionPotential": {
           "description": "Free text describing the addiction potential.",
@@ -253,6 +293,62 @@
         },
         "zero": {
           "description": "Time until tolerance returns to baseline.",
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "interactions": {
+      "description": "Interaction targets by severity.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dangerous",
+        "unsafe",
+        "uncertain"
+      ],
+      "properties": {
+        "dangerous": {
+          "description": "Combinations that are dangerous.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/interactionTarget"
+          }
+        },
+        "unsafe": {
+          "description": "Combinations that are unsafe.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/interactionTarget"
+          }
+        },
+        "uncertain": {
+          "description": "Combinations whose risk is uncertain.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/interactionTarget"
+          }
+        }
+      }
+    },
+    "interactionTarget": {
+      "description": "What a substance interacts with.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "name"
+      ],
+      "properties": {
+        "kind": {
+          "description": "substance: name is a canonical substance name. group: name is the name of an entry in interactionGroups. other: name is a drug or thing outside the catalog, kept as text.",
+          "enum": [
+            "substance",
+            "group",
+            "other"
+          ]
+        },
+        "name": {
+          "description": "Name of the target, interpreted according to kind.",
           "$ref": "#/$defs/text"
         }
       }

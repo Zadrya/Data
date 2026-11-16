@@ -9,6 +9,7 @@
     }
   ],
   "categories": [],
+  "interactionGroups": [],
   "substances": [
     {
       "name": "LSD",
@@ -44,6 +45,11 @@
         }
       ],
       "crossTolerances": [],
+      "interactions": {
+        "dangerous": [],
+        "unsafe": [],
+        "uncertain": []
+      },
       "toxicities": []
     }
   ]

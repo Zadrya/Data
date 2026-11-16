@@ -25,6 +25,20 @@
       "description": "Substances with little history of human use."
     }
   ],
+  "interactionGroups": [
+    {
+      "id": "stimulants",
+      "name": "Stimulants",
+      "members": [
+        "1P-LSD"
+      ]
+    },
+    {
+      "id": "tricyclic-antidepressants",
+      "name": "Tricyclic antidepressants",
+      "members": []
+    }
+  ],
   "substances": [
     {
       "name": "LSD",
@@ -127,6 +141,34 @@
         "psychedelic",
         "5-ht2a-agonist"
       ],
+      "interactions": {
+        "dangerous": [
+          {
+            "kind": "other",
+            "name": "Lithium"
+          }
+        ],
+        "unsafe": [
+          {
+            "kind": "group",
+            "name": "Tricyclic antidepressants"
+          },
+          {
+            "kind": "other",
+            "name": "Ritonavir"
+          }
+        ],
+        "uncertain": [
+          {
+            "kind": "substance",
+            "name": "1P-LSD"
+          },
+          {
+            "kind": "group",
+            "name": "Stimulants"
+          }
+        ]
+      },
       "addictionPotential": "non-addictive with a low abuse potential",
       "toxicities": [
         "extremely low toxicity relative to dose"
@@ -154,6 +196,11 @@
       },
       "roas": [],
       "crossTolerances": [],
+      "interactions": {
+        "dangerous": [],
+        "unsafe": [],
+        "uncertain": []
+      },
       "toxicities": []
     }
   ]

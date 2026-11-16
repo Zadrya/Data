@@ -9,6 +9,7 @@
     }
   ],
   "categories": [],
+  "interactionGroups": [],
   "substances": [
     {
       "name": "LSD",
@@ -23,6 +24,11 @@
       "crossTolerances": [
         "GABA"
       ],
+      "interactions": {
+        "dangerous": [],
+        "unsafe": [],
+        "uncertain": []
+      },
       "toxicities": []
     }
   ]
