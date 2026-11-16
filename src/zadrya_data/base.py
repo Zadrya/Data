@@ -365,6 +365,8 @@ def load_base(path: Path) -> BaseFile:
     """
     try:
         document = loads(path.read_text(encoding="utf-8"))
+    except UnicodeDecodeError as error:
+        raise BaseFormatError(f"{path}: not UTF-8 text: {error}") from error
     except StrictJsonError as error:
         raise BaseFormatError(f"{path}: {error}") from error
     return parse_base(document)

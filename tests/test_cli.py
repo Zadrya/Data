@@ -190,3 +190,41 @@ def test_fetch_requires_an_output_directory() -> None:
 def test_the_real_client_is_the_polite_one() -> None:
     with cli.make_client() as client:
         assert client.request_count == 0
+
+
+@pytest.mark.parametrize(
+    ("content", "reason"),
+    [
+        (b'{"categories": [], "substances": [{"name": "\xff"}]}', "not UTF-8 text"),
+        (b'{"categories": [], "substances": [], "substances": []}', "appears twice"),
+        (b'{"categories": []}', "missing key 'substances'"),
+        (b"[", "not valid JSON"),
+    ],
+)
+def test_fetch_exits_cleanly_when_the_base_file_cannot_be_read(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+    content: bytes,
+    reason: str,
+) -> None:
+    client, seen = replay(api_handler)
+    monkeypatch.setattr(cli, "make_client", lambda: client)
+    base = tmp_path / "Substances.json"
+    base.write_bytes(content)
+
+    assert main(["fetch", "--output", str(tmp_path / "s"), "--base", str(base)]) == 1
+
+    assert seen == []
+    captured = capsys.readouterr()
+    assert captured.err.startswith("error: fetch failed: ")
+    assert captured.out == ""
+    assert reason in captured.err
+    assert "Traceback" not in captured.err
+
+
+def test_fetch_exits_cleanly_when_the_base_path_is_a_directory(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    assert main(["fetch", "--output", str(tmp_path / "s"), "--base", str(tmp_path)]) == 1
+    assert "error: fetch failed" in capsys.readouterr().err

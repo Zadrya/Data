@@ -476,3 +476,13 @@ def test_real_file_round_trips_through_the_dataclasses(base: BaseFile) -> None:
             "name"
         ]
     assert json.dumps(rebuilt, sort_keys=True) == json.dumps(original, sort_keys=True)
+
+
+def test_a_file_that_is_not_utf_8_fails_as_a_format_error(tmp_path: Path) -> None:
+    path = tmp_path / "Substances.json"
+    path.write_bytes(b'{"categories": [], "substances": [{"name": "\xff"}]}')
+
+    with pytest.raises(BaseFormatError) as error:
+        load_base(path)
+
+    assert str(error.value).startswith(f"{path}: not UTF-8 text: ")
