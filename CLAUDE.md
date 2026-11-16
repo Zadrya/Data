@@ -8,6 +8,7 @@ The Zadrya substance dataset and the Python pipeline that builds, validates and 
 - `make check`: lint, license metadata and tests. Run before every commit.
 - `make ci`: everything CI runs, including authorship and commitlint. Run before opening a pull request.
 - `uv run zadrya-data --help`: the pipeline command line. Python 3.12 and all dependencies are managed by `uv` (`uv sync`); never use a global `pip` or `python`.
+- `uv run zadrya-data fetch --output <dir>`: download a raw snapshot (`graphql.json`, `mediawiki.json`, `snapshot.json`) from the PsychonautWiki API and wiki. It is the only command, and the only code path, that uses the network (about nine requests, one per second); every other command reads a snapshot offline.
 - `uv run pytest tests/test_cli.py`: run one test file. `uv run black .` formats, `uv run mypy` type-checks (strict).
 
 Local tools (Homebrew): `uv`, `lefthook actionlint yamllint markdownlint-cli2 zizmor reuse shellcheck`, plus Node for commitlint.
@@ -25,7 +26,8 @@ Local tools (Homebrew): `uv`, `lefthook actionlint yamllint markdownlint-cli2 zi
 
 ## Gotchas
 
-- Tests never touch the network and must keep coverage at 90 % or higher (`pyproject.toml`).
+- Tests never touch the network and must keep coverage at 90 % or higher (`pyproject.toml`). Network code is tested with `httpx.MockTransport` replaying the recorded answers in `tests/fixtures/api/` (`tests/api_fixtures.py`). All requests go through `PoliteClient` (`src/zadrya_data/http.py`): never create another `httpx` client.
+- No real snapshot is committed yet (it lands with the first dataset). Write one outside the repository when you need real data.
 - `uv.lock` is committed and CI installs with `--locked`: after changing dependencies run `uv lock` and commit the lock file in the same commit.
 - The schemas in `schema/` are the only copy: `src/zadrya_data/schemas/` holds symbolic links to them, which the build resolves into the wheel. A new schema file needs its link.
 - Schema fixtures are generated: edit `tests/schema_cases.py`, run `uv run python -m tests.schema_cases` and commit the files. A mutation test (`tests/test_schema_mutations.py`, about 10 seconds) fails when removing one constraint of a schema changes no fixture result, so a new rule needs a fixture that breaks it. Python and Dart read regular expressions differently: end every pattern with `$(?![\s\S])` and avoid `\s` (`schema/README.md`).
