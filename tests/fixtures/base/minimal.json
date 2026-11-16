@@ -1,0 +1,40 @@
+{
+  "categories": [
+    {
+      "name": "common",
+      "description": "Well known substances.",
+      "color": 4278876927
+    }
+  ],
+  "substances": [
+    {
+      "name": "Examplamine",
+      "commonNames": [],
+      "url": "https://psychonautwiki.org/wiki/Examplamine",
+      "isApproved": false,
+      "crossTolerances": [],
+      "toxicities": [],
+      "categories": [],
+      "roas": [
+        {
+          "name": "oral"
+        },
+        {
+          "name": "insufflated",
+          "dose": {
+            "units": "mg"
+          },
+          "duration": {
+            "total": {
+              "min": 2,
+              "units": "hours"
+            }
+          },
+          "bioavailability": {
+            "max": 45
+          }
+        }
+      ]
+    }
+  ]
+}

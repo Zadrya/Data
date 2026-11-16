@@ -1,0 +1,29 @@
+{
+  "categories": [
+    {
+      "name": "common",
+      "description": "Well known substances.",
+      "color": 4278876927
+    }
+  ],
+  "substances": [
+    {
+      "name": "Examplamine",
+      "commonNames": [],
+      "url": "https://psychonautwiki.org/wiki/Examplamine",
+      "isApproved": false,
+      "crossTolerances": [],
+      "toxicities": [],
+      "categories": [],
+      "roas": [],
+      "interactions": {
+        "dangerous": [],
+        "unsafe": [],
+        "uncertain": [],
+        "safe": [
+          "Cannabis"
+        ]
+      }
+    }
+  ]
+}

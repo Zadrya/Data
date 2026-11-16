@@ -1,0 +1,25 @@
+{
+  "categories": [
+    {
+      "name": "common",
+      "description": "Well known substances.",
+      "color": 4278876927
+    }
+  ],
+  "substances": [
+    {
+      "name": "Examplamine",
+      "commonNames": [],
+      "url": "https://psychonautwiki.org/wiki/Examplamine",
+      "isApproved": false,
+      "crossTolerances": [],
+      "toxicities": [],
+      "categories": [],
+      "roas": [],
+      "tolerance": {
+        "full": "1 day",
+        "quarter": "2 days"
+      }
+    }
+  ]
+}

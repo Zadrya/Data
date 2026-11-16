@@ -1,0 +1,32 @@
+{
+  "categories": [
+    {
+      "name": "common",
+      "description": "Well known substances.",
+      "color": 4278876927
+    }
+  ],
+  "substances": [
+    {
+      "name": "Examplamine",
+      "commonNames": [],
+      "url": "https://psychonautwiki.org/wiki/Examplamine",
+      "isApproved": false,
+      "crossTolerances": [],
+      "toxicities": [],
+      "categories": [],
+      "roas": [
+        {
+          "name": "oral",
+          "duration": {
+            "hangover": {
+              "min": 1,
+              "max": 2,
+              "units": "days"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
