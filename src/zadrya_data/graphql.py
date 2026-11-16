@@ -16,6 +16,9 @@ from zadrya_data.http import PoliteClient
 
 ENDPOINT = "https://api.psychonautwiki.org/"
 
+# The limit written in the query. An answer this long may have been cut off.
+LIMIT = 2000
+
 QUERY = """\
 {
   substances(limit: 2000) {
@@ -366,6 +369,22 @@ def parse_data(data: object) -> tuple[ApiSubstance, ...]:
     source.finish()
     if substances is None:
         raise ApiFormatError("$.substances: expected a list, found null")
+    if not substances:
+        raise ApiFormatError("$.substances: the list is empty")
+    if len(substances) >= LIMIT:
+        raise ApiFormatError(
+            f"$.substances: {len(substances)} entries reach the limit of the query ({LIMIT}), "
+            "so the answer may be cut off"
+        )
+    seen: set[str] = set()
+    for index, substance in enumerate(substances):
+        if not substance.name.strip():
+            raise ApiFormatError(f"$.substances[{index}].name: the name is empty")
+        if substance.name in seen:
+            raise ApiFormatError(
+                f"$.substances[{index}].name: second entry named '{substance.name}'"
+            )
+        seen.add(substance.name)
     return substances
 
 
