@@ -1,0 +1,710 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+"""The schema fixture documents, defined in code.
+
+The files in ``tests/fixtures/schema`` are generated from this module and committed,
+so that they can be read, diffed and used by other tools. After changing a case, or
+adding one for a new schema rule, rewrite them with::
+
+    uv run python -m tests.schema_cases
+
+``tests/test_schema_fixtures.py`` fails when the committed files and this module
+disagree. Every invalid case is a complete document that breaks exactly one rule:
+its name says which, ``path`` is the JSON path of the violation and ``rule`` the
+schema keyword that rejects it.
+"""
+
+import copy
+import json
+import shutil
+from collections.abc import Sequence
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
+
+FIXTURES = Path(__file__).parent / "fixtures" / "schema"
+
+type Step = str | int
+
+
+@dataclass(frozen=True)
+class InvalidCase:
+    """A document that breaks one schema rule."""
+
+    name: str
+    document: Any
+    path: str
+    rule: str
+
+
+def _put(document: Any, path: Sequence[Step], value: object) -> Any:
+    """Return a copy of the document with the value at the path set."""
+    result = copy.deepcopy(document)
+    target = result
+    for step in path[:-1]:
+        target = target[step]
+    target[path[-1]] = value
+    return result
+
+
+def _cut(document: Any, path: Sequence[Step]) -> Any:
+    """Return a copy of the document without the key at the path."""
+    result = copy.deepcopy(document)
+    target = result
+    for step in path[:-1]:
+        target = target[step]
+    del target[path[-1]]
+    return result
+
+
+# ---- substances.json
+
+
+def _minimal() -> Any:
+    return {
+        "schemaVersion": "1.0.0",
+        "datasetVersion": "1.0.0",
+        "attribution": [
+            {
+                "name": "PsychonautWiki",
+                "url": "https://psychonautwiki.org",
+                "license": "CC-BY-SA-4.0",
+            }
+        ],
+        "categories": [],
+        "interactionGroups": [],
+        "substances": [],
+    }
+
+
+def _minimal_substance() -> Any:
+    return {
+        "name": "LSD",
+        "aliases": [],
+        "url": "https://psychonautwiki.org/wiki/LSD",
+        "categories": [],
+        "classes": {"psychoactive": [], "chemical": []},
+        "roas": [],
+        "crossTolerances": [],
+        "interactions": {"dangerous": [], "unsafe": [], "uncertain": []},
+        "toxicities": [],
+    }
+
+
+def _with_substance() -> Any:
+    return _put(_minimal(), ["substances"], [_minimal_substance()])
+
+
+def _with_category() -> Any:
+    category = {
+        "id": "psychedelic",
+        "name": "Psychedelic",
+        "description": "Substances that alter perception and cognition.",
+    }
+    return _put(_minimal(), ["categories"], [category])
+
+
+def _with_group() -> Any:
+    group = {"id": "stimulants", "name": "Stimulants", "members": []}
+    return _put(_minimal(), ["interactionGroups"], [group])
+
+
+def _with_roa() -> Any:
+    roa = {
+        "route": "sublingual",
+        "dose": {"units": "µg", "threshold": 15, "light": {"min": 25, "max": 75}, "heavy": 300},
+        "duration": {"onset": {"min": 15, "max": 30}},
+        "bioavailability": {"min": 71, "max": 71},
+    }
+    return _put(_with_substance(), [*_S, "roas"], [roa])
+
+
+def _with_target() -> Any:
+    target = {"kind": "other", "name": "Ritonavir"}
+    return _put(_with_substance(), [*_S, "interactions", "unsafe"], [target])
+
+
+def _full() -> Any:
+    document = _with_category()
+    document["attribution"].append(
+        {
+            "name": "PsychonautWiki Journal",
+            "url": "https://github.com/isaakhanimann/psychonautwiki-journal-android",
+            "license": "GPL-3.0-only",
+        }
+    )
+    document["categories"].append(
+        {
+            "id": "research-chemical",
+            "name": "Research chemical",
+            "description": "Substances with little history of human use.",
+        }
+    )
+    document["interactionGroups"] = [
+        {"id": "stimulants", "name": "Stimulants", "members": ["1P-LSD"]},
+        {
+            "id": "tricyclic-antidepressants",
+            "name": "Tricyclic antidepressants",
+            "members": [],
+        },
+    ]
+    lsd = {
+        "name": "LSD",
+        "aliases": ["LSD-25", "Acid", "Lucy"],
+        "url": "https://psychonautwiki.org/wiki/LSD",
+        "summary": "LSD is a popular psychedelic with a long history of use and research.",
+        "categories": ["psychedelic"],
+        "classes": {"psychoactive": ["Psychedelics"], "chemical": ["Lysergamides"]},
+        "roas": [
+            {
+                "route": "sublingual",
+                "dose": {
+                    "units": "µg",
+                    "threshold": 15,
+                    "light": {"min": 25, "max": 75},
+                    "common": {"min": 75, "max": 150},
+                    "strong": {"min": 150, "max": 300},
+                    "heavy": 300,
+                },
+                "duration": {
+                    "onset": {"min": 15, "max": 30},
+                    "comeup": {"min": 45, "max": 90},
+                    "peak": {"min": 180, "max": 300},
+                    "offset": {"min": 180, "max": 300},
+                    "total": {"min": 480, "max": 720},
+                    "afterglow": {"min": 720, "max": 2880},
+                },
+                "bioavailability": {"min": 71, "max": 71},
+            },
+            {
+                "route": "oral",
+                "dose": {"units": "µg"},
+                "duration": {"onset": {"max": 0.5}, "total": {"min": 480}},
+                "bioavailability": {"max": 80},
+            },
+            {"route": "intravenous"},
+        ],
+        "tolerance": {
+            "full": "almost immediately after ingestion",
+            "half": "3 days",
+            "zero": "5 days",
+        },
+        "crossTolerances": ["psychedelic", "5-ht2a-agonist"],
+        "interactions": {
+            "dangerous": [{"kind": "other", "name": "Lithium"}],
+            "unsafe": [
+                {"kind": "group", "name": "Tricyclic antidepressants"},
+                {"kind": "other", "name": "Ritonavir"},
+            ],
+            "uncertain": [
+                {"kind": "substance", "name": "1P-LSD"},
+                {"kind": "group", "name": "Stimulants"},
+            ],
+        },
+        "addictionPotential": "non-addictive with a low abuse potential",
+        "toxicities": ["extremely low toxicity relative to dose"],
+        "effectsSummary": "The effect depends very much on dose, set and setting.",
+        "dosageRemark": "Blotters vary widely in strength.",
+        "generalRisks": "The risks of LSD use are psychological.",
+        "longtermRisks": "Latent mental disorders can be triggered.",
+        "saferUse": ["Dose low.", "Take LSD only in an environment where you feel comfortable."],
+    }
+    other = _minimal_substance() | {
+        "name": "1P-LSD",
+        "url": "https://psychonautwiki.org/wiki/1P-LSD",
+        "categories": ["psychedelic", "research-chemical"],
+    }
+    document["substances"] = [lsd, other]
+    return document
+
+
+_S: list[Step] = ["substances", 0]
+_R: list[Step] = [*_S, "roas", 0]
+_T: list[Step] = [*_S, "interactions", "unsafe", 0]
+_SP = "$.substances[0]"
+_RP = "$.substances[0].roas[0]"
+_TP = "$.substances[0].interactions.unsafe[0]"
+
+
+def substances_valid() -> dict[str, Any]:
+    """Return the valid documents by fixture name."""
+    return {
+        "minimal": _minimal(),
+        "minimal-substance": _with_substance(),
+        "full": _full(),
+    }
+
+
+def substances_invalid() -> list[InvalidCase]:
+    """Return the invalid documents, one per rule."""
+    case = InvalidCase
+    m, c, g, s, r, t = (
+        _minimal(),
+        _with_category(),
+        _with_group(),
+        _with_substance(),
+        _with_roa(),
+        _with_target(),
+    )
+    return [
+        case("top-level-missing-substances", _cut(m, ["substances"]), "$", "required"),
+        case(
+            "top-level-unknown-property",
+            _put(m, ["generatedAt"], "2026-11-16"),
+            "$",
+            "additionalProperties",
+        ),
+        case("top-level-not-an-object", [m], "$", "type"),
+        case(
+            "schema-version-not-semver",
+            _put(m, ["schemaVersion"], "1.0"),
+            "$.schemaVersion",
+            "pattern",
+        ),
+        case(
+            "schema-version-major-not-1",
+            _put(m, ["schemaVersion"], "2.0.0"),
+            "$.schemaVersion",
+            "pattern",
+        ),
+        case(
+            "dataset-version-not-semver",
+            _put(m, ["datasetVersion"], "v1.0.0"),
+            "$.datasetVersion",
+            "pattern",
+        ),
+        case(
+            "dataset-version-with-pre-release",
+            _put(m, ["datasetVersion"], "1.0.0-rc.1"),
+            "$.datasetVersion",
+            "pattern",
+        ),
+        case("attribution-empty", _put(m, ["attribution"], []), "$.attribution", "minItems"),
+        case(
+            "attribution-missing-license",
+            _cut(m, ["attribution", 0, "license"]),
+            "$.attribution[0]",
+            "required",
+        ),
+        case(
+            "attribution-unknown-property",
+            _put(m, ["attribution", 0, "author"], "Someone"),
+            "$.attribution[0]",
+            "additionalProperties",
+        ),
+        case(
+            "attribution-url-not-https",
+            _put(m, ["attribution", 0, "url"], "http://psychonautwiki.org"),
+            "$.attribution[0].url",
+            "pattern",
+        ),
+        case(
+            "attribution-name-empty",
+            _put(m, ["attribution", 0, "name"], ""),
+            "$.attribution[0].name",
+            "minLength",
+        ),
+        case(
+            "category-missing-description",
+            _cut(c, ["categories", 0, "description"]),
+            "$.categories[0]",
+            "required",
+        ),
+        case(
+            "category-unknown-property-color",
+            _put(c, ["categories", 0, "color"], 4288423856),
+            "$.categories[0]",
+            "additionalProperties",
+        ),
+        case(
+            "category-id-not-a-slug",
+            _put(c, ["categories", 0, "id"], "Research Chemical"),
+            "$.categories[0].id",
+            "pattern",
+        ),
+        case("substance-missing-name", _cut(s, [*_S, "name"]), _SP, "required"),
+        case(
+            "substance-unknown-property-is-approved",
+            _put(s, [*_S, "isApproved"], True),
+            _SP,
+            "additionalProperties",
+        ),
+        case("substance-name-empty", _put(s, [*_S, "name"], ""), f"{_SP}.name", "minLength"),
+        case(
+            "substance-aliases-not-a-list",
+            _put(s, [*_S, "aliases"], "Acid"),
+            f"{_SP}.aliases",
+            "type",
+        ),
+        case(
+            "substance-url-not-https",
+            _put(s, [*_S, "url"], "http://psychonautwiki.org/wiki/LSD"),
+            f"{_SP}.url",
+            "pattern",
+        ),
+        case(
+            "substance-url-not-a-psychonautwiki-article",
+            _put(s, [*_S, "url"], "https://en.wikipedia.org/wiki/LSD"),
+            f"{_SP}.url",
+            "pattern",
+        ),
+        case(
+            "substance-summary-not-a-string",
+            _put(s, [*_S, "summary"], ["LSD is a psychedelic."]),
+            f"{_SP}.summary",
+            "type",
+        ),
+        case(
+            "substance-category-not-a-slug",
+            _put(s, [*_S, "categories"], ["Psychedelic"]),
+            f"{_SP}.categories[0]",
+            "pattern",
+        ),
+        case(
+            "classes-missing-chemical",
+            _cut(s, [*_S, "classes", "chemical"]),
+            f"{_SP}.classes",
+            "required",
+        ),
+        case(
+            "classes-unknown-property",
+            _put(s, [*_S, "classes", "legal"], []),
+            f"{_SP}.classes",
+            "additionalProperties",
+        ),
+        case(
+            "tolerance-empty", _put(s, [*_S, "tolerance"], {}), f"{_SP}.tolerance", "minProperties"
+        ),
+        case(
+            "tolerance-unknown-property",
+            _put(s, [*_S, "tolerance"], {"full": "1 day", "quarter": "2 days"}),
+            f"{_SP}.tolerance",
+            "additionalProperties",
+        ),
+        case(
+            "tolerance-zero-not-a-string",
+            _put(s, [*_S, "tolerance"], {"zero": 5}),
+            f"{_SP}.tolerance.zero",
+            "type",
+        ),
+        case(
+            "cross-tolerance-not-a-lowercase-token",
+            _put(s, [*_S, "crossTolerances"], ["GABA"]),
+            f"{_SP}.crossTolerances[0]",
+            "pattern",
+        ),
+        case(
+            "toxicities-not-a-list",
+            _put(s, [*_S, "toxicities"], "low toxicity"),
+            f"{_SP}.toxicities",
+            "type",
+        ),
+        case(
+            "safer-use-not-a-list",
+            _put(s, [*_S, "saferUse"], "Dose low."),
+            f"{_SP}.saferUse",
+            "type",
+        ),
+        case("safer-use-empty", _put(s, [*_S, "saferUse"], []), f"{_SP}.saferUse", "minItems"),
+        case("roa-missing-route", _cut(r, [*_R, "route"]), _RP, "required"),
+        case(
+            "roa-unknown-property",
+            _put(r, [*_R, "name"], "sublingual"),
+            _RP,
+            "additionalProperties",
+        ),
+        case(
+            "roa-route-not-in-the-list",
+            _put(r, [*_R, "route"], "sublabial"),
+            f"{_RP}.route",
+            "enum",
+        ),
+        case("dose-missing-units", _cut(r, [*_R, "dose", "units"]), f"{_RP}.dose", "required"),
+        case(
+            "dose-unknown-property-light-min",
+            _put(r, [*_R, "dose", "lightMin"], 25),
+            f"{_RP}.dose",
+            "additionalProperties",
+        ),
+        case(
+            "dose-units-empty",
+            _put(r, [*_R, "dose", "units"], ""),
+            f"{_RP}.dose.units",
+            "minLength",
+        ),
+        case(
+            "dose-threshold-negative",
+            _put(r, [*_R, "dose", "threshold"], -1),
+            f"{_RP}.dose.threshold",
+            "minimum",
+        ),
+        case(
+            "dose-heavy-not-a-number",
+            _put(r, [*_R, "dose", "heavy"], "300"),
+            f"{_RP}.dose.heavy",
+            "type",
+        ),
+        case(
+            "dose-heavy-negative",
+            _put(r, [*_R, "dose", "heavy"], -300),
+            f"{_RP}.dose.heavy",
+            "minimum",
+        ),
+        case(
+            "dose-range-missing-max",
+            _cut(r, [*_R, "dose", "light", "max"]),
+            f"{_RP}.dose.light",
+            "required",
+        ),
+        case(
+            "dose-range-unknown-property",
+            _put(r, [*_R, "dose", "light", "units"], "mg"),
+            f"{_RP}.dose.light",
+            "additionalProperties",
+        ),
+        case(
+            "dose-range-min-negative",
+            _put(r, [*_R, "dose", "light", "min"], -25),
+            f"{_RP}.dose.light.min",
+            "minimum",
+        ),
+        case(
+            "dose-range-max-not-a-number",
+            _put(r, [*_R, "dose", "light", "max"], "75"),
+            f"{_RP}.dose.light.max",
+            "type",
+        ),
+        case("duration-empty", _put(r, [*_R, "duration"], {}), f"{_RP}.duration", "minProperties"),
+        case(
+            "duration-unknown-phase",
+            _put(r, [*_R, "duration", "hangover"], {"min": 60}),
+            f"{_RP}.duration",
+            "additionalProperties",
+        ),
+        case(
+            "duration-range-empty",
+            _put(r, [*_R, "duration", "onset"], {}),
+            f"{_RP}.duration.onset",
+            "minProperties",
+        ),
+        case(
+            "duration-range-unknown-property-units",
+            _put(r, [*_R, "duration", "onset", "units"], "minutes"),
+            f"{_RP}.duration.onset",
+            "additionalProperties",
+        ),
+        case(
+            "duration-range-min-negative",
+            _put(r, [*_R, "duration", "onset", "min"], -15),
+            f"{_RP}.duration.onset.min",
+            "minimum",
+        ),
+        case(
+            "duration-range-max-not-a-number",
+            _put(r, [*_R, "duration", "onset", "max"], "30 minutes"),
+            f"{_RP}.duration.onset.max",
+            "type",
+        ),
+        case(
+            "bioavailability-empty",
+            _put(r, [*_R, "bioavailability"], {}),
+            f"{_RP}.bioavailability",
+            "minProperties",
+        ),
+        case(
+            "bioavailability-unknown-property",
+            _put(r, [*_R, "bioavailability", "units"], "%"),
+            f"{_RP}.bioavailability",
+            "additionalProperties",
+        ),
+        case(
+            "bioavailability-min-negative",
+            _put(r, [*_R, "bioavailability", "min"], -1),
+            f"{_RP}.bioavailability.min",
+            "minimum",
+        ),
+        case(
+            "bioavailability-max-above-100",
+            _put(r, [*_R, "bioavailability", "max"], 101),
+            f"{_RP}.bioavailability.max",
+            "maximum",
+        ),
+        case(
+            "interaction-group-missing-members",
+            _cut(g, ["interactionGroups", 0, "members"]),
+            "$.interactionGroups[0]",
+            "required",
+        ),
+        case(
+            "interaction-group-unknown-property",
+            _put(g, ["interactionGroups", 0, "description"], "Stimulants."),
+            "$.interactionGroups[0]",
+            "additionalProperties",
+        ),
+        case(
+            "interaction-group-id-not-a-slug",
+            _put(g, ["interactionGroups", 0, "id"], "Stimulants"),
+            "$.interactionGroups[0].id",
+            "pattern",
+        ),
+        case(
+            "interaction-group-members-not-a-list",
+            _put(g, ["interactionGroups", 0, "members"], "Amphetamine"),
+            "$.interactionGroups[0].members",
+            "type",
+        ),
+        case(
+            "interactions-missing-uncertain",
+            _cut(t, [*_S, "interactions", "uncertain"]),
+            f"{_SP}.interactions",
+            "required",
+        ),
+        case(
+            "interactions-unknown-severity",
+            _put(t, [*_S, "interactions", "safe"], []),
+            f"{_SP}.interactions",
+            "additionalProperties",
+        ),
+        case("interaction-target-not-an-object", _put(t, _T, "Ritonavir"), _TP, "type"),
+        case("interaction-target-missing-kind", _cut(t, [*_T, "kind"]), _TP, "required"),
+        case(
+            "interaction-target-unknown-property",
+            _put(t, [*_T, "note"], "CYP3A4 inhibitor"),
+            _TP,
+            "additionalProperties",
+        ),
+        case(
+            "interaction-target-kind-not-in-the-list",
+            _put(t, [*_T, "kind"], "class"),
+            f"{_TP}.kind",
+            "enum",
+        ),
+        case(
+            "interaction-target-name-empty", _put(t, [*_T, "name"], ""), f"{_TP}.name", "minLength"
+        ),
+    ]
+
+
+# ---- manifest.json
+
+
+def _manifest() -> Any:
+    return {
+        "datasetVersion": "1.0.0",
+        "schemaVersion": "1.0.0",
+        "minAppVersion": "1.0.0",
+        "sha256": "a2300bea9bf8013fc97c4279eeb7393f1800766ec55455ac117502a1208a666f",
+        "date": "2026-11-16",
+        "attribution": [
+            {
+                "name": "PsychonautWiki",
+                "url": "https://psychonautwiki.org",
+                "license": "CC-BY-SA-4.0",
+            }
+        ],
+    }
+
+
+def manifest_valid() -> dict[str, Any]:
+    """Return the valid documents by fixture name."""
+    newer = _put(_put(_manifest(), ["schemaVersion"], "2.1.0"), ["minAppVersion"], "3.0.0")
+    return {"release": _manifest(), "newer-schema-major": newer}
+
+
+def manifest_invalid() -> list[InvalidCase]:
+    """Return the invalid documents, one per rule."""
+    case = InvalidCase
+    m = _manifest()
+    sha256: str = m["sha256"]
+    return [
+        case("missing-sha256", _cut(m, ["sha256"]), "$", "required"),
+        case(
+            "unknown-property",
+            _put(m, ["signature"], "c2lnbmF0dXJl"),
+            "$",
+            "additionalProperties",
+        ),
+        case(
+            "dataset-version-not-semver",
+            _put(m, ["datasetVersion"], "1.0"),
+            "$.datasetVersion",
+            "pattern",
+        ),
+        case(
+            "schema-version-not-semver",
+            _put(m, ["schemaVersion"], "1"),
+            "$.schemaVersion",
+            "pattern",
+        ),
+        case(
+            "min-app-version-not-semver",
+            _put(m, ["minAppVersion"], "1.0.0+42"),
+            "$.minAppVersion",
+            "pattern",
+        ),
+        case("sha256-uppercase", _put(m, ["sha256"], sha256.upper()), "$.sha256", "pattern"),
+        case("sha256-too-short", _put(m, ["sha256"], sha256[:63]), "$.sha256", "pattern"),
+        case("sha256-not-a-string", _put(m, ["sha256"], 0), "$.sha256", "type"),
+        case("date-not-iso-8601", _put(m, ["date"], "16/11/2026"), "$.date", "format"),
+        case("date-with-time", _put(m, ["date"], "2026-11-16T10:00:00Z"), "$.date", "format"),
+        case("date-not-a-calendar-day", _put(m, ["date"], "2026-02-30"), "$.date", "format"),
+        case("attribution-empty", _put(m, ["attribution"], []), "$.attribution", "minItems"),
+        case(
+            "attribution-missing-license",
+            _cut(m, ["attribution", 0, "license"]),
+            "$.attribution[0]",
+            "required",
+        ),
+        case(
+            "attribution-unknown-property",
+            _put(m, ["attribution", 0, "author"], "Someone"),
+            "$.attribution[0]",
+            "additionalProperties",
+        ),
+        case(
+            "attribution-url-not-https",
+            _put(m, ["attribution", 0, "url"], "ftp://psychonautwiki.org"),
+            "$.attribution[0].url",
+            "pattern",
+        ),
+        case(
+            "attribution-license-empty",
+            _put(m, ["attribution", 0, "license"], ""),
+            "$.attribution[0].license",
+            "minLength",
+        ),
+    ]
+
+
+# ---- files
+
+VALID = {"substances": substances_valid, "manifest": manifest_valid}
+INVALID = {"substances": substances_invalid, "manifest": manifest_invalid}
+
+
+def _text(document: object) -> str:
+    return json.dumps(document, indent=2, ensure_ascii=False) + "\n"
+
+
+def render() -> dict[str, str]:
+    """Return every fixture file as text, keyed by its path relative to the fixture root."""
+    files: dict[str, str] = {}
+    for schema, valid in VALID.items():
+        for name, document in valid().items():
+            files[f"{schema}/valid/{name}.json"] = _text(document)
+        for case in INVALID[schema]():
+            files[f"{schema}/invalid/{case.name}.json"] = _text(case.document)
+    return files
+
+
+def write(root: Path = FIXTURES) -> None:
+    """Replace the fixture files under the root with the rendered ones."""
+    shutil.rmtree(root, ignore_errors=True)
+    for relative, text in render().items():
+        path = root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+
+
+if __name__ == "__main__":  # pragma: no cover
+    write()
+    print(f"wrote {len(render())} fixture files to {FIXTURES}")

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from tests.schema_fixtures import FIXTURES
+from tests.schema_cases import FIXTURES
 from zadrya_data import __version__
 from zadrya_data.cli import main
 
