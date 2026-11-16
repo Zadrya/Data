@@ -1,0 +1,13 @@
+{
+  "datasetVersion": "1.0.0",
+  "schemaVersion": "1.0.0",
+  "minAppVersion": "1.0.0",
+  "date": "2026-11-16",
+  "attribution": [
+    {
+      "name": "PsychonautWiki",
+      "url": "https://psychonautwiki.org",
+      "license": "CC-BY-SA-4.0"
+    }
+  ]
+}

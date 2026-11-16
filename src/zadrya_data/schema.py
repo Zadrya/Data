@@ -22,6 +22,7 @@ class SchemaName(StrEnum):
     """The documents this package has a schema for."""
 
     SUBSTANCES = "substances"
+    MANIFEST = "manifest"
 
 
 @dataclass(frozen=True)
