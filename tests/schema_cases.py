@@ -208,12 +208,12 @@ def _full() -> Any:
         "interactions": {
             "dangerous": [{"kind": "other", "name": "Lithium"}],
             "unsafe": [
-                {"kind": "group", "name": "Tricyclic antidepressants"},
+                {"kind": "group", "groupId": "tricyclic-antidepressants"},
                 {"kind": "other", "name": "Ritonavir"},
             ],
             "uncertain": [
                 {"kind": "substance", "name": "1P-LSD"},
-                {"kind": "group", "name": "Stimulants"},
+                {"kind": "group", "groupId": "stimulants"},
             ],
         },
         "addictionPotential": "non-addictive with a low abuse potential",
@@ -817,21 +817,64 @@ def substances_invalid() -> list[InvalidCase]:
             f"{_SP}.interactions",
             "additionalProperties",
         ),
-        case("interaction-target-not-an-object", _put(t, _T, "Ritonavir"), _TP, "type"),
-        case("interaction-target-missing-kind", _cut(t, [*_T, "kind"]), _TP, "required"),
+        case("interaction-target-not-an-object", _put(t, _T, "Ritonavir"), _TP, "oneOf"),
+        case("interaction-target-missing-kind", _cut(t, [*_T, "kind"]), _TP, "oneOf"),
         case(
-            "interaction-target-unknown-property",
-            _put(t, [*_T, "note"], "CYP3A4 inhibitor"),
+            "interaction-target-group-missing-kind",
+            _put(t, _T, {"groupId": "stimulants"}),
             _TP,
-            "additionalProperties",
+            "oneOf",
         ),
         case(
             "interaction-target-kind-not-in-the-list",
             _put(t, [*_T, "kind"], "class"),
-            f"{_TP}.kind",
-            "enum",
+            _TP,
+            "oneOf",
         ),
-        case("interaction-target-name-empty", _put(t, [*_T, "name"], ""), f"{_TP}.name", "pattern"),
+        case("other-target-missing-name", _put(t, _T, {"kind": "other"}), _TP, "required"),
+        case(
+            "other-target-unknown-property",
+            _put(t, [*_T, "note"], "CYP3A4 inhibitor"),
+            _TP,
+            "additionalProperties",
+        ),
+        case("other-target-name-empty", _put(t, [*_T, "name"], ""), f"{_TP}.name", "pattern"),
+        case(
+            "substance-target-missing-name",
+            _put(t, _T, {"kind": "substance"}),
+            _TP,
+            "required",
+        ),
+        case(
+            "substance-target-unknown-property-group-id",
+            _put(t, _T, {"kind": "substance", "name": "1P-LSD", "groupId": "psychedelics"}),
+            _TP,
+            "additionalProperties",
+        ),
+        case(
+            "substance-target-name-not-a-string",
+            _put(t, _T, {"kind": "substance", "name": ["1P-LSD"]}),
+            f"{_TP}.name",
+            "type",
+        ),
+        case(
+            "group-target-missing-group-id",
+            _put(t, _T, {"kind": "group"}),
+            _TP,
+            "required",
+        ),
+        case(
+            "group-target-unknown-property-name",
+            _put(t, _T, {"kind": "group", "groupId": "stimulants", "name": "Stimulants"}),
+            _TP,
+            "additionalProperties",
+        ),
+        case(
+            "group-target-group-id-is-a-display-name",
+            _put(t, _T, {"kind": "group", "groupId": "Stimulants"}),
+            f"{_TP}.groupId",
+            "pattern",
+        ),
     ]
 
 

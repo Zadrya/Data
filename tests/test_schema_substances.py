@@ -35,7 +35,9 @@ REQUIRED = {
     "classes": ["psychoactive", "chemical"],
     "toleranceTime": ["text"],
     "interactions": ["dangerous", "unsafe", "uncertain"],
-    "interactionTarget": ["kind", "name"],
+    "substanceTarget": ["kind", "name"],
+    "groupTarget": ["kind", "groupId"],
+    "otherTarget": ["kind", "name"],
     "roa": ["route"],
     "dose": ["units"],
 }
