@@ -1,0 +1,11 @@
+{
+  "categories": [
+    {
+      "name": "common",
+      "description": "Well known substances.",
+      "color": 1,
+      "icon": "star"
+    }
+  ],
+  "substances": []
+}
