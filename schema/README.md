@@ -16,7 +16,7 @@ uv run zadrya-data validate dataset/substances.json
 uv run zadrya-data validate --schema manifest manifest.json
 ```
 
-Exit code 0 means valid, 1 means schema violations (each printed with its JSON path) and 2 means the file cannot be read as strict JSON: `NaN`, `Infinity`, a number out of range such as `1e999`, a repeated key in one object and nesting that is too deep are all refused. Format assertions are on, so `date` must be a real calendar day.
+Exit code 0 means valid, 1 means schema violations (each printed with its JSON path) and 2 means the file cannot be read as strict JSON: `NaN`, `Infinity`, a number out of range such as `1e999`, an integer above 2**53 - 1, a repeated key in one object and nesting that is too deep are all refused. Format assertions are on, so `date` must be a real calendar day.
 
 ## Conventions the app must follow
 
@@ -49,5 +49,11 @@ Until the first signed dataset release, version 1.0.0 may still change in place:
 
 - Every key has a `description`, and every object rejects unknown keys. Tests enforce both.
 - The fixture documents are defined in `tests/schema_cases.py`, each invalid one with the JSON path and the keyword that must reject it. The files in `tests/fixtures/schema/` are generated from it: after a change run `uv run python -m tests.schema_cases` and commit the result. A test fails when the files are out of date.
-- What the tests guarantee, exactly: each invalid fixture breaks one rule and nothing else, and removing any single constraint from a schema changes the result of at least one fixture. "Constraint" means the keywords `$ref`, `additionalProperties`, `const`, `enum`, `format`, `items`, `maximum`, `minItems`, `minProperties`, `minimum`, `not`, `oneOf`, `pattern` and `type`, each entry of a `required` list and each entry of a `dependentRequired` map (`tests/test_schema_mutations.py`). They do not guarantee that every string a pattern should reject is rejected, nor that Python and ECMA 262 agree on every pattern: the patterns were checked once by hand in Node, and a new pattern needs the same check.
+- What the tests guarantee, exactly (`tests/test_schema_mutations.py`):
+  - Each invalid fixture breaks one rule and nothing else.
+  - Loosening any single constraint of a schema changes the result of at least one fixture. "Constraint" means the keywords `$ref`, `additionalProperties`, `const`, `enum`, `format`, `items`, `maximum`, `minItems`, `minProperties`, `minimum`, `not`, `oneOf`, `pattern` and `type` (removed), each entry of a `required` list and of a `dependentRequired` map (removed), and each entry of an `enum` (removed, and added).
+  - A schema uses no keyword outside that list and the structural ones (`properties`, `$defs`, `description` and the like). A new keyword, for example `minLength` or `uniqueItems`, fails the test until it is taught how to mutate it.
+- What they do not guarantee:
+  - A pattern that is widened, not removed, is not caught: there is no generic way to mutate a regular expression. The fixtures of each pattern are the only guard, so a change to a pattern needs a fixture for what it newly rejects or must keep rejecting.
+  - Python and ECMA 262 are not compared automatically. The patterns were checked once by hand in Node, and a new pattern needs the same check.
 - The files here are the only copy. `src/zadrya_data/schemas/` holds symbolic links to them, which the build resolves so that the installed package carries the schemas.

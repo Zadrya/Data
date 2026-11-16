@@ -23,7 +23,7 @@ The schema is read by two implementations: `jsonschema` in Python here, and the 
 ### Text
 
 - Text is never empty, never only whitespace, never starts or ends with whitespace (the byte order mark U+FEFF counts as whitespace), and never contains a control character (U+0000 to U+001F, U+007F to U+009F) or a line or paragraph separator (U+2028, U+2029).
-- One exception, forced by the data: `effectsSummary`, `dosageRemark`, `generalRisks` and `longtermRisks` hold several paragraphs in the base file, separated by line feeds (65 values). These four fields use a second definition, `paragraphs`, with the same rules except that the line feed U+000A is allowed inside. Carriage returns and tabs are not. Whether these fields should instead become lists of paragraphs is open, and is easy to change before the first signed release.
+- One exception, decided by the owner because the data needs it: `effectsSummary`, `dosageRemark`, `generalRisks` and `longtermRisks` hold several paragraphs in the base file, separated by line feeds (65 values). These four fields use a second definition, `paragraphs`, with the same rules except that the line feed U+000A is allowed inside. Carriage returns and tabs are not, and the text still cannot start or end with a line feed. The alternative, lists of paragraphs, was not taken.
 
 ### Groups, interactions and cross tolerance
 
@@ -70,7 +70,9 @@ Each pattern has a fixture with a trailing newline, and all patterns were run on
 
 ### Strict JSON
 
-`validate` reads documents with `zadrya_data.strict_json`: `NaN`, `Infinity`, numbers out of range such as `1e999`, and objects with a repeated key are rejected, and nesting that is too deep is an error instead of a crash. All of them exit with code 2. The base loader on its own branch has a private copy of the same checks; the two are unified after both are merged.
+`validate` reads documents with `zadrya_data.strict_json`: `NaN`, `Infinity`, numbers out of range such as `1e999`, and objects with a repeated key are rejected, and nesting that is too deep is an error instead of a crash. So are integers whose absolute value is above 2**53 - 1, which parsers that read numbers as IEEE 754 doubles round or read as infinity. All of them exit with code 2. The base loader has a private copy of some of these checks; the two are unified in a follow-up.
+
+This strictness lives in the reading path only. The future `build` command must write with `allow_nan=False`, so that it cannot produce what `validate` refuses, and must validate the bytes it wrote, read back through `strict_json`, not the object it had in memory: the signature and the hash cover the bytes.
 
 ### Versions, addresses and dates
 
@@ -90,7 +92,7 @@ The schemas live in `schema/`, where the spec puts them. The Python package read
 
 ### Fixtures
 
-Every fixture document is defined in `tests/schema_cases.py`, with the JSON path and the keyword that must reject it, and the files in `tests/fixtures/schema/` are generated from it. Tests check that the files are up to date, that each invalid document breaks exactly its rule, and, by removing each constraint of the schema in turn, that no constraint can be dropped without a fixture changing its result.
+Every fixture document is defined in `tests/schema_cases.py`, with the JSON path and the keyword that must reject it, and the files in `tests/fixtures/schema/` are generated from it. Tests check that the files are up to date, that each invalid document breaks exactly its rule, and, by loosening each constraint of the schema in turn (removing a keyword, a `required` or `dependentRequired` entry, or removing or adding an `enum` entry), that no constraint can be loosened without a fixture changing its result. A schema may only use keywords that this mutation test knows. A pattern that is widened instead of removed is not caught by it: the fixtures of each pattern are the only guard.
 
 ### Versioning rules
 
