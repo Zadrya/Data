@@ -34,6 +34,19 @@ The substance information in the base file was written by the contributors of [P
 
 Both licenses require attribution, which the dataset carries in its `attribution` list and the release manifest repeats. CC BY-SA 4.0 also requires that adapted text is shared under the same license.
 
+### PsychonautWiki API and wiki (planned inputs)
+
+`zadrya-data fetch` reads two services, and nothing else in this repository uses the network:
+
+| Service | Address | What is read |
+| --- | --- | --- |
+| GraphQL API | <https://api.psychonautwiki.org/> | Every substance with its doses, durations, tolerance, classes and interactions, in one query |
+| Wiki API (MediaWiki) | <https://psychonautwiki.org/w/api.php> | For each substance name: whether the page exists, its title after redirects, and the id and timestamp of its last revision. No page text |
+
+Their content is PsychonautWiki content under the licenses in the table above: text (for example the `summary` of the API) under CC BY-SA 4.0, semantic data under CC BY 4.0.
+
+No snapshot of these services is committed yet: the first one lands together with the first dataset, once the license of the derived data is decided (see "Open questions"). A snapshot records its own provenance: the endpoints, the exact query, the fetch date, and the last revision of every page. Until then the only data from these services in the repository is [`tests/fixtures/api/`](tests/fixtures/api): a few recorded answers, trimmed to seven substances and eight page lookups, annotated `CC-BY-SA-4.0 AND CC-BY-4.0` in `REUSE.toml`.
+
 ## Derived data
 
 The dataset this repository builds is derived from the inputs above. Its annotation in `REUSE.toml` is added together with the first dataset file, so that no file ever falls back to the default annotation for code.
