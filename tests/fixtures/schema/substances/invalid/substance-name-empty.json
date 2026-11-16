@@ -9,6 +9,7 @@
     }
   ],
   "categories": [],
+  "interactionGroups": [],
   "substances": [
     {
       "name": "",
@@ -21,6 +22,11 @@
       },
       "roas": [],
       "crossTolerances": [],
+      "interactions": {
+        "dangerous": [],
+        "unsafe": [],
+        "uncertain": []
+      },
       "toxicities": []
     }
   ]

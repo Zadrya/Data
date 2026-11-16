@@ -72,13 +72,38 @@ INVALID_FIXTURES = {
     ),
     "bioavailability-min-negative": ("$.substances[0].roas[0].bioavailability.min", "minimum"),
     "bioavailability-max-above-100": ("$.substances[0].roas[0].bioavailability.max", "maximum"),
+    "interaction-group-missing-members": ("$.interactionGroups[0]", "required"),
+    "interaction-group-unknown-property": ("$.interactionGroups[0]", "additionalProperties"),
+    "interaction-group-id-not-a-slug": ("$.interactionGroups[0].id", "pattern"),
+    "interaction-group-members-not-a-list": ("$.interactionGroups[0].members", "type"),
+    "interactions-missing-uncertain": ("$.substances[0].interactions", "required"),
+    "interactions-unknown-severity": ("$.substances[0].interactions", "additionalProperties"),
+    "interaction-target-not-an-object": ("$.substances[0].interactions.unsafe[0]", "type"),
+    "interaction-target-missing-kind": ("$.substances[0].interactions.unsafe[0]", "required"),
+    "interaction-target-unknown-property": (
+        "$.substances[0].interactions.unsafe[0]",
+        "additionalProperties",
+    ),
+    "interaction-target-kind-not-in-the-list": (
+        "$.substances[0].interactions.unsafe[0].kind",
+        "enum",
+    ),
+    "interaction-target-name-empty": ("$.substances[0].interactions.unsafe[0].name", "minLength"),
 }
 # Required keys of the top level ("") and of every definition, pinned here so
 # that a key cannot become optional without a test changing.
 REQUIRED = {
-    "": ["schemaVersion", "datasetVersion", "attribution", "categories", "substances"],
+    "": [
+        "schemaVersion",
+        "datasetVersion",
+        "attribution",
+        "categories",
+        "interactionGroups",
+        "substances",
+    ],
     "attribution": ["name", "url", "license"],
     "category": ["id", "name", "description"],
+    "interactionGroup": ["id", "name", "members"],
     "substance": [
         "name",
         "aliases",
@@ -87,9 +112,12 @@ REQUIRED = {
         "classes",
         "roas",
         "crossTolerances",
+        "interactions",
         "toxicities",
     ],
     "classes": ["psychoactive", "chemical"],
+    "interactions": ["dangerous", "unsafe", "uncertain"],
+    "interactionTarget": ["kind", "name"],
     "roa": ["route"],
     "dose": ["units"],
     "doseRange": ["min", "max"],
