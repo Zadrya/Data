@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "1.0.0",
+  "attribution": [
+    {
+      "name": "PsychonautWiki",
+      "url": "https://psychonautwiki.org",
+      "license": 7
+    }
+  ],
+  "categories": [],
+  "interactionGroups": [],
+  "crossToleranceGroups": [],
+  "substances": []
+}

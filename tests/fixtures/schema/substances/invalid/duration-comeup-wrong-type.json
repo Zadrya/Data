@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "1.0.0",
+  "attribution": [
+    {
+      "name": "PsychonautWiki",
+      "url": "https://psychonautwiki.org",
+      "license": "CC-BY-SA-4.0"
+    }
+  ],
+  "categories": [],
+  "interactionGroups": [],
+  "crossToleranceGroups": [],
+  "substances": [
+    {
+      "name": "LSD",
+      "aliases": [],
+      "url": "https://psychonautwiki.org/wiki/LSD",
+      "categories": [],
+      "classes": {
+        "psychoactive": [],
+        "chemical": []
+      },
+      "roas": [
+        {
+          "route": "sublingual",
+          "dose": {
+            "units": "µg",
+            "lightMin": 15,
+            "commonMin": 75,
+            "strongMin": 150,
+            "heavyMin": 300
+          },
+          "duration": {
+            "onset": {
+              "min": 15,
+              "max": 30
+            },
+            "comeup": 7
+          },
+          "bioavailability": {
+            "min": 71,
+            "max": 71
+          }
+        }
+      ],
+      "crossTolerances": [],
+      "interactions": {
+        "dangerous": [],
+        "unsafe": [],
+        "uncertain": []
+      },
+      "toxicities": []
+    }
+  ]
+}
