@@ -3,13 +3,18 @@
 
 ``json.loads`` is lenient in ways that matter for a dataset that is hashed, signed
 and read by another JSON implementation: it accepts ``NaN`` and ``Infinity``, turns
-a number such as ``1e999`` into infinity, and keeps the last value when an object
-repeats a key. ``loads`` here rejects all of them, and reports nesting that is too
-deep as an error instead of a ``RecursionError``.
+a number such as ``1e999`` into infinity, reads integers of any size (which other
+parsers round or read as infinity), and keeps the last value when an object repeats
+a key. ``loads`` here rejects all of them, and reports nesting that is too deep as
+an error instead of a ``RecursionError``.
 """
 
 import json
 import math
+
+# Largest integer that an IEEE 754 double, the number type of most JSON parsers,
+# represents exactly together with all smaller ones.
+MAX_SAFE_INTEGER = 2**53 - 1
 
 
 class StrictJsonError(ValueError):
@@ -24,6 +29,16 @@ def _finite_float(text: str) -> float:
     number = float(text)
     if not math.isfinite(number):
         raise StrictJsonError(f"the number {text} is out of range")
+    return number
+
+
+def _safe_integer(text: str) -> int:
+    try:
+        number = int(text)
+    except ValueError as error:  # more digits than Python converts by default
+        raise StrictJsonError("an integer has too many digits") from error
+    if abs(number) > MAX_SAFE_INTEGER:
+        raise StrictJsonError(f"the integer {text} is outside the safe range of a double")
     return number
 
 
@@ -43,6 +58,7 @@ def loads(text: str) -> object:
             text,
             parse_constant=_reject_constant,
             parse_float=_finite_float,
+            parse_int=_safe_integer,
             object_pairs_hook=_unique_keys,
         )
     except StrictJsonError:
