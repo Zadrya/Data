@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "1.0.0",
+  "attribution": [
+    {
+      "name": "PsychonautWiki",
+      "url": "https://psychonautwiki.org",
+      "license": "CC-BY-SA-4.0"
+    },
+    {
+      "name": "PsychonautWiki Journal",
+      "url": "https://github.com/isaakhanimann/psychonautwiki-journal-android",
+      "license": "GPL-3.0-only"
+    }
+  ],
+  "categories": [
+    {
+      "id": "psychedelic",
+      "name": "Psychedelic",
+      "description": "Substances that alter perception and cognition."
+    },
+    {
+      "id": "research-chemical",
+      "name": "Research chemical",
+      "description": "Substances with little history of human use."
+    }
+  ],
+  "substances": [
+    {
+      "name": "LSD",
+      "aliases": [
+        "LSD-25",
+        "Acid",
+        "Lucy"
+      ],
+      "url": "https://psychonautwiki.org/wiki/LSD",
+      "summary": "LSD is a popular psychedelic with a long history of use and research.",
+      "categories": [
+        "psychedelic"
+      ],
+      "classes": {
+        "psychoactive": [
+          "Psychedelics"
+        ],
+        "chemical": [
+          "Lysergamides"
+        ]
+      },
+      "tolerance": {
+        "full": "almost immediately after ingestion",
+        "half": "3 days",
+        "zero": "5 days"
+      },
+      "crossTolerances": [
+        "psychedelic",
+        "5-ht2a-agonist"
+      ],
+      "addictionPotential": "non-addictive with a low abuse potential",
+      "toxicities": [
+        "extremely low toxicity relative to dose"
+      ],
+      "effectsSummary": "The effect depends very much on dose, set and setting.",
+      "dosageRemark": "Blotters vary widely in strength.",
+      "generalRisks": "The risks of LSD use are psychological.",
+      "longtermRisks": "Latent mental disorders can be triggered.",
+      "saferUse": [
+        "Dose low.",
+        "Take LSD only in an environment where you feel comfortable."
+      ]
+    },
+    {
+      "name": "1P-LSD",
+      "aliases": [],
+      "url": "https://psychonautwiki.org/wiki/1P-LSD",
+      "categories": [
+        "psychedelic",
+        "research-chemical"
+      ],
+      "classes": {
+        "psychoactive": [],
+        "chemical": []
+      },
+      "crossTolerances": [],
+      "toxicities": []
+    }
+  ]
+}
