@@ -61,9 +61,14 @@
       "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$(?![\\s\\S])"
     },
     "text": {
-      "description": "A string with at least one character.",
+      "description": "One line of text: not empty, no whitespace at the start or the end, and no control character or line break anywhere.",
       "type": "string",
-      "minLength": 1
+      "pattern": "^[^\\s\\ufeff\\u0000-\\u001f\\u007f-\\u009f\\u2028\\u2029]([^\\u0000-\\u001f\\u007f-\\u009f\\u2028\\u2029]*[^\\s\\ufeff\\u0000-\\u001f\\u007f-\\u009f\\u2028\\u2029])?$(?![\\s\\S])"
+    },
+    "paragraphs": {
+      "description": "Text of one or more paragraphs separated by line feeds (U+000A): not empty, no whitespace at the start or the end, and no other control character.",
+      "type": "string",
+      "pattern": "^[^\\s\\ufeff\\u0000-\\u001f\\u007f-\\u009f\\u2028\\u2029]([^\\u0000-\\u0009\\u000b-\\u001f\\u007f-\\u009f\\u2028\\u2029]*[^\\s\\ufeff\\u0000-\\u001f\\u007f-\\u009f\\u2028\\u2029])?$(?![\\s\\S])"
     },
     "slug": {
       "description": "A lowercase token: letters and digits, with single hyphens between words.",
@@ -227,20 +232,20 @@
           }
         },
         "effectsSummary": {
-          "description": "Free text overview of the effects.",
-          "$ref": "#/$defs/text"
+          "description": "Free text, possibly several paragraphs, overview of the effects.",
+          "$ref": "#/$defs/paragraphs"
         },
         "dosageRemark": {
-          "description": "Free text remark about dosing.",
-          "$ref": "#/$defs/text"
+          "description": "Free text, possibly several paragraphs, remark about dosing.",
+          "$ref": "#/$defs/paragraphs"
         },
         "generalRisks": {
-          "description": "Free text about the general risks.",
-          "$ref": "#/$defs/text"
+          "description": "Free text, possibly several paragraphs, about the general risks.",
+          "$ref": "#/$defs/paragraphs"
         },
         "longtermRisks": {
-          "description": "Free text about the long-term risks.",
-          "$ref": "#/$defs/text"
+          "description": "Free text, possibly several paragraphs, about the long-term risks.",
+          "$ref": "#/$defs/paragraphs"
         },
         "saferUse": {
           "description": "Safer use advice, one item per piece of advice. Absent when there is none.",

@@ -204,7 +204,7 @@ def _full() -> Any:
         "toxicities": ["extremely low toxicity relative to dose"],
         "effectsSummary": "The effect depends very much on dose, set and setting.",
         "dosageRemark": "Blotters vary widely in strength.",
-        "generalRisks": "The risks of LSD use are psychological.",
+        "generalRisks": "The risks of LSD use are psychological.\nThere is a risk that latent mental disorders are triggered.",
         "longtermRisks": "Latent mental disorders can be triggered.",
         "saferUse": ["Dose low.", "Take LSD only in an environment where you feel comfortable."],
     }
@@ -349,7 +349,91 @@ def substances_invalid() -> list[InvalidCase]:
             "attribution-name-empty",
             _put(m, ["attribution", 0, "name"], ""),
             "$.attribution[0].name",
-            "minLength",
+            "pattern",
+        ),
+        case(
+            "text-only-whitespace",
+            _put(m, ["attribution", 0, "name"], " \t "),
+            "$.attribution[0].name",
+            "pattern",
+        ),
+        case(
+            "text-leading-whitespace",
+            _put(m, ["attribution", 0, "name"], " PsychonautWiki"),
+            "$.attribution[0].name",
+            "pattern",
+        ),
+        case(
+            "text-trailing-whitespace",
+            _put(m, ["attribution", 0, "name"], "PsychonautWiki "),
+            "$.attribution[0].name",
+            "pattern",
+        ),
+        case(
+            "text-trailing-newline",
+            _put(m, ["attribution", 0, "name"], "PsychonautWiki\n"),
+            "$.attribution[0].name",
+            "pattern",
+        ),
+        case(
+            "text-leading-no-break-space",
+            _put(m, ["attribution", 0, "name"], "\u00a0PsychonautWiki"),
+            "$.attribution[0].name",
+            "pattern",
+        ),
+        case(
+            "text-leading-byte-order-mark",
+            _put(m, ["attribution", 0, "name"], "\ufeffPsychonautWiki"),
+            "$.attribution[0].name",
+            "pattern",
+        ),
+        case(
+            "text-null-character",
+            _put(m, ["attribution", 0, "name"], "Psychonaut\u0000Wiki"),
+            "$.attribution[0].name",
+            "pattern",
+        ),
+        case(
+            "text-line-break-inside",
+            _put(m, ["attribution", 0, "name"], "Psychonaut\nWiki"),
+            "$.attribution[0].name",
+            "pattern",
+        ),
+        case(
+            "text-tab-inside",
+            _put(m, ["attribution", 0, "name"], "Psychonaut\tWiki"),
+            "$.attribution[0].name",
+            "pattern",
+        ),
+        case(
+            "paragraphs-empty",
+            _put(s, [*_S, "generalRisks"], ""),
+            f"{_SP}.generalRisks",
+            "pattern",
+        ),
+        case(
+            "paragraphs-leading-line-break",
+            _put(s, [*_S, "generalRisks"], "\nThe risks are psychological."),
+            f"{_SP}.generalRisks",
+            "pattern",
+        ),
+        case(
+            "paragraphs-trailing-line-break",
+            _put(s, [*_S, "generalRisks"], "The risks are psychological.\n"),
+            f"{_SP}.generalRisks",
+            "pattern",
+        ),
+        case(
+            "paragraphs-null-character",
+            _put(s, [*_S, "generalRisks"], "The risks are\u0000psychological."),
+            f"{_SP}.generalRisks",
+            "pattern",
+        ),
+        case(
+            "paragraphs-carriage-return",
+            _put(s, [*_S, "generalRisks"], "The risks.\r\nThey are psychological."),
+            f"{_SP}.generalRisks",
+            "pattern",
         ),
         case(
             "category-missing-description",
@@ -376,7 +460,7 @@ def substances_invalid() -> list[InvalidCase]:
             _SP,
             "additionalProperties",
         ),
-        case("substance-name-empty", _put(s, [*_S, "name"], ""), f"{_SP}.name", "minLength"),
+        case("substance-name-empty", _put(s, [*_S, "name"], ""), f"{_SP}.name", "pattern"),
         case(
             "substance-aliases-not-a-list",
             _put(s, [*_S, "aliases"], "Acid"),
@@ -477,7 +561,7 @@ def substances_invalid() -> list[InvalidCase]:
             "dose-units-empty",
             _put(r, [*_R, "dose", "units"], ""),
             f"{_RP}.dose.units",
-            "minLength",
+            "pattern",
         ),
         case(
             "dose-threshold-negative",
@@ -626,9 +710,7 @@ def substances_invalid() -> list[InvalidCase]:
             f"{_TP}.kind",
             "enum",
         ),
-        case(
-            "interaction-target-name-empty", _put(t, [*_T, "name"], ""), f"{_TP}.name", "minLength"
-        ),
+        case("interaction-target-name-empty", _put(t, [*_T, "name"], ""), f"{_TP}.name", "pattern"),
     ]
 
 
@@ -729,10 +811,34 @@ def manifest_invalid() -> list[InvalidCase]:
             "pattern",
         ),
         case(
+            "text-only-whitespace",
+            _put(m, ["attribution", 0, "name"], "  "),
+            "$.attribution[0].name",
+            "pattern",
+        ),
+        case(
+            "text-leading-whitespace",
+            _put(m, ["attribution", 0, "name"], " PsychonautWiki"),
+            "$.attribution[0].name",
+            "pattern",
+        ),
+        case(
+            "text-trailing-whitespace",
+            _put(m, ["attribution", 0, "name"], "PsychonautWiki\n"),
+            "$.attribution[0].name",
+            "pattern",
+        ),
+        case(
+            "text-null-character",
+            _put(m, ["attribution", 0, "name"], "Psychonaut\u0000Wiki"),
+            "$.attribution[0].name",
+            "pattern",
+        ),
+        case(
             "attribution-license-empty",
             _put(m, ["attribution", 0, "license"], ""),
             "$.attribution[0].license",
-            "minLength",
+            "pattern",
         ),
     ]
 
