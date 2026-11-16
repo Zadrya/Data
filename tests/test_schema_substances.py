@@ -15,11 +15,12 @@ REQUIRED = {
         "attribution",
         "categories",
         "interactionGroups",
+        "crossToleranceGroups",
         "substances",
     ],
     "attribution": ["name", "url", "license"],
     "category": ["id", "name", "description"],
-    "interactionGroup": ["id", "name", "members"],
+    "substanceGroup": ["id", "name", "members"],
     "substance": [
         "name",
         "aliases",

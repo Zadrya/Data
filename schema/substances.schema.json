@@ -12,6 +12,7 @@
     "attribution",
     "categories",
     "interactionGroups",
+    "crossToleranceGroups",
     "substances"
   ],
   "properties": {
@@ -43,7 +44,14 @@
       "description": "Named groups of substances that interaction targets of kind group refer to.",
       "type": "array",
       "items": {
-        "$ref": "#/$defs/interactionGroup"
+        "$ref": "#/$defs/substanceGroup"
+      }
+    },
+    "crossToleranceGroups": {
+      "description": "Groups of substances that share tolerance with each other. A substance lists the groups it has cross tolerance with in crossTolerances.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/substanceGroup"
       }
     },
     "substances": {
@@ -135,8 +143,8 @@
         }
       }
     },
-    "interactionGroup": {
-      "description": "A named group of substances, such as a pharmacological class, that an interaction can target as a whole.",
+    "substanceGroup": {
+      "description": "A named group of substances, such as a pharmacological class. Interactions can target a group as a whole, and substances in the same cross tolerance group share tolerance.",
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -146,11 +154,11 @@
       ],
       "properties": {
         "id": {
-          "description": "Stable identifier of the group.",
+          "description": "Stable identifier that the rest of the document refers to.",
           "$ref": "#/$defs/slug"
         },
         "name": {
-          "description": "Display name. Interaction targets of kind group refer to this name.",
+          "description": "Display name.",
           "$ref": "#/$defs/text"
         },
         "members": {
@@ -221,7 +229,7 @@
           "$ref": "#/$defs/tolerance"
         },
         "crossTolerances": {
-          "description": "Classes or groups the substance shares tolerance with, as lowercase tokens.",
+          "description": "Identifiers of the entries of crossToleranceGroups the substance has cross tolerance with. May be empty.",
           "type": "array",
           "items": {
             "$ref": "#/$defs/slug"

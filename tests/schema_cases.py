@@ -72,6 +72,7 @@ def _minimal() -> Any:
         ],
         "categories": [],
         "interactionGroups": [],
+        "crossToleranceGroups": [],
         "substances": [],
     }
 
@@ -106,6 +107,11 @@ def _with_category() -> Any:
 def _with_group() -> Any:
     group = {"id": "stimulants", "name": "Stimulants", "members": []}
     return _put(_minimal(), ["interactionGroups"], [group])
+
+
+def _with_cross_tolerance_group() -> Any:
+    group = {"id": "psychedelics", "name": "Psychedelics", "members": []}
+    return _put(_minimal(), ["crossToleranceGroups"], [group])
 
 
 def _with_roa() -> Any:
@@ -146,6 +152,10 @@ def _full() -> Any:
             "name": "Tricyclic antidepressants",
             "members": [],
         },
+    ]
+    document["crossToleranceGroups"] = [
+        {"id": "psychedelics", "name": "Psychedelics", "members": ["LSD", "1P-LSD"]},
+        {"id": "5-ht2a-agonists", "name": "5-HT2A agonists", "members": []},
     ]
     lsd = {
         "name": "LSD",
@@ -188,7 +198,7 @@ def _full() -> Any:
             "half": {"text": "3 days", "min": 4320, "max": 4320},
             "zero": {"text": "1-2 weeks", "min": 10080, "max": 20160},
         },
-        "crossTolerances": ["psychedelic", "5-ht2a-agonist"],
+        "crossTolerances": ["psychedelics", "5-ht2a-agonists"],
         "interactions": {
             "dangerous": [{"kind": "other", "name": "Lithium"}],
             "unsafe": [
@@ -238,6 +248,7 @@ def substances_valid() -> dict[str, Any]:
 def substances_invalid() -> list[InvalidCase]:
     """Return the invalid documents, one per rule."""
     case = InvalidCase
+    x = _with_cross_tolerance_group()
     m, c, g, s, r, t = (
         _minimal(),
         _with_category(),
@@ -574,7 +585,31 @@ def substances_invalid() -> list[InvalidCase]:
             "type",
         ),
         case(
-            "cross-tolerance-not-a-lowercase-token",
+            "cross-tolerance-group-missing-name",
+            _cut(x, ["crossToleranceGroups", 0, "name"]),
+            "$.crossToleranceGroups[0]",
+            "required",
+        ),
+        case(
+            "cross-tolerance-group-unknown-property",
+            _put(x, ["crossToleranceGroups", 0, "substances"], []),
+            "$.crossToleranceGroups[0]",
+            "additionalProperties",
+        ),
+        case(
+            "cross-tolerance-group-id-not-a-slug",
+            _put(x, ["crossToleranceGroups", 0, "id"], "serotonin|serotonergic"),
+            "$.crossToleranceGroups[0].id",
+            "pattern",
+        ),
+        case(
+            "cross-tolerance-groups-not-a-list",
+            _put(x, ["crossToleranceGroups"], {"psychedelics": ["LSD"]}),
+            "$.crossToleranceGroups",
+            "type",
+        ),
+        case(
+            "cross-tolerance-not-a-group-id",
             _put(s, [*_S, "crossTolerances"], ["GABA"]),
             f"{_SP}.crossTolerances[0]",
             "pattern",
