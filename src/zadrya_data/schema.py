@@ -25,6 +25,17 @@ class SchemaName(StrEnum):
     MANIFEST = "manifest"
 
 
+class SchemaLoadError(RuntimeError):
+    """A schema file of this package cannot be used."""
+
+    def __init__(self, name: SchemaName, reason: str) -> None:
+        super().__init__(
+            f"cannot load the {name.value} schema: {reason}. In a checkout the files in "
+            "src/zadrya_data/schemas are symbolic links to schema/: a clone without "
+            "symbolic link support (git config core.symlinks) leaves them as plain text."
+        )
+
+
 @dataclass(frozen=True)
 class SchemaViolation:
     """One place where a document breaks its schema."""
@@ -40,7 +51,12 @@ class SchemaViolation:
 def load_schema(name: SchemaName) -> dict[str, Any]:
     """Return the schema of the given document as parsed JSON."""
     resource = files("zadrya_data").joinpath("schemas", f"{name.value}.schema.json")
-    schema: dict[str, Any] = json.loads(resource.read_text(encoding="utf-8"))
+    try:
+        schema = json.loads(resource.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as error:
+        raise SchemaLoadError(name, str(error)) from error
+    if not isinstance(schema, dict):
+        raise SchemaLoadError(name, f"expected a JSON object, found {type(schema).__name__}")
     return schema
 
 
