@@ -13,6 +13,9 @@ dependencies = [
     "jsonschema>=4.26.0",
 ]
 
+[project.scripts]
+zadrya-data = "zadrya_data.cli:main"
+
 [build-system]
 requires = ["uv_build>=0.13.7,<0.14.0"]
 build-backend = "uv_build"
