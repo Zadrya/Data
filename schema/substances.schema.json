@@ -154,7 +154,7 @@
       ],
       "properties": {
         "id": {
-          "description": "Stable identifier that the rest of the document refers to.",
+          "description": "Stable identifier. Interaction targets and cross tolerances refer to a group by it.",
           "$ref": "#/$defs/slug"
         },
         "name": {
@@ -385,7 +385,21 @@
       }
     },
     "interactionTarget": {
-      "description": "What a substance interacts with.",
+      "description": "What a substance interacts with: a substance of the catalog, a group of interactionGroups, or something outside the catalog. The value of kind tells which.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/substanceTarget"
+        },
+        {
+          "$ref": "#/$defs/groupTarget"
+        },
+        {
+          "$ref": "#/$defs/otherTarget"
+        }
+      ]
+    },
+    "substanceTarget": {
+      "description": "An interaction with one substance of the catalog.",
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -394,15 +408,49 @@
       ],
       "properties": {
         "kind": {
-          "description": "substance: name is a canonical substance name. group: name is the name of an entry in interactionGroups. other: name is a drug or thing outside the catalog, kept as text.",
-          "enum": [
-            "substance",
-            "group",
-            "other"
-          ]
+          "description": "Marks a target that is a substance of the catalog.",
+          "const": "substance"
         },
         "name": {
-          "description": "Name of the target, interpreted according to kind.",
+          "description": "Canonical name of the substance.",
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "groupTarget": {
+      "description": "An interaction with every member of a group.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "groupId"
+      ],
+      "properties": {
+        "kind": {
+          "description": "Marks a target that is an entry of interactionGroups.",
+          "const": "group"
+        },
+        "groupId": {
+          "description": "Identifier of the entry of interactionGroups.",
+          "$ref": "#/$defs/slug"
+        }
+      }
+    },
+    "otherTarget": {
+      "description": "An interaction with a drug or thing outside the catalog, for example Ritonavir or Grapefruit.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "name"
+      ],
+      "properties": {
+        "kind": {
+          "description": "Marks a target outside the catalog.",
+          "const": "other"
+        },
+        "name": {
+          "description": "Name of the drug or thing, kept as text.",
           "$ref": "#/$defs/text"
         }
       }

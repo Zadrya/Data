@@ -7,13 +7,14 @@ them into the wheel and an installed package finds them without the repository.
 """
 
 import json
+from collections.abc import Iterator
 from dataclasses import dataclass
 from enum import StrEnum
 from functools import cache
 from importlib.resources import files
 from typing import Any
 
-from jsonschema import Draft202012Validator
+from jsonschema import Draft202012Validator, ValidationError
 
 SCHEMA_VERSION = "1.0.0"
 
@@ -60,17 +61,50 @@ def load_schema(name: SchemaName) -> dict[str, Any]:
     return schema
 
 
-@cache
-def _validator(name: SchemaName) -> Draft202012Validator:
-    schema = load_schema(name)
+def build_validator(schema: dict[str, Any]) -> Draft202012Validator:
+    """Return a Draft 2020-12 validator of the schema with format assertions on."""
     Draft202012Validator.check_schema(schema)
     return Draft202012Validator(schema, format_checker=Draft202012Validator.FORMAT_CHECKER)
 
 
+@cache
+def _validator(name: SchemaName) -> Draft202012Validator:
+    return build_validator(load_schema(name))
+
+
+def _expand(error: ValidationError) -> Iterator[ValidationError]:
+    """Replace a ``oneOf`` failure by the failures of the branch the document chose.
+
+    The branches of a ``oneOf`` in these schemas differ by a constant (``kind``). When
+    exactly one branch has no failed constant, the document meant that branch, and its
+    failures say what is wrong. Otherwise the ``oneOf`` failure itself is reported.
+    """
+    if error.validator == "oneOf" and error.context:
+        branches: dict[object, list[ValidationError]] = {}
+        for inner in error.context:
+            branches.setdefault(inner.relative_schema_path[0], []).append(inner)
+        chosen = [
+            inners
+            for inners in branches.values()
+            if all(inner.validator != "const" for inner in inners)
+        ]
+        if len(chosen) == 1:
+            for inner in chosen[0]:
+                yield from _expand(inner)
+            return
+    yield error
+
+
+def violations(validator: Draft202012Validator, document: object) -> list[SchemaViolation]:
+    """Return every violation the validator finds in the document, ordered by path."""
+    found = [
+        SchemaViolation(path=error.json_path, rule=str(error.validator), message=error.message)
+        for top in validator.iter_errors(document)
+        for error in _expand(top)
+    ]
+    return sorted(found, key=lambda violation: (violation.path, violation.rule))
+
+
 def validate(document: object, name: SchemaName) -> list[SchemaViolation]:
     """Return every violation of the schema, ordered by path. An empty list means valid."""
-    violations = [
-        SchemaViolation(path=error.json_path, rule=str(error.validator), message=error.message)
-        for error in _validator(name).iter_errors(document)
-    ]
-    return sorted(violations, key=lambda violation: (violation.path, violation.rule))
+    return violations(_validator(name), document)
