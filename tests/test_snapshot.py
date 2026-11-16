@@ -17,6 +17,7 @@ from zadrya_data.snapshot import (
     dump_json,
     fetch_raw,
     load_snapshot,
+    sort_substances,
     write_snapshot,
 )
 
@@ -89,13 +90,40 @@ def test_snapshot_round_trips(tmp_path: Path) -> None:
     }
 
 
-def test_graphql_file_is_the_data_member_unchanged(tmp_path: Path) -> None:
+def test_graphql_file_holds_every_value_as_received(tmp_path: Path) -> None:
     write_snapshot(tmp_path, _data(), PAGES, DAY)
     text = (tmp_path / "graphql.json").read_text(encoding="utf-8")
+    written = json.loads(text)["substances"]
+    received = _data()["substances"]
+    assert isinstance(received, list)
 
-    assert json.loads(text) == _data()
-    assert text == dump_json(_data())
+    assert sorted(written, key=lambda entry: entry["name"]) == written
+    assert {entry["name"]: entry for entry in written} == {
+        entry["name"]: entry for entry in received
+    }
+    assert text == dump_json(sort_substances(_data()))
     assert "μg" in text and "\\u" not in text
+
+
+def test_substances_are_ordered_by_the_code_points_of_their_names() -> None:
+    template = _data()["substances"]
+    assert isinstance(template, list)
+    names = ["b", "Zolpidem", "\u0392k-2C-B", "1cP-MiPLA", "B", "1P-ETH-LAD", "1,3-Butanediol"]
+    data: dict[str, object] = {"substances": [template[0] | {"name": name} for name in names]}
+
+    ordered = sort_substances(data)["substances"]
+
+    assert isinstance(ordered, list)
+    assert [entry["name"] for entry in ordered] == [
+        "1,3-Butanediol",
+        "1P-ETH-LAD",
+        "1cP-MiPLA",
+        "B",
+        "Zolpidem",
+        "b",
+        "\u0392k-2C-B",
+    ]
+    assert data["substances"] != ordered  # the argument is left as it was
 
 
 def test_info_file_records_where_and_what_was_asked(tmp_path: Path) -> None:
