@@ -355,3 +355,115 @@ def test_a_repeated_key_fails_instead_of_keeping_the_last_value(tmp_path: Path) 
 
     with pytest.raises(BaseFormatError, match="duplicate key 'max'"):
         load_base(path)
+
+
+def _present(pairs: dict[str, object | None]) -> dict[str, object]:
+    return {key: value for key, value in pairs.items() if value is not None}
+
+
+def _range_document(value: BaseDurationRange | None) -> dict[str, object] | None:
+    if value is None:
+        return None
+    return _present({"min": value.min, "max": value.max, "units": value.units})
+
+
+def _route_document(route: BaseRoute) -> dict[str, object]:
+    dose, duration, bioavailability = route.dose, route.duration, route.bioavailability
+    return _present(
+        {
+            "name": route.name,
+            "dose": dose
+            and _present(
+                {
+                    "units": dose.units,
+                    "lightMin": dose.light_min,
+                    "commonMin": dose.common_min,
+                    "strongMin": dose.strong_min,
+                    "heavyMin": dose.heavy_min,
+                }
+            ),
+            "duration": duration
+            and _present(
+                {
+                    "onset": _range_document(duration.onset),
+                    "comeup": _range_document(duration.comeup),
+                    "peak": _range_document(duration.peak),
+                    "offset": _range_document(duration.offset),
+                    "total": _range_document(duration.total),
+                    "afterglow": _range_document(duration.afterglow),
+                }
+            ),
+            "bioavailability": bioavailability
+            and _present({"min": bioavailability.min, "max": bioavailability.max}),
+        }
+    )
+
+
+def _document(base: BaseFile) -> dict[str, list[dict[str, object]]]:
+    """Rebuild the JSON document from the dataclasses, with the key names written by hand."""
+    return {
+        "categories": [
+            _present(
+                {
+                    "name": category.name,
+                    "description": category.description,
+                    "color": category.color,
+                    "url": category.url,
+                }
+            )
+            for category in base.categories
+        ],
+        "substances": [
+            _present(
+                {
+                    "name": substance.name,
+                    "commonNames": list(substance.common_names),
+                    "url": substance.url,
+                    "isApproved": substance.is_approved,
+                    "tolerance": substance.tolerance
+                    and _present(
+                        {
+                            "full": substance.tolerance.full,
+                            "half": substance.tolerance.half,
+                            "zero": substance.tolerance.zero,
+                        }
+                    ),
+                    "crossTolerances": list(substance.cross_tolerances),
+                    "addictionPotential": substance.addiction_potential,
+                    "toxicities": list(substance.toxicities),
+                    "categories": list(substance.categories),
+                    "summary": substance.summary,
+                    "effectsSummary": substance.effects_summary,
+                    "dosageRemark": substance.dosage_remark,
+                    "generalRisks": substance.general_risks,
+                    "longtermRisks": substance.longterm_risks,
+                    "saferUse": None if substance.safer_use is None else list(substance.safer_use),
+                    "interactions": substance.interactions
+                    and {
+                        "dangerous": list(substance.interactions.dangerous),
+                        "unsafe": list(substance.interactions.unsafe),
+                        "uncertain": list(substance.interactions.uncertain),
+                    },
+                    "roas": [_route_document(route) for route in substance.roas],
+                }
+            )
+            for substance in base.substances
+        ],
+    }
+
+
+def test_real_file_round_trips_through_the_dataclasses(base: BaseFile) -> None:
+    """Nothing is lost or changed: the rebuilt document equals the file, value by value.
+
+    Both sides are compared as canonical JSON text, because ``1 == 1.0`` in Python and
+    the int or float type of every number must survive too.
+    """
+    original = json.loads(BASE_FILE.read_text(encoding="utf-8"))
+    rebuilt = _document(base)
+
+    assert len(original["substances"]) == 289
+    for before, after in zip(original["substances"], rebuilt["substances"], strict=True):
+        assert json.dumps(after, sort_keys=True) == json.dumps(before, sort_keys=True), before[
+            "name"
+        ]
+    assert json.dumps(rebuilt, sort_keys=True) == json.dumps(original, sort_keys=True)
