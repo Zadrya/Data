@@ -1,0 +1,135 @@
+{
+  "rule": "The API ranges of these two real routes leave gaps (the maximum of one class is below the minimum of the next). Boundaries make the gaps harmless: every dose falls in exactly one class, and the maxima are not stored.",
+  "base": [
+    {
+      "name": "4-HO-DET",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg",
+            "lightMin": 5,
+            "commonMin": 20,
+            "strongMin": 30,
+            "heavyMin": 45
+          }
+        }
+      ]
+    },
+    {
+      "name": "Oxycodone"
+    }
+  ],
+  "api": [
+    {
+      "name": "4-HO-DET",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "common": {
+              "max": 30.0,
+              "min": 20.0
+            },
+            "heavy": 45.0,
+            "light": {
+              "max": 15.0,
+              "min": 10.0
+            },
+            "strong": {
+              "max": 45.0,
+              "min": 30.0
+            },
+            "threshold": 5.0,
+            "units": "mg"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Oxycodone",
+      "roas": [
+        {
+          "name": "intravenous",
+          "dose": {
+            "common": {
+              "max": 10.0,
+              "min": 7.5
+            },
+            "heavy": 15.0,
+            "light": {
+              "max": 5.0,
+              "min": 2.5
+            },
+            "strong": {
+              "max": 15.0,
+              "min": 12.5
+            },
+            "threshold": 1.0,
+            "units": "mg"
+          }
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "roas"
+  ],
+  "reportKinds": [
+    "api-block-rejected",
+    "base-block-used",
+    "block-dropped",
+    "dose-boundary-filled",
+    "dose-fill-discarded",
+    "dose-equal-boundaries",
+    "dose-label-differs",
+    "unit-repaired",
+    "unit-not-mass",
+    "duration-rounded",
+    "api-phase-ignored",
+    "route-only-in-base",
+    "route-only-in-api"
+  ],
+  "expected": [
+    {
+      "name": "4-HO-DET",
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {
+            "units": "mg",
+            "thresholdMin": 5,
+            "lightMin": 10,
+            "commonMin": 20,
+            "strongMin": 30,
+            "heavyMin": 45
+          }
+        }
+      ]
+    },
+    {
+      "name": "Oxycodone",
+      "roas": [
+        {
+          "route": "intravenous",
+          "dose": {
+            "units": "mg",
+            "thresholdMin": 1,
+            "lightMin": 2.5,
+            "commonMin": 7.5,
+            "strongMin": 12.5,
+            "heavyMin": 15
+          }
+        }
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "route-only-in-api",
+      "substance": "Oxycodone",
+      "route": "intravenous",
+      "detail": "the base file does not list this route"
+    }
+  ]
+}

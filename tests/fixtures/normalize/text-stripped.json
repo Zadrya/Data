@@ -1,0 +1,45 @@
+{
+  "rule": "Text is stripped at both ends and otherwise left alone: inner double spaces and no-break spaces stay. The four paragraph fields keep the line feeds between paragraphs.",
+  "base": [
+    {
+      "name": "LSD",
+      "summary": "  LSD is a  popular psychedelic.\n",
+      "effectsSummary": "\nFirst paragraph.\nSecond paragraph.\n\n",
+      "dosageRemark": "Blotters vary.﻿",
+      "generalRisks": " Psychological. ",
+      "longtermRisks": "Rare.",
+      "addictionPotential": " not habit-forming ",
+      "toxicities": [
+        " low toxicity "
+      ]
+    }
+  ],
+  "api": [],
+  "compare": [
+    "summary",
+    "effectsSummary",
+    "dosageRemark",
+    "generalRisks",
+    "longtermRisks",
+    "addictionPotential",
+    "toxicities"
+  ],
+  "reportKinds": [
+    "text-dropped"
+  ],
+  "expected": [
+    {
+      "name": "LSD",
+      "summary": "LSD is a  popular psychedelic.",
+      "effectsSummary": "First paragraph.\nSecond paragraph.",
+      "dosageRemark": "Blotters vary.",
+      "generalRisks": "Psychological.",
+      "longtermRisks": "Rare.",
+      "addictionPotential": "not habit-forming",
+      "toxicities": [
+        "low toxicity"
+      ]
+    }
+  ],
+  "report": []
+}

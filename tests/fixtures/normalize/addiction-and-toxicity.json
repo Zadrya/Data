@@ -1,0 +1,66 @@
+{
+  "rule": "addictionPotential and toxicities take the API value when it is present and not empty, otherwise the base value. An empty API list does not hide the base list.",
+  "base": [
+    {
+      "name": "LSD",
+      "addictionPotential": "not habit-forming",
+      "toxicities": [
+        "low toxicity"
+      ]
+    },
+    {
+      "name": "DXM",
+      "addictionPotential": "mildly addictive",
+      "toxicities": [
+        "toxic at heavy doses"
+      ]
+    },
+    {
+      "name": "MDMA",
+      "toxicities": []
+    }
+  ],
+  "api": [
+    {
+      "name": "LSD",
+      "addictionPotential": "non-addictive with a low abuse potential",
+      "toxicity": [
+        "extremely low toxicity relative to dose"
+      ]
+    },
+    {
+      "name": "DXM",
+      "addictionPotential": " ",
+      "toxicity": []
+    },
+    {
+      "name": "MDMA"
+    }
+  ],
+  "compare": [
+    "addictionPotential",
+    "toxicities"
+  ],
+  "reportKinds": [],
+  "expected": [
+    {
+      "name": "DXM",
+      "addictionPotential": "mildly addictive",
+      "toxicities": [
+        "toxic at heavy doses"
+      ]
+    },
+    {
+      "name": "LSD",
+      "addictionPotential": "non-addictive with a low abuse potential",
+      "toxicities": [
+        "extremely low toxicity relative to dose"
+      ]
+    },
+    {
+      "name": "MDMA",
+      "toxicities": []
+    }
+  ],
+  "report": []
+}

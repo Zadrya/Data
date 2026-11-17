@@ -1,0 +1,80 @@
+{
+  "rule": "A substance that only the API has gets its categories from its psychoactive classes through the mapping table. A class without a mapping is reported and gives no category. The derivation is reported, also when it yields nothing.",
+  "base": [],
+  "api": [
+    {
+      "name": "Tizanidine",
+      "class": {
+        "psychoactive": [
+          "Depressant",
+          "Muscle relaxant",
+          "Depressants"
+        ]
+      },
+      "roas": [
+        {
+          "name": "oral",
+          "duration": {
+            "onset": {
+              "min": 15,
+              "max": 45,
+              "units": "minutes"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Blue Lotus",
+      "roas": [
+        {
+          "name": "smoked",
+          "dose": {
+            "units": "g",
+            "threshold": 0.5
+          }
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "categories"
+  ],
+  "reportKinds": [
+    "category-unknown",
+    "categories-derived",
+    "class-unmapped"
+  ],
+  "expected": [
+    {
+      "name": "Blue Lotus",
+      "categories": []
+    },
+    {
+      "name": "Tizanidine",
+      "categories": [
+        "depressant"
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "categories-derived",
+      "substance": "Blue Lotus",
+      "route": null,
+      "detail": "categories derived from the psychoactive classes of the API: none"
+    },
+    {
+      "kind": "class-unmapped",
+      "substance": "Tizanidine",
+      "route": null,
+      "detail": "the psychoactive class 'Muscle relaxant' has no category"
+    },
+    {
+      "kind": "categories-derived",
+      "substance": "Tizanidine",
+      "route": null,
+      "detail": "categories derived from the psychoactive classes of the API: depressant"
+    }
+  ]
+}

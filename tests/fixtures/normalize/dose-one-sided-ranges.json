@@ -1,0 +1,133 @@
+{
+  "rule": "Real routes whose API ranges have one bound only. 25I-NBOMe insufflated: strong has no maximum and there is no heavy value, so there is nothing to fill heavyMin from. Diphenidine smoked: light has no minimum, so lightMin is absent.",
+  "base": [
+    {
+      "name": "25I-NBOMe",
+      "roas": [
+        {
+          "name": "insufflated",
+          "dose": {
+            "units": "µg",
+            "lightMin": 50,
+            "commonMin": 500,
+            "strongMin": 700
+          }
+        }
+      ]
+    },
+    {
+      "name": "Diphenidine",
+      "roas": [
+        {
+          "name": "smoked",
+          "dose": {
+            "units": "mg",
+            "commonMin": 20,
+            "strongMin": 40,
+            "heavyMin": 55
+          }
+        }
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "25I-NBOMe",
+      "roas": [
+        {
+          "name": "insufflated",
+          "dose": {
+            "common": {
+              "max": 700.0,
+              "min": 500.0
+            },
+            "light": {
+              "max": 500.0,
+              "min": 200.0
+            },
+            "strong": {
+              "max": null,
+              "min": 700.0
+            },
+            "threshold": 50.0,
+            "units": "µg"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Diphenidine",
+      "roas": [
+        {
+          "name": "smoked",
+          "dose": {
+            "common": {
+              "max": 40.0,
+              "min": 20.0
+            },
+            "heavy": 55.0,
+            "light": {
+              "max": 20.0,
+              "min": null
+            },
+            "strong": {
+              "max": 55.0,
+              "min": 40.0
+            },
+            "units": "mg"
+          }
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "roas"
+  ],
+  "reportKinds": [
+    "api-block-rejected",
+    "base-block-used",
+    "block-dropped",
+    "dose-boundary-filled",
+    "dose-fill-discarded",
+    "dose-equal-boundaries",
+    "dose-label-differs",
+    "unit-repaired",
+    "unit-not-mass",
+    "duration-rounded",
+    "api-phase-ignored",
+    "route-only-in-base",
+    "route-only-in-api"
+  ],
+  "expected": [
+    {
+      "name": "25I-NBOMe",
+      "roas": [
+        {
+          "route": "insufflated",
+          "dose": {
+            "units": "µg",
+            "thresholdMin": 50,
+            "lightMin": 200,
+            "commonMin": 500,
+            "strongMin": 700
+          }
+        }
+      ]
+    },
+    {
+      "name": "Diphenidine",
+      "roas": [
+        {
+          "route": "smoked",
+          "dose": {
+            "units": "mg",
+            "commonMin": 20,
+            "strongMin": 40,
+            "heavyMin": 55
+          }
+        }
+      ]
+    }
+  ],
+  "report": []
+}

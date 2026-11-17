@@ -1,0 +1,84 @@
+{
+  "rule": "An API entry that is not in the base file enters the catalog only when it has route data and is named on the allow list. It takes its URL from the API. A wiki redirect to another title is reported and the name is kept.",
+  "base": [
+    {
+      "name": "LSD"
+    }
+  ],
+  "api": [
+    {
+      "name": "LSD"
+    },
+    {
+      "name": "Blue Lotus",
+      "url": "https://psychonautwiki.org/wiki/Blue%20Lotus",
+      "roas": [
+        {
+          "name": "smoked",
+          "dose": {
+            "units": "g",
+            "threshold": 0.5,
+            "light": {
+              "min": 0.75,
+              "max": 1.25
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "pages": {
+    "Blue Lotus": {
+      "title": "Blue lotus"
+    }
+  },
+  "compare": [
+    "url",
+    "roas"
+  ],
+  "reportKinds": [
+    "api-entry-dropped",
+    "api-entry-not-on-allow-list",
+    "api-only-added",
+    "base-only",
+    "name-matched",
+    "wiki-page-missing",
+    "wiki-title-differs"
+  ],
+  "expected": [
+    {
+      "name": "Blue Lotus",
+      "url": "https://psychonautwiki.org/wiki/Blue%20Lotus",
+      "roas": [
+        {
+          "route": "smoked",
+          "dose": {
+            "units": "g",
+            "thresholdMin": 0.5,
+            "lightMin": 0.75,
+            "commonMin": 1.25
+          }
+        }
+      ]
+    },
+    {
+      "name": "LSD",
+      "url": "https://psychonautwiki.org/wiki/LSD",
+      "roas": []
+    }
+  ],
+  "report": [
+    {
+      "kind": "api-only-added",
+      "substance": "Blue Lotus",
+      "route": null,
+      "detail": "not in the base file, on the allow list (a plant with its own wiki article, a smoked dose and oral durations)"
+    },
+    {
+      "kind": "wiki-title-differs",
+      "substance": "Blue Lotus",
+      "route": null,
+      "detail": "the wiki redirects to 'Blue lotus'"
+    }
+  ]
+}

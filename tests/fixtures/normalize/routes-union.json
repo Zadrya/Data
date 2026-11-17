@@ -1,0 +1,137 @@
+{
+  "rule": "The routes are the union of both sources by name, in the order of the schema's route list, not in source order. A route that only one source lists is kept and reported when the substance is in both sources. A route without any block is kept as a bare route.",
+  "base": [
+    {
+      "name": "Cocaine",
+      "roas": [
+        {
+          "name": "smoked",
+          "dose": {
+            "units": "mg",
+            "lightMin": 10
+          }
+        },
+        {
+          "name": "insufflated",
+          "dose": {
+            "units": "mg",
+            "lightMin": 5
+          }
+        },
+        {
+          "name": "rectal"
+        }
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "Cocaine",
+      "roas": [
+        {
+          "name": "intravenous",
+          "dose": {
+            "units": "mg",
+            "threshold": 2
+          }
+        },
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg",
+            "threshold": 20
+          }
+        },
+        {
+          "name": "insufflated",
+          "dose": {
+            "units": "mg",
+            "threshold": 5
+          }
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "roas"
+  ],
+  "reportKinds": [
+    "api-block-rejected",
+    "base-block-used",
+    "block-dropped",
+    "dose-boundary-filled",
+    "dose-fill-discarded",
+    "dose-equal-boundaries",
+    "dose-label-differs",
+    "unit-repaired",
+    "unit-not-mass",
+    "duration-rounded",
+    "api-phase-ignored",
+    "route-only-in-base",
+    "route-only-in-api"
+  ],
+  "expected": [
+    {
+      "name": "Cocaine",
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {
+            "units": "mg",
+            "thresholdMin": 20
+          }
+        },
+        {
+          "route": "insufflated",
+          "dose": {
+            "units": "mg",
+            "thresholdMin": 5
+          }
+        },
+        {
+          "route": "rectal"
+        },
+        {
+          "route": "intravenous",
+          "dose": {
+            "units": "mg",
+            "thresholdMin": 2
+          }
+        },
+        {
+          "route": "smoked",
+          "dose": {
+            "units": "mg",
+            "thresholdMin": 10
+          }
+        }
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "route-only-in-api",
+      "substance": "Cocaine",
+      "route": "oral",
+      "detail": "the base file does not list this route"
+    },
+    {
+      "kind": "route-only-in-base",
+      "substance": "Cocaine",
+      "route": "rectal",
+      "detail": "the API does not list this route"
+    },
+    {
+      "kind": "route-only-in-api",
+      "substance": "Cocaine",
+      "route": "intravenous",
+      "detail": "the base file does not list this route"
+    },
+    {
+      "kind": "route-only-in-base",
+      "substance": "Cocaine",
+      "route": "smoked",
+      "detail": "the API does not list this route"
+    }
+  ]
+}

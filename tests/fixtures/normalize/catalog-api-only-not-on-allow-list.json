@@ -1,0 +1,71 @@
+{
+  "rule": "An API entry with route data that is not on the allow list stays out and is reported, so that the owner can decide. Cake is the wiki's 2017 April Fools page: the report says so.",
+  "base": [
+    {
+      "name": "LSD"
+    }
+  ],
+  "api": [
+    {
+      "name": "LSD"
+    },
+    {
+      "name": "Cake",
+      "class": {
+        "psychoactive": [
+          "Depressant"
+        ]
+      },
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "g",
+            "threshold": 30,
+            "heavy": 300
+          }
+        }
+      ]
+    },
+    {
+      "name": "Examplamine",
+      "roas": [
+        {
+          "name": "oral",
+          "bioavailability": {
+            "max": 50
+          }
+        }
+      ]
+    }
+  ],
+  "compare": [],
+  "reportKinds": [
+    "api-entry-dropped",
+    "api-entry-not-on-allow-list",
+    "api-only-added",
+    "base-only",
+    "name-matched",
+    "wiki-page-missing",
+    "wiki-title-differs"
+  ],
+  "expected": [
+    {
+      "name": "LSD"
+    }
+  ],
+  "report": [
+    {
+      "kind": "api-entry-not-on-allow-list",
+      "substance": "Cake",
+      "route": null,
+      "detail": "not in the base file, has route data, not on the allow list: its wiki page is a satire page (the 2017 April Fools joke)"
+    },
+    {
+      "kind": "api-entry-not-on-allow-list",
+      "substance": "Examplamine",
+      "route": null,
+      "detail": "not in the base file, has route data, not on the allow list"
+    }
+  ]
+}

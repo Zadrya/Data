@@ -1,0 +1,83 @@
+{
+  "rule": "Text that still breaks the schema's text rules after stripping is reported and dropped, never repaired: a line feed inside a single-line field, a tab or a carriage return inside a paragraph field, a null character. A field that is only whitespace is simply absent.",
+  "base": [
+    {
+      "name": "LSD",
+      "summary": "LSD is popular.\nIt is old.",
+      "effectsSummary": "Col 1\tCol 2",
+      "dosageRemark": "Line one.\r\nLine two.",
+      "generalRisks": "   ",
+      "addictionPotential": "not\u0000habit-forming",
+      "toxicities": [
+        "low toxicity",
+        "bad\ntoxicity"
+      ],
+      "saferUse": [
+        "Dose low.",
+        "Test\tfirst."
+      ]
+    }
+  ],
+  "api": [],
+  "compare": [
+    "summary",
+    "effectsSummary",
+    "dosageRemark",
+    "generalRisks",
+    "addictionPotential",
+    "toxicities",
+    "saferUse"
+  ],
+  "reportKinds": [
+    "text-dropped"
+  ],
+  "expected": [
+    {
+      "name": "LSD",
+      "toxicities": [
+        "low toxicity"
+      ],
+      "saferUse": [
+        "Dose low."
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "text-dropped",
+      "substance": "LSD",
+      "route": null,
+      "detail": "summary 'LSD is popular.\\nIt is old.' is not valid text"
+    },
+    {
+      "kind": "text-dropped",
+      "substance": "LSD",
+      "route": null,
+      "detail": "effectsSummary 'Col 1\\tCol 2' is not valid text"
+    },
+    {
+      "kind": "text-dropped",
+      "substance": "LSD",
+      "route": null,
+      "detail": "dosageRemark 'Line one.\\r\\nLine two.' is not valid text"
+    },
+    {
+      "kind": "text-dropped",
+      "substance": "LSD",
+      "route": null,
+      "detail": "saferUse item 'Test\\tfirst.' is not valid text"
+    },
+    {
+      "kind": "text-dropped",
+      "substance": "LSD",
+      "route": null,
+      "detail": "addictionPotential 'not\\x00habit-forming' is not valid text"
+    },
+    {
+      "kind": "text-dropped",
+      "substance": "LSD",
+      "route": null,
+      "detail": "toxicity 'bad\\ntoxicity' is not valid text"
+    }
+  ]
+}

@@ -1,0 +1,223 @@
+{
+  "rule": "Units are stripped and kept as written, except that the Greek letter mu becomes the micro sign (reported). Every unit other than µg, mg and g is reported and left alone. A block that states units only is kept when no source has boundaries, and gives way to a block with boundaries from the other source. Boundaries without units are inconsistent.",
+  "base": [
+    {
+      "name": "Fentanyl",
+      "roas": [
+        {
+          "name": "transdermal",
+          "dose": {
+            "units": "µg",
+            "lightMin": 12
+          }
+        }
+      ]
+    },
+    {
+      "name": "LSA",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "seeds",
+            "lightMin": 50
+          }
+        }
+      ]
+    },
+    {
+      "name": "Buspirone",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg"
+          }
+        },
+        {
+          "name": "sublingual",
+          "dose": {
+            "units": "mg",
+            "lightMin": 5
+          }
+        }
+      ]
+    },
+    {
+      "name": "Apomorphine",
+      "roas": [
+        {
+          "name": "subcutaneous",
+          "dose": {
+            "units": "Mg#",
+            "lightMin": 1
+          }
+        }
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "Fentanyl",
+      "roas": [
+        {
+          "name": "transdermal",
+          "dose": {
+            "units": " μg ",
+            "threshold": 12
+          }
+        }
+      ]
+    },
+    {
+      "name": "LSA",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "seeds",
+            "threshold": 50
+          }
+        }
+      ]
+    },
+    {
+      "name": "Buspirone",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg"
+          }
+        },
+        {
+          "name": "sublingual",
+          "dose": {
+            "units": "mg"
+          }
+        },
+        {
+          "name": "rectal",
+          "dose": {
+            "threshold": 5
+          }
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "roas"
+  ],
+  "reportKinds": [
+    "api-block-rejected",
+    "base-block-used",
+    "block-dropped",
+    "dose-boundary-filled",
+    "dose-fill-discarded",
+    "dose-equal-boundaries",
+    "dose-label-differs",
+    "unit-repaired",
+    "unit-not-mass",
+    "duration-rounded",
+    "api-phase-ignored",
+    "route-only-in-base",
+    "route-only-in-api"
+  ],
+  "expected": [
+    {
+      "name": "Apomorphine",
+      "roas": [
+        {
+          "route": "subcutaneous",
+          "dose": {
+            "units": "Mg#",
+            "thresholdMin": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "Buspirone",
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {
+            "units": "mg"
+          }
+        },
+        {
+          "route": "sublingual",
+          "dose": {
+            "units": "mg",
+            "thresholdMin": 5
+          }
+        },
+        {
+          "route": "rectal"
+        }
+      ]
+    },
+    {
+      "name": "Fentanyl",
+      "roas": [
+        {
+          "route": "transdermal",
+          "dose": {
+            "units": "µg",
+            "thresholdMin": 12
+          }
+        }
+      ]
+    },
+    {
+      "name": "LSA",
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {
+            "units": "seeds",
+            "thresholdMin": 50
+          }
+        }
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "unit-not-mass",
+      "substance": "Apomorphine",
+      "route": "subcutaneous",
+      "detail": "dose: units 'Mg#' are not a mass unit"
+    },
+    {
+      "kind": "base-block-used",
+      "substance": "Buspirone",
+      "route": "sublingual",
+      "detail": "dose: the API states units only; the base block is used"
+    },
+    {
+      "kind": "route-only-in-api",
+      "substance": "Buspirone",
+      "route": "rectal",
+      "detail": "the base file does not list this route"
+    },
+    {
+      "kind": "block-dropped",
+      "substance": "Buspirone",
+      "route": "rectal",
+      "detail": "dose: no consistent block (API: boundaries without usable units)"
+    },
+    {
+      "kind": "unit-repaired",
+      "substance": "Fentanyl",
+      "route": "transdermal",
+      "detail": "dose: units 'μg' written with the Greek letter mu"
+    },
+    {
+      "kind": "unit-not-mass",
+      "substance": "LSA",
+      "route": "oral",
+      "detail": "dose: units 'seeds' are not a mass unit"
+    }
+  ]
+}

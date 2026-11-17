@@ -1,0 +1,59 @@
+{
+  "rule": "An API name that the wiki redirects to the page of a base substance is the same substance. It is reported and named after the wiki's canonical title, even when neither source spells it that way.",
+  "base": [
+    {
+      "name": "Tilidin"
+    }
+  ],
+  "api": [
+    {
+      "name": "Tilidine hydrochloride",
+      "class": {
+        "psychoactive": [
+          "Opioids"
+        ]
+      }
+    }
+  ],
+  "pages": {
+    "Tilidin": {
+      "title": "Tilidine"
+    },
+    "Tilidine hydrochloride": {
+      "title": "Tilidine"
+    }
+  },
+  "compare": [
+    "classes",
+    "url"
+  ],
+  "reportKinds": [
+    "api-entry-dropped",
+    "api-entry-not-on-allow-list",
+    "api-only-added",
+    "base-only",
+    "name-matched",
+    "wiki-page-missing",
+    "wiki-title-differs"
+  ],
+  "expected": [
+    {
+      "name": "Tilidine",
+      "classes": {
+        "psychoactive": [
+          "Opioids"
+        ],
+        "chemical": []
+      },
+      "url": "https://psychonautwiki.org/wiki/Tilidin"
+    }
+  ],
+  "report": [
+    {
+      "kind": "name-matched",
+      "substance": "Tilidine",
+      "route": null,
+      "detail": "base name 'Tilidin' and API name 'Tilidine hydrochloride' are one substance, named 'Tilidine'"
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "rule": "An API entry that is not in the base file and has no number in any route is dropped and reported, even on the allow list. Units alone are not data (1,3-Butanediol), and neither is an entry without routes (a class page such as Stimulants).",
+  "base": [
+    {
+      "name": "LSD"
+    }
+  ],
+  "api": [
+    {
+      "name": "LSD"
+    },
+    {
+      "name": "1,3-Butanediol",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg"
+          },
+          "duration": {
+            "onset": {
+              "units": "minutes"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Stimulants"
+    },
+    {
+      "name": "Blue Lotus",
+      "roas": [
+        {
+          "name": "smoked",
+          "dose": {
+            "units": "g"
+          }
+        }
+      ]
+    }
+  ],
+  "compare": [],
+  "reportKinds": [
+    "api-entry-dropped",
+    "api-entry-not-on-allow-list",
+    "api-only-added",
+    "base-only",
+    "name-matched",
+    "wiki-page-missing",
+    "wiki-title-differs"
+  ],
+  "expected": [
+    {
+      "name": "LSD"
+    }
+  ],
+  "report": [
+    {
+      "kind": "api-entry-dropped",
+      "substance": "1,3-Butanediol",
+      "route": null,
+      "detail": "not in the base file and no route with a dose, duration or bioavailability number"
+    },
+    {
+      "kind": "api-entry-dropped",
+      "substance": "Blue Lotus",
+      "route": null,
+      "detail": "not in the base file and no route with a dose, duration or bioavailability number"
+    },
+    {
+      "kind": "api-entry-dropped",
+      "substance": "Stimulants",
+      "route": null,
+      "detail": "not in the base file and no route with a dose, duration or bioavailability number"
+    }
+  ]
+}

@@ -1,0 +1,149 @@
+{
+  "rule": "When the API has no threshold but a light minimum, that number is stored as lightMin and thresholdMin is absent. The base file calls the same number the threshold, so the difference in label is reported. Equal neighbours are allowed and reported.",
+  "base": [
+    {
+      "name": "Metizolam",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg",
+            "lightMin": 1,
+            "commonMin": 2,
+            "strongMin": 4,
+            "heavyMin": 6
+          }
+        }
+      ]
+    },
+    {
+      "name": "LSD",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "µg",
+            "lightMin": 15,
+            "commonMin": 75
+          }
+        }
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "Metizolam",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg",
+            "light": {
+              "min": 1,
+              "max": 2
+            },
+            "common": {
+              "min": 2,
+              "max": 4
+            },
+            "strong": {
+              "min": 4,
+              "max": 6
+            },
+            "heavy": 6
+          }
+        }
+      ]
+    },
+    {
+      "name": "LSD",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "µg",
+            "threshold": 15,
+            "light": {
+              "min": 15,
+              "max": 75
+            },
+            "common": {
+              "min": 75,
+              "max": 150
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "roas"
+  ],
+  "reportKinds": [
+    "api-block-rejected",
+    "base-block-used",
+    "block-dropped",
+    "dose-boundary-filled",
+    "dose-fill-discarded",
+    "dose-equal-boundaries",
+    "dose-label-differs",
+    "unit-repaired",
+    "unit-not-mass",
+    "duration-rounded",
+    "api-phase-ignored",
+    "route-only-in-base",
+    "route-only-in-api"
+  ],
+  "expected": [
+    {
+      "name": "LSD",
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {
+            "units": "µg",
+            "thresholdMin": 15,
+            "lightMin": 15,
+            "commonMin": 75,
+            "strongMin": 150
+          }
+        }
+      ]
+    },
+    {
+      "name": "Metizolam",
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {
+            "units": "mg",
+            "lightMin": 1,
+            "commonMin": 2,
+            "strongMin": 4,
+            "heavyMin": 6
+          }
+        }
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "dose-boundary-filled",
+      "substance": "LSD",
+      "route": "oral",
+      "detail": "dose: strongMin 150 filled from common.max"
+    },
+    {
+      "kind": "dose-equal-boundaries",
+      "substance": "LSD",
+      "route": "oral",
+      "detail": "dose: thresholdMin and lightMin are both 15"
+    },
+    {
+      "kind": "dose-label-differs",
+      "substance": "Metizolam",
+      "route": "oral",
+      "detail": "dose: the API has no threshold and a light minimum of 1, stored as lightMin; the base file calls 1 the threshold"
+    }
+  ]
+}

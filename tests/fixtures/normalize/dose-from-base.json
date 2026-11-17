@@ -1,0 +1,101 @@
+{
+  "rule": "From the base file thresholdMin is the base lightMin (the lowest number of the Journal app is the wiki threshold), lightMin is absent, and commonMin, strongMin and heavyMin are as named. A base block is used silently for a substance the API does not have, and reported when the API has the route without a dose.",
+  "base": [
+    {
+      "name": "Oxazepam",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg",
+            "lightMin": 5,
+            "commonMin": 10,
+            "strongMin": 20,
+            "heavyMin": 30
+          }
+        }
+      ]
+    },
+    {
+      "name": "LSD",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "µg",
+            "lightMin": 15,
+            "commonMin": 75.5,
+            "heavyMin": 300
+          }
+        }
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "LSD",
+      "roas": [
+        {
+          "name": "oral"
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "roas"
+  ],
+  "reportKinds": [
+    "api-block-rejected",
+    "base-block-used",
+    "block-dropped",
+    "dose-boundary-filled",
+    "dose-fill-discarded",
+    "dose-equal-boundaries",
+    "dose-label-differs",
+    "unit-repaired",
+    "unit-not-mass",
+    "duration-rounded",
+    "api-phase-ignored",
+    "route-only-in-base",
+    "route-only-in-api"
+  ],
+  "expected": [
+    {
+      "name": "LSD",
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {
+            "units": "µg",
+            "thresholdMin": 15,
+            "commonMin": 75.5,
+            "heavyMin": 300
+          }
+        }
+      ]
+    },
+    {
+      "name": "Oxazepam",
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {
+            "units": "mg",
+            "thresholdMin": 5,
+            "commonMin": 10,
+            "strongMin": 20,
+            "heavyMin": 30
+          }
+        }
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "base-block-used",
+      "substance": "LSD",
+      "route": "oral",
+      "detail": "dose: the API has none; the base block is used"
+    }
+  ]
+}

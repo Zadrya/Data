@@ -1,0 +1,73 @@
+{
+  "rule": "The summary is the base summary and nothing else. The API summary is the first text of the wiki page (a banner, a stub notice, a placeholder), so it is never used. A substance without a base summary has none and is reported with the reason.",
+  "base": [
+    {
+      "name": "LSD",
+      "summary": "LSD is a popular psychedelic."
+    },
+    {
+      "name": "A-PHP"
+    },
+    {
+      "name": "Etizolam"
+    },
+    {
+      "name": "Oxazepam"
+    }
+  ],
+  "api": [
+    {
+      "name": "LSD",
+      "summary": "Summary sheet: LSD LSD"
+    },
+    {
+      "name": "A-PHP",
+      "summary": "Not to be confused with A-PVP. Summary sheet: A-PHP"
+    },
+    {
+      "name": "Etizolam",
+      "summary": "This page has not been fully approved by the PsychonautWiki administrators."
+    }
+  ],
+  "compare": [
+    "summary"
+  ],
+  "reportKinds": [
+    "no-summary"
+  ],
+  "expected": [
+    {
+      "name": "A-PHP"
+    },
+    {
+      "name": "Etizolam"
+    },
+    {
+      "name": "LSD",
+      "summary": "LSD is a popular psychedelic."
+    },
+    {
+      "name": "Oxazepam"
+    }
+  ],
+  "report": [
+    {
+      "kind": "no-summary",
+      "substance": "A-PHP",
+      "route": null,
+      "detail": "no base summary; the API summary is a placeholder and is not used"
+    },
+    {
+      "kind": "no-summary",
+      "substance": "Etizolam",
+      "route": null,
+      "detail": "no base summary; the API summary is the first text of the wiki page and is not used"
+    },
+    {
+      "kind": "no-summary",
+      "substance": "Oxazepam",
+      "route": null,
+      "detail": "no base summary, and the API has none either"
+    }
+  ]
+}

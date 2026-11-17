@@ -1,0 +1,136 @@
+{
+  "rule": "Bioavailability is in percent: the API block when it is within 0 to 100 with the minimum not above the maximum, otherwise the base block, otherwise none. A block with one bound is kept.",
+  "base": [
+    {
+      "name": "Ketamine",
+      "roas": [
+        {
+          "name": "oral",
+          "bioavailability": {
+            "min": 16,
+            "max": 20
+          }
+        },
+        {
+          "name": "insufflated",
+          "bioavailability": {
+            "max": 45
+          }
+        },
+        {
+          "name": "sublingual",
+          "bioavailability": {
+            "min": 30,
+            "max": 20
+          }
+        },
+        {
+          "name": "rectal",
+          "bioavailability": {
+            "min": 25,
+            "max": 30
+          }
+        }
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "Ketamine",
+      "roas": [
+        {
+          "name": "oral",
+          "bioavailability": {
+            "min": 17,
+            "max": 17.5
+          }
+        },
+        {
+          "name": "insufflated",
+          "bioavailability": {
+            "min": 45,
+            "max": 145
+          }
+        },
+        {
+          "name": "sublingual",
+          "bioavailability": {
+            "min": 29,
+            "max": 20
+          }
+        },
+        {
+          "name": "rectal"
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "roas"
+  ],
+  "reportKinds": [
+    "api-block-rejected",
+    "base-block-used",
+    "block-dropped",
+    "dose-boundary-filled",
+    "dose-fill-discarded",
+    "dose-equal-boundaries",
+    "dose-label-differs",
+    "unit-repaired",
+    "unit-not-mass",
+    "duration-rounded",
+    "api-phase-ignored",
+    "route-only-in-base",
+    "route-only-in-api"
+  ],
+  "expected": [
+    {
+      "name": "Ketamine",
+      "roas": [
+        {
+          "route": "oral",
+          "bioavailability": {
+            "min": 17,
+            "max": 17.5
+          }
+        },
+        {
+          "route": "sublingual"
+        },
+        {
+          "route": "insufflated",
+          "bioavailability": {
+            "max": 45
+          }
+        },
+        {
+          "route": "rectal",
+          "bioavailability": {
+            "min": 25,
+            "max": 30
+          }
+        }
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "block-dropped",
+      "substance": "Ketamine",
+      "route": "sublingual",
+      "detail": "bioavailability: no consistent block (API: min 29 is above max 20; base: min 30 is above max 20)"
+    },
+    {
+      "kind": "api-block-rejected",
+      "substance": "Ketamine",
+      "route": "insufflated",
+      "detail": "bioavailability: max 145 is not within 0 to 100; the base block is used"
+    },
+    {
+      "kind": "base-block-used",
+      "substance": "Ketamine",
+      "route": "rectal",
+      "detail": "bioavailability: the API has none; the base block is used"
+    }
+  ]
+}
