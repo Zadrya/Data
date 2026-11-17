@@ -1,0 +1,133 @@
+{
+  "rule": "For a route in both sources, an API block that lacks commonMin, strongMin or heavyMin while the consistent base block has it is rejected, and the whole base block is used: losing an upper boundary would show larger doses in a lower class. The check runs after fills (first route: no heavy value and no strong maximum to fill from). A difference only in thresholdMin or lightMin keeps the API block (second route).",
+  "base": [
+    {
+      "name": "Examplamine",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg",
+            "lightMin": 5,
+            "commonMin": 20,
+            "strongMin": 40,
+            "heavyMin": 80
+          }
+        },
+        {
+          "name": "sublingual",
+          "dose": {
+            "units": "mg",
+            "lightMin": 5,
+            "commonMin": 20,
+            "strongMin": 40,
+            "heavyMin": 80
+          }
+        }
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "Examplamine",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg",
+            "threshold": 5,
+            "light": {
+              "min": 10,
+              "max": 20
+            },
+            "common": {
+              "min": 20,
+              "max": 40
+            },
+            "strong": {
+              "min": 40
+            }
+          }
+        },
+        {
+          "name": "sublingual",
+          "dose": {
+            "units": "mg",
+            "light": {
+              "min": 10,
+              "max": 20
+            },
+            "common": {
+              "min": 20,
+              "max": 40
+            },
+            "strong": {
+              "min": 40,
+              "max": 80
+            },
+            "heavy": 80
+          }
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "roas"
+  ],
+  "reportKinds": [
+    "api-block-rejected",
+    "base-block-used",
+    "block-dropped",
+    "dose-boundary-filled",
+    "dose-fill-discarded",
+    "dose-equal-boundaries",
+    "dose-label-differs",
+    "unit-repaired",
+    "unit-not-mass",
+    "duration-rounded",
+    "api-phase-ignored",
+    "route-only-in-base",
+    "route-only-in-api"
+  ],
+  "expected": [
+    {
+      "name": "Examplamine",
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {
+            "units": "mg",
+            "thresholdMin": 5,
+            "commonMin": 20,
+            "strongMin": 40,
+            "heavyMin": 80
+          }
+        },
+        {
+          "route": "sublingual",
+          "dose": {
+            "units": "mg",
+            "lightMin": 10,
+            "commonMin": 20,
+            "strongMin": 40,
+            "heavyMin": 80
+          }
+        }
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "api-block-rejected",
+      "substance": "Examplamine",
+      "route": "oral",
+      "detail": "dose: missing upper boundaries the base has (heavyMin); the base block is used"
+    },
+    {
+      "kind": "dose-label-differs",
+      "substance": "Examplamine",
+      "route": "sublingual",
+      "detail": "dose: the API has no threshold and a light minimum of 10, stored as lightMin; the base file calls 5 the threshold"
+    }
+  ]
+}

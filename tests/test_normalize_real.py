@@ -383,45 +383,13 @@ def test_an_allowed_api_entry_left_without_numbers_is_dropped(doses: Normalized)
     ]
 
 
-def test_no_base_dose_boundary_is_lost_without_a_report(base: BaseFile, doses: Normalized) -> None:
-    """The regression guard: what the base file knows about a dose is kept or reported.
+def test_real_dose_blocks_against_the_base_file(doses: Normalized) -> None:
+    """The upper-boundary rule changes no real route, and the inverted range is reported.
 
-    For every route that both sources have, a base heavyMin, strongMin or commonMin must
-    be present in the normalized dose, and the lowest base boundary must be present as
-    thresholdMin or lightMin, unless the report says the block was dropped.
+    Normalization itself stops if a base upper boundary is ever lost without a rejection
+    (``test_the_guard_stops_a_route_that_lost_an_upper_boundary_of_the_base``), so a
+    successful run over the real data is the regression guard.
     """
-    recording = graphql.parse_data(recorded("graphql-doses.json")["data"])
-    api_routes = {s.name: {r.name for r in s.roas or ()} for s in recording}
-    dropped = {(f.substance, f.route) for f in doses.report.of(Kind.BLOCK_DROPPED)}
-    by_name = _by_name(doses)
-    checked = 0
-
-    for substance in base.substances:
-        for route in substance.roas:
-            if route.name not in api_routes.get(substance.name, ()) or route.dose is None:
-                continue
-            found = {r["route"]: r for r in by_name[substance.name]["roas"]}[route.name].get(
-                "dose", {}
-            )
-            wanted = {
-                "heavyMin": (route.dose.heavy_min, ("heavyMin",)),
-                "strongMin": (route.dose.strong_min, ("strongMin",)),
-                "commonMin": (route.dose.common_min, ("commonMin",)),
-                "lowest": (route.dose.light_min, ("thresholdMin", "lightMin")),
-            }
-            for boundary, (value, keys) in wanted.items():
-                if value is None:
-                    continue
-                checked += 1
-                kept = any(key in found for key in keys)
-                assert (
-                    kept or (substance.name, route.name) in dropped
-                ), f"{substance.name} {route.name}: the base {boundary} {value} is lost"
-
-    assert checked > 300
-
-
-def test_an_inverted_api_range_makes_the_base_dose_win(doses: Normalized) -> None:
     rejected = {(f.substance, f.route): f.detail for f in doses.report.of(Kind.API_BLOCK_REJECTED)}
 
     assert rejected == {

@@ -123,3 +123,65 @@ def test_the_class_mapping_only_names_real_categories_of_the_base_file() -> None
     assert set(CLASS_TO_CATEGORY.values()) <= known
     for psychoactive, category in CLASS_TO_CATEGORY.items():
         assert psychoactive.casefold().rstrip("s") == category.rstrip("s")
+
+
+def test_the_guard_stops_a_route_that_lost_an_upper_boundary_of_the_base(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Whatever the merge policy does, an upper boundary of the base is never lost quietly."""
+    from zadrya_data.normalize import dose as dose_rules
+
+    monkeypatch.setattr(dose_rules, "require_upper_boundaries", lambda api, base: api)
+    base = [
+        {
+            "name": "LSD",
+            "roas": [
+                {
+                    "name": "oral",
+                    "dose": {
+                        "units": "µg",
+                        "lightMin": 15,
+                        "commonMin": 75,
+                        "strongMin": 150,
+                        "heavyMin": 300,
+                    },
+                }
+            ],
+        }
+    ]
+    api = [
+        {
+            "name": "LSD",
+            "roas": [
+                {"name": "oral", "dose": {"units": "µg", "threshold": 15, "common": {"min": 75}}}
+            ],
+        }
+    ]
+
+    message = _fails(base, api)
+
+    assert message == (
+        "'LSD' oral: the dose lost strongMin, heavyMin, which the base file has; "
+        "the merge policy should have prevented this"
+    )
+
+
+def test_the_guard_does_not_fire_when_the_policy_keeps_the_base_boundaries() -> None:
+    base = [
+        {
+            "name": "LSD",
+            "roas": [{"name": "oral", "dose": {"units": "µg", "lightMin": 15, "heavyMin": 300}}],
+        }
+    ]
+    api = [{"name": "LSD", "roas": [{"name": "oral", "dose": {"units": "µg", "threshold": 15}}]}]
+
+    result = normalize(*build(base, api))
+
+    assert result.document["substances"][0]["roas"][0]["dose"] == {
+        "units": "µg",
+        "thresholdMin": 15,
+        "heavyMin": 300,
+    }
+    assert [f.kind for f in result.report.findings if f.route == "oral"] == [
+        Kind.API_BLOCK_REJECTED
+    ]

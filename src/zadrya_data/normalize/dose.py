@@ -214,3 +214,29 @@ def from_base(dose: BaseDose | None) -> Candidate[Dose]:
         "heavyMin": dose.heavy_min,
     }
     return _candidate(dose.units, direct, {}, [])
+
+
+UPPER_BOUNDARIES = ("commonMin", "strongMin", "heavyMin")
+
+
+def require_upper_boundaries(api: Candidate[Dose], base: Candidate[Dose]) -> Candidate[Dose]:
+    """Reject an API block that lacks an upper boundary the consistent base block has.
+
+    Losing ``commonMin``, ``strongMin`` or ``heavyMin`` is the unsafe direction: larger
+    doses would be shown in a lower class. A complete base block is preferred to a
+    truncated API block, even when the base is older. Differences in ``thresholdMin``
+    and ``lightMin`` are not checked here; they are reported as label differences.
+    """
+    if api.value is None or api.weak or base.value is None or base.weak:
+        return api
+    missing = [name for name in UPPER_BOUNDARIES if name in base.value and name not in api.value]
+    if not missing:
+        return api
+    return Candidate(problem=f"missing upper boundaries the base has ({', '.join(missing)})")
+
+
+def lost_upper_boundaries(base: Candidate[Dose], chosen: Dose | None) -> list[str]:
+    """Return the upper boundaries of a consistent base block that the chosen dose lacks."""
+    if base.value is None or base.weak:
+        return []
+    return [name for name in UPPER_BOUNDARIES if name in base.value and name not in (chosen or {})]

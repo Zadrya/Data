@@ -6,6 +6,10 @@ the order of the schema's route list. A route name outside that list stops the
 normalization: a new route is a schema change, not something to drop. For each route,
 the dose, each duration phase and the bioavailability are chosen separately by the
 merge policy in ``blocks``.
+
+For the dose, an API block that lacks an upper boundary the base block has is
+rejected before the policy runs (``dose.require_upper_boundaries``), and afterwards a
+check stops the normalization if a base upper boundary was lost anyway.
 """
 
 from functools import cache
@@ -80,15 +84,24 @@ def normalize_routes(
         result: dict[str, Any] = {"route": route}
 
         base_dose = base_route.dose if base_route else None
+        api_dose = dose_rules.from_api(api_route.dose if api_route else None, base_dose)
+        base_dose_candidate = dose_rules.from_base(base_dose)
+        api_dose = dose_rules.require_upper_boundaries(api_dose, base_dose_candidate)
         dose = choose(
-            dose_rules.from_api(api_route.dose if api_route else None, base_dose),
-            dose_rules.from_base(base_dose),
+            api_dose,
+            base_dose_candidate,
             what="dose",
             substance=name,
             route=route,
             in_both_sources=both,
             report=report,
         )
+        lost = dose_rules.lost_upper_boundaries(base_dose_candidate, dose)
+        if lost:
+            raise NormalizationError(
+                f"'{name}' {route}: the dose lost {', '.join(lost)}, which the base file has; "
+                "the merge policy should have prevented this"
+            )
         if dose is not None:
             result["dose"] = dose
 
@@ -98,13 +111,17 @@ def normalize_routes(
         for phase_name in PHASES:
             api_phase = getattr(api_duration, phase_name) if api_duration else None
             base_phase = getattr(base_duration, phase_name) if base_duration else None
+            api_candidate = (
+                phase(api_phase.min, api_phase.max, api_phase.units) if api_phase else Candidate()
+            )
+            base_candidate = (
+                phase(base_phase.min, base_phase.max, base_phase.units)
+                if base_phase
+                else Candidate()
+            )
             chosen = choose(
-                phase(api_phase.min, api_phase.max, api_phase.units) if api_phase else Candidate(),
-                (
-                    phase(base_phase.min, base_phase.max, base_phase.units)
-                    if base_phase
-                    else Candidate()
-                ),
+                api_candidate,
+                base_candidate,
                 what=f"duration {phase_name}",
                 substance=name,
                 route=route,
