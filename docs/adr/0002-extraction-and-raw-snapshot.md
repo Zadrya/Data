@@ -47,10 +47,13 @@ A snapshot is a directory with exactly three files:
 
 The first two are written with sorted keys, a two-space indent, UTF-8 without escapes, no `NaN` and a final newline, and carry no date, so two fetches of unchanged upstream data give the same bytes.
 
-**Writing is all or nothing.** The three files are written into a temporary directory next to the destination, read back through `strict_json` into the typed objects, and only then moved into place. If anything fails before that, an existing snapshot is untouched; if the move itself fails, the previous snapshot is put back. `fetch` writes nothing unless every request succeeded and every answer was understood. A destination that holds anything other than snapshot files is refused, so a wrong `--output` can never delete unrelated files. The move is two renames, not one atomic step: a crash exactly between them leaves the previous snapshot in a hidden sibling directory, which is the one case that needs a hand.
+**Writing is all or nothing.** The three files are written into a temporary directory next to the destination, read back through `strict_json` into the typed objects, and only then moved into place. If anything fails before that, an existing snapshot is untouched; if the move itself fails, the previous snapshot is put back. `fetch` writes nothing unless every request succeeded and every answer was understood. A destination that holds anything other than snapshot files is refused, so a wrong `--output` can never delete unrelated files. The move is two renames, not one atomic step: a crash exactly between them leaves the previous snapshot in a hidden sibling directory, which is the one case that needs a hand. The hidden siblings are named `.<name>.new-<pid>` and `.<name>.old-<pid>`. Once a snapshot is committed to this repository, its parent directory needs a `.gitignore` line for them (`.*.new-*` and `.*.old-*`), so that a leftover can never be committed by accident; nothing is needed while snapshots live outside the repository.
+
+The destination is checked before the first request: a symbolic link is refused (replacing it would swap the link, not the directory it points to), and so is a directory that holds anything other than snapshot files.
 
 **Loading checks that the three files belong together**, not only that each is well formed:
 
+- the directory holds the three files and nothing else;
 - the SHA-256 of `graphql.json` and `mediawiki.json` are the ones in `snapshot.json`, so a file swapped in from another fetch is rejected even when the counts agree;
 - `snapshot.json` has exactly the known keys, its counts are integers equal to what the other files contain, and its endpoints and query equal the constants in the code (a snapshot fetched with another query must be fetched again);
 - a page record has positive ids and a UTC timestamp exactly when the page exists;
