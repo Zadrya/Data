@@ -96,7 +96,9 @@ The question that decides it: should `minAppVersion` be able to make an app acce
 These rules hold with or without a signed manifest, and no file format can enforce them:
 
 - **Compatibility is decided by the signed `schemaVersion`.** The app accepts a dataset only if the major version inside the signed bytes is one it supports. `minAppVersion` can only add a refusal (the app is older than the stated minimum); it is never a reason to accept, and never replaces the schema check.
+- **Verify at every startup, not only at download.** The stored downloaded dataset and its signature are checked against the pinned keys each time the app starts, before the dataset is used: the files in the app's storage can change after the download (a restored backup, another process, a damaged write). On any failure the app uses the bundled dataset, and it does not delete the downloaded files until the user is told.
 - **No downgrade.** The app refuses a downloaded dataset whose `datasetVersion` is lower than the active one, and also lower than the bundled one, using the version inside the signed bytes and not the one in the manifest. "Restore the bundled dataset" is the only way back.
+- **Versions are compared as numbers.** `datasetVersion` and `schemaVersion` are compared as semantic versions, component by component as integers (`1.10.0` is higher than `1.9.0`), never as text. The schema allows only `MAJOR.MINOR.PATCH` without pre-release or build parts, so there is no other rule to implement.
 - **`date` is display only.** No decision depends on it.
 - **Length before verification.** The app checks that the decoded signature is exactly 64 bytes before it calls the Dart verifier, which throws `StateError` on another length instead of returning false.
 - **Every exception is a rejection.** Any error from decoding, hashing, parsing, validating or verifying means the release is not accepted and the active dataset stays.
