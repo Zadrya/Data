@@ -250,3 +250,21 @@ def test_a_title_that_would_break_the_title_list_is_refused_before_sending(title
 )
 def test_timestamps_are_iso_8601_utc(text: str, valid: bool) -> None:
     assert is_utc_timestamp(text) is valid
+
+
+def _chain(length: int) -> dict[str, object]:
+    """Return an answer in which T0 redirects through that many hops to an existing page."""
+    redirects = [{"from": f"T{hop}", "to": f"T{hop + 1}"} for hop in range(length)]
+    revision = {"revid": 9, "parentid": 8, "timestamp": "2026-01-01T00:00:00Z"}
+    page = {"pageid": 1, "ns": 0, "title": f"T{length}", "revisions": [revision]}
+    return {"batchcomplete": True, "query": {"redirects": redirects, "pages": [page]}}
+
+
+@pytest.mark.parametrize("length", [1, 4, 5])
+def test_a_redirect_chain_of_up_to_five_that_ends_is_followed(length: int) -> None:
+    assert [page.title for page in parse_answer(_chain(length), ["T0"])] == [f"T{length}"]
+
+
+def test_a_redirect_chain_of_six_fails() -> None:
+    with pytest.raises(WikiFormatError, match="more than 5 redirects from 'T0'"):
+        parse_answer(_chain(6), ["T0"])
