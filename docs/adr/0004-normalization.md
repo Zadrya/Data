@@ -55,17 +55,21 @@ Each route has up to eight blocks: the dose, the six duration phases and the bio
 2. otherwise the base block, when it is present and consistent;
 3. otherwise no block.
 
-A block is never assembled half from one source and half from the other, with the single exception of the unit qualifier below. An API block that was rejected, a base block used because the API has none, and a block dropped because neither is consistent are reported. A dose that states units only is "weak": it is used only when the other source has no boundaries either. When the API states units only and the base block is inconsistent, the units are kept and the loss of the base block is reported as `block-dropped`, with the reason the base block was unusable; nothing is lost without a finding.
+A block is never assembled half from one source and half from the other, with the single exception of the unit qualifier below. An API block that was rejected, a base block used because the API has none, and a block dropped because neither is consistent are reported. A dose that states units only is "weak": it is used only when the other source has no boundaries either. When the API states units only and the base block is inconsistent, the units are kept and the loss of the base block is reported as `block-dropped`, with the reason the base block was unusable. When a consistent API block is used and the base block is inconsistent, the base block is reported as `base-block-inconsistent`, with its reason: nothing usable is lost, but the error in the source data is visible in the dataset review (none today; the one inconsistent base dose, Meclofenoxate oral, is inconsistent in the API too and is dropped).
 
-**What changed against the base file.** When the chosen block comes from the API and the base has a consistent block for the same route, every difference is reported, so that the dataset review sees each one. That includes every value the base states and the chosen API block does not, so no base value disappears without a finding:
+**What changed against the base file.** When the chosen block comes from the API and the base has a consistent block for the same route, every difference is reported, so that the dataset review sees each one, including every value the base states and the chosen API block does not:
 
 - `dose-changed`, one finding per boundary, with its direction (`lower` or `higher`). A higher `strongMin` or `heavyMin` is the risky direction, because the doses between the two values now show in the class below; such a finding says `HIGHER (risky)` and names those doses. When the units differ, the numbers are listed without a direction, because they cannot be compared.
 - `unit-changed` when the units differ.
 - `dose-boundary-not-in-api`, one finding per boundary the base dose states and the chosen API dose does not. Under the rules above this can only be `thresholdMin` (or `lightMin`, which the base never states): a missing upper boundary rejects the API block instead.
 - `duration-changed`, one finding per bound of a phase, in minutes, with its direction.
 - `duration-bound-not-in-api`, one finding per bound the base phase states and the chosen API phase does not.
+- `bioavailability-changed`, one finding per bound, in percent, with its direction.
+- `bioavailability-bound-not-in-api`, one finding per bound the base states and the chosen API block does not.
 
-Today: Clonazolam oral (common 200 to 125 µg, strong 400 to 300, heavy 999 to 500) and N-Ethylhexedrone insufflated (30, 40, 50 to 24, 30, 40 mg), all lower; durations of Cocaine insufflated, NEP insufflated (total), Oxycodone oral and insufflated. No higher `strongMin` or `heavyMin`, and no change of unit. `dose-boundary-not-in-api` occurs on 8 routes, the same 8 that carry `dose-label-differs` below: the API has no threshold and states the base threshold as its light minimum, so the number is kept under another label and both findings say so. `duration-bound-not-in-api` does not occur.
+**No base value of a block disappears without a finding.** For the dose, each of the six duration phases and the bioavailability of a route, the base block ends in one of these ways, and each is either lossless or reported: the base block is used whole (reported as `base-block-used` or `api-block-rejected` when the API had the route); the API block is used and the base block was consistent (each difference and each base value the API lacks is reported, as above); the API block is used and the base block was inconsistent (`base-block-inconsistent`); the API states units only and the base block was inconsistent (`block-dropped`); neither source has a consistent block (`block-dropped`, with both reasons). Two transformations of base values are documented rules, not losses: the base `lightMin` is stored as `thresholdMin` (ADR 1), and durations are converted to minutes, with any rounding reported (`duration-rounded`). Outside these blocks, the base category `color` and `url` and the substance flag `isApproved` are not in the schema and are not carried.
+
+Today: Clonazolam oral (common 200 to 125 µg, strong 400 to 300, heavy 999 to 500) and N-Ethylhexedrone insufflated (30, 40, 50 to 24, 30, 40 mg), all lower; durations of Cocaine insufflated, NEP insufflated (total), Oxycodone oral and insufflated. No higher `strongMin` or `heavyMin`, and no change of unit. `dose-boundary-not-in-api` occurs on 8 routes, the same 8 that carry `dose-label-differs` below: the API has no threshold and states the base threshold as its light minimum, so the number is kept under another label and both findings say so. `duration-bound-not-in-api`, `bioavailability-changed`, `bioavailability-bound-not-in-api` and `base-block-inconsistent` do not occur.
 
 ### Dose
 
@@ -116,7 +120,7 @@ Every number is handled as an exact fraction made from the shortest decimal text
 
 ### Bioavailability
 
-The API block, otherwise the base block. Consistent means every bound is within 0 to 100 and the minimum is not above the maximum.
+The API block, otherwise the base block. Consistent means every bound is within 0 to 100 and the minimum is not above the maximum. Changes against the base are reported as for durations (`bioavailability-changed`, `bioavailability-bound-not-in-api`).
 
 ### Output and order
 
