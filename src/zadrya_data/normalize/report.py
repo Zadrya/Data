@@ -46,6 +46,9 @@ class Kind(StrEnum):
     UNIT_NOT_MASS = "unit-not-mass"
     UNIT_QUALIFIED = "unit-qualified"
     UNIT_QUALIFIER_NOT_ADOPTED = "unit-qualifier-not-adopted"
+    UNIT_CHANGED = "unit-changed"
+    DOSE_CHANGED = "dose-changed"
+    DURATION_CHANGED = "duration-changed"
     DURATION_ROUNDED = "duration-rounded"
 
 

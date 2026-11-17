@@ -14,6 +14,8 @@ from zadrya_data.normalize.dose import (
     lost_upper_boundaries,
     require_upper_boundaries,
 )
+from zadrya_data.normalize.dose import changes as dose_changes
+from zadrya_data.normalize.duration import changes as duration_changes
 from zadrya_data.normalize.duration import phase
 from zadrya_data.normalize.report import Kind
 
@@ -88,7 +90,7 @@ def test_a_range_with_equal_or_one_bound_is_not_inverted() -> None:
     }
 
 
-# ---- upper boundaries the base has
+# ---- upper boundaries and changes against the base
 
 
 def _dose(**values: object) -> Candidate[Dose]:
@@ -130,6 +132,60 @@ def test_lost_upper_boundaries() -> None:
     assert lost_upper_boundaries(base, base.value) == []
     assert lost_upper_boundaries(Candidate(problem="inverted"), None) == []
     assert lost_upper_boundaries(Candidate({"units": "mg"}, weak=True), None) == []
+
+
+def test_dose_changes_name_each_boundary_and_its_direction() -> None:
+    base: Dose = {
+        "units": "mg",
+        "thresholdMin": 1,
+        "lightMin": 2,
+        "commonMin": 5,
+        "strongMin": 10,
+        "heavyMin": 20,
+    }
+    chosen: Dose = {
+        "units": "mg",
+        "thresholdMin": 1,
+        "lightMin": 3,
+        "commonMin": 4,
+        "strongMin": 12,
+        "heavyMin": 25,
+    }
+
+    assert dose_changes(chosen, base) == [
+        (Kind.DOSE_CHANGED, "lightMin 2 to 3 mg, higher"),
+        (Kind.DOSE_CHANGED, "commonMin 5 to 4 mg, lower"),
+        (
+            Kind.DOSE_CHANGED,
+            "strongMin 10 to 12 mg, HIGHER (risky): doses from 10 up to 12 mg now show as "
+            "common instead of strong",
+        ),
+        (
+            Kind.DOSE_CHANGED,
+            "heavyMin 20 to 25 mg, HIGHER (risky): doses from 20 up to 25 mg now show as "
+            "strong instead of heavy",
+        ),
+    ]
+    assert dose_changes(base, base) == []
+
+
+def test_dose_changes_in_other_units_are_listed_without_a_direction() -> None:
+    chosen: Dose = {"units": "g", "commonMin": 1}
+    base: Dose = {"units": "mg", "commonMin": 1000, "heavyMin": 5}
+
+    assert dose_changes(chosen, base) == [
+        (Kind.UNIT_CHANGED, "units 'mg' to 'g'"),
+        (Kind.DOSE_CHANGED, "commonMin 1000 mg to 1 g, in other units: not compared"),
+    ]
+
+
+def test_duration_changes_name_each_bound_and_its_direction() -> None:
+    assert duration_changes("total", {"min": 60, "max": 300}, {"min": 120, "max": 240}) == [
+        (Kind.DURATION_CHANGED, "total min 120 to 60 minutes, lower"),
+        (Kind.DURATION_CHANGED, "total max 240 to 300 minutes, higher"),
+    ]
+    assert duration_changes("peak", {"min": 60}, {"max": 90}) == []
+    assert duration_changes("peak", {"min": 0.75}, {"min": 0.75}) == []
 
 
 def test_a_label_difference_needs_a_lowest_base_boundary() -> None:

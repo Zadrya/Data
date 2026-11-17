@@ -260,3 +260,48 @@ def lost_upper_boundaries(base: Candidate[Dose], chosen: Dose | None) -> list[st
     if base.value is None or base.weak:
         return []
     return [name for name in UPPER_BOUNDARIES if name in base.value and name not in (chosen or {})]
+
+
+_LOWER_CLASS = {"strongMin": ("common", "strong"), "heavyMin": ("strong", "heavy")}
+
+
+def changes(chosen: Dose, base: Dose) -> list[Note]:
+    """Describe how the chosen API dose differs from the base dose of the same route.
+
+    Each boundary that both state with different values is one finding, with its
+    direction. When the units differ, every boundary both state is listed without a
+    direction, because the numbers cannot be compared. A higher ``strongMin`` or ``heavyMin`` is the risky direction, and the
+    finding says which doses now fall in the class below.
+    """
+    notes: list[Note] = []
+    units, base_units = str(chosen["units"]), str(base["units"])
+    if units != base_units:
+        notes.append((Kind.UNIT_CHANGED, f"units '{base_units}' to '{units}'"))
+    for name in BOUNDARIES:
+        if name not in chosen or name not in base:
+            continue
+        old, new = base[name], chosen[name]
+        assert isinstance(old, (int, float)) and isinstance(new, (int, float))
+        if units != base_units:
+            notes.append(
+                (
+                    Kind.DOSE_CHANGED,
+                    f"{name} {old:g} {base_units} to {new:g} {units}, in other units: "
+                    "not compared",
+                )
+            )
+            continue
+        if new == old:
+            continue
+        if new < old:
+            detail = f"{name} {old:g} to {new:g} {units}, lower"
+        elif name in _LOWER_CLASS:
+            below, was = _LOWER_CLASS[name]
+            detail = (
+                f"{name} {old:g} to {new:g} {units}, HIGHER (risky): doses from {old:g} up "
+                f"to {new:g} {units} now show as {below} instead of {was}"
+            )
+        else:
+            detail = f"{name} {old:g} to {new:g} {units}, higher"
+        notes.append((Kind.DOSE_CHANGED, detail))
+    return notes

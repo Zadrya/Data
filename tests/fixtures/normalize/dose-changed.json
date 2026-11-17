@@ -1,0 +1,209 @@
+{
+  "rule": "When the API dose is chosen and the base has a consistent dose for the same route, every boundary that differs is reported with its direction. A higher strongMin or heavyMin is marked as the risky direction, with the doses that now fall in the class below. Clonazolam oral is real (every upper boundary is lower in the API); the second substance is made up to show the risky direction and a change of units.",
+  "base": [
+    {
+      "name": "Clonazolam",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "µg",
+            "lightMin": 50,
+            "commonMin": 200,
+            "strongMin": 400,
+            "heavyMin": 999
+          }
+        }
+      ]
+    },
+    {
+      "name": "Examplamine",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg",
+            "lightMin": 5,
+            "commonMin": 10,
+            "strongMin": 20,
+            "heavyMin": 40
+          }
+        },
+        {
+          "name": "rectal",
+          "dose": {
+            "units": "mg",
+            "lightMin": 5
+          }
+        }
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "Clonazolam",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "common": {
+              "max": 300.0,
+              "min": 125.0
+            },
+            "heavy": 500.0,
+            "light": {
+              "max": 125.0,
+              "min": 75.0
+            },
+            "strong": {
+              "max": 500.0,
+              "min": 300.0
+            },
+            "threshold": 50.0,
+            "units": "µg"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Examplamine",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg",
+            "threshold": 4,
+            "common": {
+              "min": 10,
+              "max": 25
+            },
+            "strong": {
+              "min": 25,
+              "max": 60
+            },
+            "heavy": 60
+          }
+        },
+        {
+          "name": "rectal",
+          "dose": {
+            "units": "g",
+            "threshold": 0.005
+          }
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "roas"
+  ],
+  "reportKinds": [
+    "api-block-rejected",
+    "base-block-used",
+    "block-dropped",
+    "dose-boundary-filled",
+    "dose-fill-discarded",
+    "dose-equal-boundaries",
+    "dose-label-differs",
+    "unit-repaired",
+    "unit-not-mass",
+    "duration-rounded",
+    "api-phase-ignored",
+    "route-only-in-base",
+    "route-only-in-api",
+    "unit-qualifier-not-adopted",
+    "unit-changed",
+    "dose-changed",
+    "duration-changed"
+  ],
+  "expected": [
+    {
+      "name": "Clonazolam",
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {
+            "units": "µg",
+            "thresholdMin": 50,
+            "lightMin": 75,
+            "commonMin": 125,
+            "strongMin": 300,
+            "heavyMin": 500
+          }
+        }
+      ]
+    },
+    {
+      "name": "Examplamine",
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {
+            "units": "mg",
+            "thresholdMin": 4,
+            "commonMin": 10,
+            "strongMin": 25,
+            "heavyMin": 60
+          }
+        },
+        {
+          "route": "rectal",
+          "dose": {
+            "units": "g",
+            "thresholdMin": 0.005
+          }
+        }
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "dose-changed",
+      "substance": "Clonazolam",
+      "route": "oral",
+      "detail": "dose: commonMin 200 to 125 µg, lower"
+    },
+    {
+      "kind": "dose-changed",
+      "substance": "Clonazolam",
+      "route": "oral",
+      "detail": "dose: strongMin 400 to 300 µg, lower"
+    },
+    {
+      "kind": "dose-changed",
+      "substance": "Clonazolam",
+      "route": "oral",
+      "detail": "dose: heavyMin 999 to 500 µg, lower"
+    },
+    {
+      "kind": "dose-changed",
+      "substance": "Examplamine",
+      "route": "oral",
+      "detail": "dose: thresholdMin 5 to 4 mg, lower"
+    },
+    {
+      "kind": "dose-changed",
+      "substance": "Examplamine",
+      "route": "oral",
+      "detail": "dose: strongMin 20 to 25 mg, HIGHER (risky): doses from 20 up to 25 mg now show as common instead of strong"
+    },
+    {
+      "kind": "dose-changed",
+      "substance": "Examplamine",
+      "route": "oral",
+      "detail": "dose: heavyMin 40 to 60 mg, HIGHER (risky): doses from 40 up to 60 mg now show as strong instead of heavy"
+    },
+    {
+      "kind": "unit-changed",
+      "substance": "Examplamine",
+      "route": "rectal",
+      "detail": "dose: units 'mg' to 'g'"
+    },
+    {
+      "kind": "dose-changed",
+      "substance": "Examplamine",
+      "route": "rectal",
+      "detail": "dose: thresholdMin 5 mg to 0.005 g, in other units: not compared"
+    }
+  ]
+}

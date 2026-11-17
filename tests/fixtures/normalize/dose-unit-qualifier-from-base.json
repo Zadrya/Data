@@ -132,6 +132,9 @@
     "route-only-in-base",
     "route-only-in-api",
     "unit-qualifier-not-adopted",
+    "unit-changed",
+    "dose-changed",
+    "duration-changed",
     "unit-qualified"
   ],
   "expected": [
