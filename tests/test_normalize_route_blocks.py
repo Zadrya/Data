@@ -6,6 +6,7 @@ import pytest
 from zadrya_data.base import BaseDose
 from zadrya_data.graphql import ApiDose, ApiRange
 from zadrya_data.normalize.bioavailability import bioavailability
+from zadrya_data.normalize.bioavailability import changes as bioavailability_changes
 from zadrya_data.normalize.blocks import Candidate
 from zadrya_data.normalize.dose import (
     Dose,
@@ -269,3 +270,14 @@ def test_bioavailability(
     low: float | None, high: float | None, expected: Candidate[dict[str, float]]
 ) -> None:
     assert bioavailability(low, high) == expected
+
+
+def test_bioavailability_changes_name_each_bound_and_its_direction() -> None:
+    assert bioavailability_changes({"min": 15}, {"min": 10, "max": 20}) == [
+        (Kind.BIOAVAILABILITY_CHANGED, "min 10 to 15 %, higher"),
+        (Kind.BIOAVAILABILITY_BOUND_NOT_IN_API, "max 20 %, not in the API block"),
+    ]
+    assert bioavailability_changes({"min": 5, "max": 20}, {"min": 10, "max": 20}) == [
+        (Kind.BIOAVAILABILITY_CHANGED, "min 10 to 5 %, lower"),
+    ]
+    assert bioavailability_changes({"min": 5, "max": 20}, {"max": 20}) == []

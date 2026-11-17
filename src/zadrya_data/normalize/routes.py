@@ -21,6 +21,7 @@ from zadrya_data.base import BaseRoute, BaseSubstance
 from zadrya_data.graphql import ApiRoute, ApiSubstance
 from zadrya_data.normalize import dose as dose_rules
 from zadrya_data.normalize.bioavailability import bioavailability
+from zadrya_data.normalize.bioavailability import changes as bioavailability_changes
 from zadrya_data.normalize.blocks import Candidate, choose
 from zadrya_data.normalize.blocks import Note
 from zadrya_data.normalize.duration import PHASES, phase
@@ -158,9 +159,13 @@ def normalize_routes(
 
         api_bio = api_route.bioavailability if api_route else None
         base_bio = base_route.bioavailability if base_route else None
+        api_bio_candidate = bioavailability(api_bio.min, api_bio.max) if api_bio else Candidate()
+        base_bio_candidate = (
+            bioavailability(base_bio.min, base_bio.max) if base_bio else Candidate()
+        )
         chosen_bio = choose(
-            bioavailability(api_bio.min, api_bio.max) if api_bio else Candidate(),
-            bioavailability(base_bio.min, base_bio.max) if base_bio else Candidate(),
+            api_bio_candidate,
+            base_bio_candidate,
             what="bioavailability",
             substance=name,
             route=route,
@@ -169,6 +174,9 @@ def normalize_routes(
         )
         if chosen_bio is not None:
             result["bioavailability"] = chosen_bio
+            if chosen_bio is api_bio_candidate.value and base_bio_candidate.value is not None:
+                notes = bioavailability_changes(chosen_bio, base_bio_candidate.value)
+                _report(report, name, route, "bioavailability", notes)
         routes.append(result)
     return routes
 

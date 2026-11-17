@@ -1,0 +1,81 @@
+{
+  "rule": "When the API bioavailability is chosen and the base has a consistent one for the same route, each bound that differs is reported with its direction, and each bound the base states and the API block does not is reported too. Here the API minimum is 15 against a base minimum of 10, and the base maximum of 20 is not in the API block.",
+  "base": [
+    {
+      "name": "Examplamine",
+      "roas": [
+        {
+          "name": "oral",
+          "bioavailability": {
+            "min": 10,
+            "max": 20
+          }
+        }
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "Examplamine",
+      "roas": [
+        {
+          "name": "oral",
+          "bioavailability": {
+            "min": 15
+          }
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "roas"
+  ],
+  "reportKinds": [
+    "api-block-rejected",
+    "base-block-used",
+    "block-dropped",
+    "dose-boundary-filled",
+    "dose-fill-discarded",
+    "dose-equal-boundaries",
+    "dose-label-differs",
+    "unit-repaired",
+    "unit-not-mass",
+    "duration-rounded",
+    "api-phase-ignored",
+    "route-only-in-base",
+    "route-only-in-api",
+    "unit-qualifier-not-adopted",
+    "unit-changed",
+    "dose-changed",
+    "duration-changed",
+    "bioavailability-changed",
+    "bioavailability-bound-not-in-api"
+  ],
+  "expected": [
+    {
+      "name": "Examplamine",
+      "roas": [
+        {
+          "route": "oral",
+          "bioavailability": {
+            "min": 15
+          }
+        }
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "bioavailability-changed",
+      "substance": "Examplamine",
+      "route": "oral",
+      "detail": "bioavailability: min 10 to 15 %, higher"
+    },
+    {
+      "kind": "bioavailability-bound-not-in-api",
+      "substance": "Examplamine",
+      "route": "oral",
+      "detail": "bioavailability: max 20 %, not in the API block"
+    }
+  ]
+}
