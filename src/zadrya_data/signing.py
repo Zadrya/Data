@@ -185,10 +185,27 @@ def private_key_path_from_env() -> Path:
             f"{KEY_FILE_VARIABLE} is not set: it must hold the path of the private key file "
             "(the key itself never goes in a variable of this name, nor in the repository)"
         )
-    path = Path(value)
-    if not path.is_file():
-        raise KeyLoadError(f"{KEY_FILE_VARIABLE} names {path}, which is not an existing file")
-    return path
+    if not _is_existing_file(value):
+        # The value is never shown: the likely mistake is to put the key itself here.
+        hint = ""
+        if _looks_like_key_material(value):
+            hint = (
+                ": its value looks like the key itself, not a path. Write the key to a file "
+                "that only you can read and put the path of that file in the variable"
+            )
+        raise KeyLoadError(f"{KEY_FILE_VARIABLE} does not name an existing file{hint}")
+    return Path(value)
+
+
+def _is_existing_file(value: str) -> bool:
+    try:
+        return Path(value).is_file()
+    except (OSError, ValueError):  # for example a name that is too long: no detail is kept
+        return False
+
+
+def _looks_like_key_material(value: str) -> bool:
+    return any(mark in value for mark in ("\n", "\r", "-----", "PRIVATE KEY"))
 
 
 def load_private_key(path: Path) -> Ed25519PrivateKey:

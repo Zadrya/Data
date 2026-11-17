@@ -72,6 +72,14 @@ def _private_pem(private_key: Ed25519PrivateKey | ec.EllipticCurvePrivateKey) ->
     )
 
 
+def _encrypted_pem(private_key: Ed25519PrivateKey, password: bytes) -> bytes:
+    return private_key.private_bytes(
+        serialization.Encoding.PEM,
+        serialization.PrivateFormat.PKCS8,
+        serialization.BestAvailableEncryption(password),
+    )
+
+
 def _public_pem(private_key: Ed25519PrivateKey | ec.EllipticCurvePrivateKey) -> bytes:
     return private_key.public_key().public_bytes(
         serialization.Encoding.PEM, serialization.PublicFormat.SubjectPublicKeyInfo
@@ -402,13 +410,85 @@ def test_an_unset_or_empty_key_path_variable_fails_clearly(
         private_key_path_from_env()
 
 
-def test_a_key_path_that_is_not_a_file_fails_clearly(
+def test_a_key_path_that_is_not_a_file_fails_without_showing_the_value(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    monkeypatch.setenv(KEY_FILE_VARIABLE, str(tmp_path / "missing.pem"))
+    monkeypatch.setenv(KEY_FILE_VARIABLE, str(tmp_path / "missing-file.pem"))
 
-    with pytest.raises(KeyLoadError, match="missing.pem, which is not an existing file"):
+    with pytest.raises(KeyLoadError) as caught:
         private_key_path_from_env()
+
+    assert str(caught.value) == "ZADRYA_SIGNING_KEY_FILE does not name an existing file"
+    assert "missing-file" not in repr(caught.value)
+
+
+def _one_line(pem: bytes) -> bytes:
+    return pem.replace(b"\n", b"")
+
+
+@pytest.mark.parametrize(
+    "spelling",
+    [
+        pytest.param(lambda key: _private_pem(key), id="plain"),
+        pytest.param(lambda key: _encrypted_pem(key, b"throwaway test password"), id="encrypted"),
+        pytest.param(lambda key: _one_line(_private_pem(key)), id="one-line"),
+        pytest.param(
+            lambda key: _one_line(_encrypted_pem(key, b"throwaway test password")),
+            id="encrypted-one-line",
+        ),
+        pytest.param(lambda key: _private_pem(key).replace(b"\n", b"\\n"), id="escaped-breaks"),
+        pytest.param(lambda key: _private_pem(key).replace(b"\n", b"\r\n"), id="carriage-returns"),
+    ],
+)
+def test_a_key_put_in_the_path_variable_is_never_shown(
+    monkeypatch: pytest.MonkeyPatch, spelling: Callable[[Ed25519PrivateKey], bytes]
+) -> None:
+    value = spelling(Ed25519PrivateKey.generate()).decode("ascii")
+    monkeypatch.setenv(KEY_FILE_VARIABLE, value)
+
+    with pytest.raises(KeyLoadError, match="looks like the key itself, not a path") as caught:
+        private_key_path_from_env()
+
+    error = caught.value
+    shown = str(error) + repr(error) + repr(error.args) + repr(vars(error))
+    # No run of eight characters of the value appears anywhere in the error.
+    pieces = {value[start : start + 8] for start in range(len(value) - 7)}
+    assert not [piece for piece in pieces if piece in shown]
+    assert "BEGIN" not in shown and "\n" not in shown
+    assert error.__cause__ is None and error.__context__ is None
+
+
+def test_an_error_of_the_file_system_about_the_value_is_not_shown(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Some systems answer a very long name with an error that quotes it."""
+    value = _one_line(_private_pem(Ed25519PrivateKey.generate())).decode("ascii")
+    monkeypatch.setenv(KEY_FILE_VARIABLE, value)
+
+    def too_long(self: Path) -> bool:
+        raise OSError(63, "File name too long", str(self))
+
+    monkeypatch.setattr(Path, "is_file", too_long)
+
+    with pytest.raises(KeyLoadError, match="looks like the key itself") as caught:
+        private_key_path_from_env()
+
+    assert value[20:40] not in str(caught.value) + repr(caught.value)
+    assert caught.value.__cause__ is None and caught.value.__context__ is None
+
+
+def test_a_key_body_alone_in_the_path_variable_is_not_shown_either(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Without the PEM lines there is nothing to recognize: no hint, and still no value."""
+    body = _private_pem(Ed25519PrivateKey.generate()).splitlines()[1].decode("ascii")
+    monkeypatch.setenv(KEY_FILE_VARIABLE, body)
+
+    with pytest.raises(KeyLoadError) as caught:
+        private_key_path_from_env()
+
+    assert str(caught.value) == "ZADRYA_SIGNING_KEY_FILE does not name an existing file"
+    assert body[:8] not in repr(caught.value)
 
 
 def test_an_unencrypted_private_key_round_trips(
@@ -422,14 +502,6 @@ def test_an_unencrypted_private_key_round_trips(
     loaded = load_private_key(path)
 
     assert verify(DATA, sign(DATA, loaded), [_pinned("current", private_key)]).name == "current"
-
-
-def _encrypted_pem(private_key: Ed25519PrivateKey, password: bytes) -> bytes:
-    return private_key.private_bytes(
-        serialization.Encoding.PEM,
-        serialization.PrivateFormat.PKCS8,
-        serialization.BestAvailableEncryption(password),
-    )
 
 
 def test_an_encrypted_private_key_needs_its_password_from_the_environment(
