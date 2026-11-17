@@ -566,7 +566,9 @@ def test_a_missing_file_fails(tmp_path: Path, name: str) -> None:
         load_snapshot(directory)
 
 
-@pytest.mark.parametrize("name", ["notes.txt", ".DS_Store", "graphql.json.bak", "old"])
+@pytest.mark.parametrize(
+    "name", ["notes.txt", "graphql.json.bak", "old", "._graphql.json", ".ds_store", ".DS_Store.bak"]
+)
 def test_a_directory_with_an_extra_entry_is_not_a_snapshot(tmp_path: Path, name: str) -> None:
     directory = _write(tmp_path / "s")
     if name == "old":
@@ -583,3 +585,39 @@ def test_a_directory_with_an_extra_entry_is_not_a_snapshot(tmp_path: Path, name:
 def test_a_directory_that_does_not_exist_is_not_a_snapshot(tmp_path: Path) -> None:
     with pytest.raises(SnapshotError, match="No such file or directory"):
         load_snapshot(tmp_path / "absent")
+
+
+def test_a_finder_ds_store_file_does_not_spoil_a_snapshot(tmp_path: Path) -> None:
+    directory = _write(tmp_path / "s")
+    expected = load_snapshot(directory)
+    (directory / ".DS_Store").write_bytes(b"\x00\x00\x00\x01Bud1")
+
+    assert load_snapshot(directory) == expected
+
+
+def test_replacing_a_snapshot_with_a_ds_store_file_leaves_none_behind(tmp_path: Path) -> None:
+    directory = _write(tmp_path / "s")
+    (directory / ".DS_Store").write_bytes(b"\x00\x00\x00\x01Bud1")
+    data, pages = _other_fetch()
+
+    write_snapshot(directory, data, pages, BASE_NAMES, DAY)
+
+    assert sorted(_files(directory)) == ["graphql.json", "mediawiki.json", "snapshot.json"]
+    assert load_snapshot(directory).substances[0].summary == "Changed upstream."
+    assert _leftovers(tmp_path) == []
+
+
+@pytest.mark.parametrize("kind", ["directory", "symbolic link"])
+def test_a_ds_store_that_is_not_a_regular_file_is_not_tolerated(tmp_path: Path, kind: str) -> None:
+    directory = _write(tmp_path / "s")
+    entry = directory / ".DS_Store"
+    if kind == "directory":
+        entry.mkdir()
+    else:
+        entry.symlink_to(tmp_path / "elsewhere")
+    data, pages = _fetched()
+
+    with pytest.raises(SnapshotError, match="holds '.DS_Store', which is not a snapshot file"):
+        load_snapshot(directory)
+    with pytest.raises(SnapshotError, match="holds '.DS_Store', which is not a snapshot file"):
+        write_snapshot(directory, data, pages, BASE_NAMES, DAY)

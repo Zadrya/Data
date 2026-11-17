@@ -209,6 +209,23 @@ def test_fetch_refuses_a_directory_that_is_not_a_snapshot_before_any_request(
     assert "which is not a snapshot file" in capsys.readouterr().err
 
 
+def test_fetch_replaces_a_snapshot_that_finder_has_visited(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    output = tmp_path / "snapshot"
+    monkeypatch.setattr(cli, "make_client", lambda: replay(api_handler)[0])
+    assert main(["fetch", "--output", str(output), "--base", str(BASE_FIXTURE)]) == 0
+    (output / ".DS_Store").write_bytes(b"Bud1")
+
+    assert main(["fetch", "--output", str(output), "--base", str(BASE_FIXTURE)]) == 0
+
+    assert sorted(path.name for path in output.iterdir()) == [
+        "graphql.json",
+        "mediawiki.json",
+        "snapshot.json",
+    ]
+
+
 def test_fetch_refuses_a_symbolic_link_as_output_before_any_request(
     tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
 ) -> None:

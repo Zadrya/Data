@@ -41,6 +41,11 @@ GRAPHQL_FILE = "graphql.json"
 MEDIAWIKI_FILE = "mediawiki.json"
 INFO_FILE = "snapshot.json"
 FILES = (GRAPHQL_FILE, MEDIAWIKI_FILE, INFO_FILE)
+# The one other name a snapshot directory may hold: Finder writes it when someone
+# merely opens the folder on macOS. It is not part of the snapshot, is not hashed and
+# is never read, and replacing the directory removes it. Only this exact name, and
+# only as a regular file; anything else (AppleDouble ``._*`` files included) is refused.
+TOLERATED_FILE = ".DS_Store"
 FORMAT_VERSION = 1
 
 _PAGE_KEYS = {"requested", "title", "exists", "pageId", "revisionId", "timestamp"}
@@ -163,14 +168,15 @@ def write_snapshot(
 def load_snapshot(directory: Path) -> Snapshot:
     """Read a snapshot directory into typed objects, or raise ``SnapshotError``.
 
-    The directory must hold the three snapshot files and nothing else. Beyond the shape
-    of each file, this checks that the three belong together: the
+    The directory must hold the three snapshot files and nothing else besides a
+    ``.DS_Store`` file, which is ignored. Beyond the shape of each file, this checks
+    that the three belong together: the
     hashes and counts in ``snapshot.json`` match the other two files, the endpoints
     and the query are the ones this code uses, and the looked up titles are exactly
     the substance names of the API and of the base file.
     """
     try:
-        extra = sorted(path.name for path in directory.iterdir() if path.name not in FILES)
+        extra = _foreign_entries(directory)
     except OSError as error:
         raise SnapshotError(f"{directory}: {error}") from error
     if extra:
@@ -233,7 +239,8 @@ def check_destination(directory: Path) -> None:
     """Refuse a destination that ``write_snapshot`` must not replace.
 
     A symbolic link is refused, because replacing it would swap the link, not what it
-    points to. An existing path must be a directory that holds snapshot files only.
+    points to. An existing path must be a directory that holds snapshot files only,
+    besides a ``.DS_Store`` file, which goes with the directory it is in.
     ``fetch`` calls this before its first request, so a wrong path costs no requests.
     """
     if directory.is_symlink():
@@ -242,12 +249,22 @@ def check_destination(directory: Path) -> None:
         return
     if not directory.is_dir():
         raise SnapshotError(f"{directory}: not a directory")
-    foreign = sorted(path.name for path in directory.iterdir() if path.name not in FILES)
+    foreign = _foreign_entries(directory)
     if foreign:
         raise SnapshotError(
             f"{directory}: holds '{foreign[0]}', which is not a snapshot file: "
             "refusing to replace the directory"
         )
+
+
+def _foreign_entries(directory: Path) -> list[str]:
+    """Return the sorted names in the directory that are neither snapshot files nor tolerated."""
+    return sorted(
+        path.name
+        for path in directory.iterdir()
+        if path.name not in FILES
+        and not (path.name == TOLERATED_FILE and path.is_file() and not path.is_symlink())
+    )
 
 
 def _counts(substances: tuple[ApiSubstance, ...], pages: tuple[WikiPage, ...]) -> dict[str, int]:
