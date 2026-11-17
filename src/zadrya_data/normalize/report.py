@@ -55,6 +55,10 @@ class Kind(StrEnum):
     BIOAVAILABILITY_CHANGED = "bioavailability-changed"
     BIOAVAILABILITY_BOUND_NOT_IN_API = "bioavailability-bound-not-in-api"
     DURATION_ROUNDED = "duration-rounded"
+    # Tolerance
+    TOLERANCE_FROM_BASE = "tolerance-from-base"
+    TOLERANCE_DIFFERS = "tolerance-differs"
+    TOLERANCE_NOT_PARSED = "tolerance-not-parsed"
 
 
 @dataclass(frozen=True, slots=True)

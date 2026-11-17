@@ -1,0 +1,143 @@
+{
+  "rule": "full, half and zero are three independent facts, so each is taken on its own: the API text when it is present and not empty after stripping, otherwise the base text. Using the base text is reported, and so is every field where both sources have a text and the texts differ. Text that is not valid after stripping is reported and treated as absent. A substance with no tolerance text has no tolerance.",
+  "base": [
+    {
+      "name": "LSD",
+      "tolerance": {
+        "full": "almost immediately after ingestion",
+        "half": "5-7 days",
+        "zero": "14 days"
+      }
+    },
+    {
+      "name": "Cinolazepam",
+      "tolerance": {
+        "full": "within a couple of days of continuous use",
+        "zero": "7 - 14 days"
+      }
+    },
+    {
+      "name": "Caffeine"
+    },
+    {
+      "name": "Cocaine",
+      "tolerance": {
+        "half": "3 days"
+      }
+    }
+  ],
+  "api": [
+    {
+      "name": "LSD",
+      "tolerance": {
+        "full": " almost immediately after ingestion ",
+        "half": "",
+        "zero": "7 days"
+      }
+    },
+    {
+      "name": "Caffeine",
+      "tolerance": {
+        "full": null,
+        "half": null,
+        "zero": null
+      }
+    },
+    {
+      "name": "Cocaine",
+      "tolerance": {
+        "full": "with\nrepeated use",
+        "half": null,
+        "zero": null
+      }
+    }
+  ],
+  "compare": [
+    "tolerance"
+  ],
+  "reportKinds": [
+    "tolerance-from-base",
+    "tolerance-differs",
+    "text-dropped"
+  ],
+  "expected": [
+    {
+      "name": "Caffeine"
+    },
+    {
+      "name": "Cinolazepam",
+      "tolerance": {
+        "full": "within a couple of days of continuous use",
+        "zero": {
+          "text": "7 - 14 days",
+          "min": 10080,
+          "max": 20160
+        }
+      }
+    },
+    {
+      "name": "Cocaine",
+      "tolerance": {
+        "half": {
+          "text": "3 days",
+          "min": 4320,
+          "max": 4320
+        }
+      }
+    },
+    {
+      "name": "LSD",
+      "tolerance": {
+        "full": "almost immediately after ingestion",
+        "half": {
+          "text": "5-7 days",
+          "min": 7200,
+          "max": 10080
+        },
+        "zero": {
+          "text": "7 days",
+          "min": 10080,
+          "max": 10080
+        }
+      }
+    }
+  ],
+  "report": [
+    {
+      "kind": "tolerance-from-base",
+      "substance": "Cinolazepam",
+      "route": null,
+      "detail": "full: the API has no usable text, the base text 'within a couple of days of continuous use' is used"
+    },
+    {
+      "kind": "tolerance-from-base",
+      "substance": "Cinolazepam",
+      "route": null,
+      "detail": "zero: the API has no usable text, the base text '7 - 14 days' is used"
+    },
+    {
+      "kind": "text-dropped",
+      "substance": "Cocaine",
+      "route": null,
+      "detail": "tolerance full of the API 'with\\nrepeated use' is not valid text"
+    },
+    {
+      "kind": "tolerance-from-base",
+      "substance": "Cocaine",
+      "route": null,
+      "detail": "half: the API has no usable text, the base text '3 days' is used"
+    },
+    {
+      "kind": "tolerance-from-base",
+      "substance": "LSD",
+      "route": null,
+      "detail": "half: the API has no usable text, the base text '5-7 days' is used"
+    },
+    {
+      "kind": "tolerance-differs",
+      "substance": "LSD",
+      "route": null,
+      "detail": "zero: the API text '7 days' is used, the base text was '14 days'"
+    }
+  ]
+}

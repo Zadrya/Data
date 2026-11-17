@@ -1,0 +1,545 @@
+{
+ "data": {
+  "substances": [
+   {
+    "addictionPotential": null,
+    "class": {
+     "chemical": [
+      "Amphetamine",
+      "Substituted amphetamines"
+     ],
+     "psychoactive": [
+      "Entactogen",
+      "Stimulants"
+     ]
+    },
+    "commonNames": [
+     "3-FMA"
+    ],
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "3-FMA",
+    "roas": [
+     {
+      "bioavailability": null,
+      "dose": {
+       "common": {
+        "max": 35.0,
+        "min": 20.0
+       },
+       "heavy": 50.0,
+       "light": {
+        "max": 20.0,
+        "min": 10.0
+       },
+       "strong": {
+        "max": 50.0,
+        "min": 35.0
+       },
+       "threshold": 5.0,
+       "units": "mg"
+      },
+      "duration": {
+       "afterglow": {
+        "max": 12.0,
+        "min": 6.0,
+        "units": "hours"
+       },
+       "comeup": {
+        "max": 60.0,
+        "min": 30.0,
+        "units": "minutes"
+       },
+       "duration": null,
+       "offset": {
+        "max": 3.0,
+        "min": 1.0,
+        "units": "hours"
+       },
+       "onset": {
+        "max": 60.0,
+        "min": 20.0,
+        "units": "minutes"
+       },
+       "peak": {
+        "max": 4.0,
+        "min": 2.0,
+        "units": "hours"
+       },
+       "total": {
+        "max": 7.0,
+        "min": 3.0,
+        "units": "hours"
+       }
+      },
+      "name": "oral"
+     }
+    ],
+    "summary": "Summary sheet: 3-FMA 3-FMA",
+    "systematicName": "1-(3-Fluorophenyl)-N-methylpropan-2-amine",
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/3-FMA"
+   },
+   {
+    "addictionPotential": "extremely addictive",
+    "class": {
+     "chemical": [
+      "Thienodiazepines"
+     ],
+     "psychoactive": [
+      "Depressant"
+     ]
+    },
+    "commonNames": [
+     "Metizolam",
+     "Desmethyletizolam"
+    ],
+    "crossTolerances": [
+     "thienzodiazepines",
+     "benzodiazepines"
+    ],
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Metizolam",
+    "roas": [
+     {
+      "bioavailability": null,
+      "dose": {
+       "common": {
+        "max": 4.0,
+        "min": 2.0
+       },
+       "heavy": 6.0,
+       "light": {
+        "max": 2.0,
+        "min": 1.0
+       },
+       "strong": {
+        "max": 6.0,
+        "min": 4.0
+       },
+       "threshold": null,
+       "units": "mg"
+      },
+      "duration": {
+       "afterglow": {
+        "max": 30.0,
+        "min": 10.0,
+        "units": "hours"
+       },
+       "comeup": null,
+       "duration": null,
+       "offset": null,
+       "onset": {
+        "max": 90.0,
+        "min": 30.0,
+        "units": "minutes"
+       },
+       "peak": null,
+       "total": {
+        "max": 8.0,
+        "min": 5.0,
+        "units": "hours"
+       }
+      },
+      "name": "oral"
+     }
+    ],
+    "summary": "Fatal overdose may occur when thienodiazepines are combined with other depressants such as opiates, benzodiazepines, barbiturates, gabapentinoids, alcohol or other GABAergic substances.[1] It is strongly discouraged to combine these substances, particularly in common to heavy doses.",
+    "systematicName": null,
+    "tolerance": {
+     "full": "within a couple of days of repeated administration",
+     "half": "3 - 7 days",
+     "zero": "1 - 2 weeks"
+    },
+    "toxicity": [
+     "large therapeutic index and margin of safety"
+    ],
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Metizolam"
+   },
+   {
+    "addictionPotential": null,
+    "class": {
+     "chemical": [
+      "Substituted morphinans"
+     ],
+     "psychoactive": [
+      "Opioids"
+     ]
+    },
+    "commonNames": [
+     "Morphine",
+     "MS-Contin",
+     "Oramorph",
+     "Zomorph",
+     "Sevredol",
+     "Duramorph"
+    ],
+    "crossTolerances": [
+     "opioids"
+    ],
+    "dangerousInteractions": [
+     {
+      "name": "Alcohol"
+     },
+     {
+      "name": "Benzodiazepines"
+     },
+     {
+      "name": "DXM"
+     },
+     {
+      "name": "GHB"
+     },
+     {
+      "name": "GBL"
+     },
+     {
+      "name": "Ketamine"
+     },
+     {
+      "name": "MXE"
+     },
+     {
+      "name": "Tramadol"
+     },
+     {
+      "name": "Grapefruit"
+     }
+    ],
+    "featured": true,
+    "name": "Morphine",
+    "roas": [
+     {
+      "bioavailability": null,
+      "dose": {
+       "common": {
+        "max": 7.5,
+        "min": 5.0
+       },
+       "heavy": 10.0,
+       "light": {
+        "max": 5.0,
+        "min": 3.33
+       },
+       "strong": {
+        "max": 10.0,
+        "min": 7.5
+       },
+       "threshold": 3.33,
+       "units": "mg"
+      },
+      "duration": {
+       "afterglow": null,
+       "comeup": {
+        "max": 5.0,
+        "min": 2.0,
+        "units": "minutes"
+       },
+       "duration": null,
+       "offset": {
+        "max": 90.0,
+        "min": 60.0,
+        "units": "minutes"
+       },
+       "onset": {
+        "max": 30.0,
+        "min": 0.0,
+        "units": "seconds"
+       },
+       "peak": {
+        "max": 2.5,
+        "min": 1.5,
+        "units": "hours"
+       },
+       "total": {
+        "max": 5.0,
+        "min": 4.0,
+        "units": "hours"
+       }
+      },
+      "name": "intravenous"
+     },
+     {
+      "bioavailability": {
+       "max": 40.0,
+       "min": 35.0
+      },
+      "dose": {
+       "common": {
+        "max": 20.0,
+        "min": 15.0
+       },
+       "heavy": 30.0,
+       "light": {
+        "max": 15.0,
+        "min": 10.0
+       },
+       "strong": {
+        "max": 30.0,
+        "min": 20.0
+       },
+       "threshold": 10.0,
+       "units": "mg"
+      },
+      "duration": {
+       "afterglow": null,
+       "comeup": {
+        "max": 40.0,
+        "min": 20.0,
+        "units": "minutes"
+       },
+       "duration": null,
+       "offset": {
+        "max": 2.0,
+        "min": 1.0,
+        "units": "hours"
+       },
+       "onset": {
+        "max": 30.0,
+        "min": 10.0,
+        "units": "minutes"
+       },
+       "peak": {
+        "max": 3.0,
+        "min": 2.0,
+        "units": "hours"
+       },
+       "total": {
+        "max": 6.0,
+        "min": 4.0,
+        "units": "hours"
+       }
+      },
+      "name": "oral"
+     }
+    ],
+    "summary": "Fatal overdose may occur when opiates are combined with other depressants such as benzodiazepines, barbiturates, gabapentinoids, thienodiazepines, alcohol or other GABAergic substances.[1] It is strongly discouraged to combine these substances, particularly in common to heavy doses.",
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": [
+     {
+      "name": "Stimulants"
+     },
+     {
+      "name": "MAOIs"
+     },
+     {
+      "name": "Nitrous"
+     },
+     {
+      "name": "PCP"
+     }
+    ],
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Morphine"
+   },
+   {
+    "addictionPotential": "mildly addictive with a low potential for abuse",
+    "class": {
+     "chemical": [
+      "Benzhydryl"
+     ],
+     "psychoactive": [
+      "Stimulants",
+      "Nootropic",
+      "Eugeroics"
+     ]
+    },
+    "commonNames": [
+     "N-Methylbisfluoromodafinil",
+     "Dehydroxyfluorafinil",
+     "Modafiendz"
+    ],
+    "crossTolerances": [
+     "modafanil",
+     "analog"
+    ],
+    "dangerousInteractions": [
+     {
+      "name": "25x-NBOMe"
+     },
+     {
+      "name": "25x-NBOH"
+     },
+     {
+      "name": "Tramadol"
+     },
+     {
+      "name": "MAOIs"
+     }
+    ],
+    "featured": true,
+    "name": "N-Methylbisfluoromodafinil",
+    "roas": [
+     {
+      "bioavailability": null,
+      "dose": {
+       "common": {
+        "max": 150.0,
+        "min": 100.0
+       },
+       "heavy": 200.0,
+       "light": {
+        "max": 100.0,
+        "min": 50.0
+       },
+       "strong": {
+        "max": 200.0,
+        "min": 150.0
+       },
+       "threshold": 25.0,
+       "units": "mg"
+      },
+      "duration": {
+       "afterglow": null,
+       "comeup": null,
+       "duration": null,
+       "offset": null,
+       "onset": null,
+       "peak": null,
+       "total": {
+        "max": 8.0,
+        "min": 5.0,
+        "units": "hours"
+       }
+      },
+      "name": "oral"
+     }
+    ],
+    "summary": "Summary sheet: N-Methylbisfluoromodafinil N-Methylbisfluoromodafinil",
+    "systematicName": null,
+    "tolerance": {
+     "full": "develops with prolonged and repeated use",
+     "half": "3 - 7 days",
+     "zero": "1 - 2 weeks"
+    },
+    "toxicity": [
+     "exact toxic dosage is unknown"
+    ],
+    "uncertainInteractions": [
+     {
+      "name": "Alcohol"
+     },
+     {
+      "name": "MXE"
+     },
+     {
+      "name": "Dissociatives"
+     }
+    ],
+    "unsafeInteractions": [
+     {
+      "name": "DXM"
+     },
+     {
+      "name": "MDMA"
+     },
+     {
+      "name": "Stimulants"
+     }
+    ],
+    "url": "https://psychonautwiki.org/wiki/N-Methylbisfluoromodafinil"
+   },
+   {
+    "addictionPotential": "mildly addictive",
+    "class": {
+     "chemical": [
+      "Dibenzothiazepine",
+      "Antidepressants"
+     ],
+     "psychoactive": [
+      "Nootropic",
+      "Opioids",
+      "Antidepressants"
+     ]
+    },
+    "commonNames": [
+     "Tianeptine",
+     "Stablon",
+     "Coaxil",
+     "Tatinol"
+    ],
+    "crossTolerances": [
+     "trycyclic antidepressants",
+     "opioids"
+    ],
+    "dangerousInteractions": null,
+    "featured": true,
+    "name": "Tianeptine",
+    "roas": [
+     {
+      "bioavailability": null,
+      "dose": {
+       "common": {
+        "max": 35.0,
+        "min": 12.0
+       },
+       "heavy": 100.0,
+       "light": {
+        "max": 12.0,
+        "min": 6.0
+       },
+       "strong": {
+        "max": 100.0,
+        "min": 35.0
+       },
+       "threshold": 3.0,
+       "units": "mg"
+      },
+      "duration": {
+       "afterglow": null,
+       "comeup": {
+        "max": 30.0,
+        "min": 15.0,
+        "units": "minutes"
+       },
+       "duration": null,
+       "offset": {
+        "max": 60.0,
+        "min": 30.0,
+        "units": "minutes"
+       },
+       "onset": {
+        "max": 60.0,
+        "min": 30.0,
+        "units": "minutes"
+       },
+       "peak": {
+        "max": 90.0,
+        "min": 60.0,
+        "units": "minutes"
+       },
+       "total": {
+        "max": 3.0,
+        "min": 2.0,
+        "units": "hours"
+       }
+      },
+      "name": "oral"
+     }
+    ],
+    "summary": "Summary sheet: Tianeptine Tianeptine",
+    "systematicName": null,
+    "tolerance": {
+     "full": "with prolonged use",
+     "half": "3 - 7 days",
+     "zero": "1 - 2 weeks"
+    },
+    "toxicity": [
+     "large therapeutic index and margin of safety"
+    ],
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Tianeptine"
+   }
+  ]
+ }
+}
