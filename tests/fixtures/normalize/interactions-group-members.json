@@ -1,0 +1,185 @@
+{
+  "rule": "Only the groups that some target names are listed, by id, each with the members its rule selects, sorted: a catalog category, a psychoactive or chemical class of the API compared without case, a name pattern matched by the whole name, or an explicit list of names. Every group is reported with its rule and members; an explicit name missing from the catalog and a group without members are reported on their own.",
+  "base": [
+    {
+      "name": "LSD",
+      "interactions": {
+        "dangerous": [
+          "25x-NBOMe",
+          "Amphetamines",
+          "Stimulants",
+          "SSRIs",
+          "MAOIs"
+        ],
+        "unsafe": [],
+        "uncertain": []
+      }
+    },
+    {
+      "name": "25I-NBOMe"
+    },
+    {
+      "name": "25C-NBOMe"
+    },
+    {
+      "name": "25I-NBOMe-like"
+    },
+    {
+      "name": "Amphetamine"
+    },
+    {
+      "name": "MDMA"
+    },
+    {
+      "name": "Caffeine",
+      "categories": [
+        "stimulant"
+      ]
+    },
+    {
+      "name": "Kratom"
+    }
+  ],
+  "api": [
+    {
+      "name": "MDMA",
+      "class": {
+        "chemical": [
+          "Substituted amphetamines"
+        ]
+      }
+    },
+    {
+      "name": "Kratom",
+      "class": {
+        "psychoactive": [
+          "stimulants"
+        ]
+      }
+    }
+  ],
+  "compare": [],
+  "reportKinds": [
+    "interaction-group",
+    "interaction-group-empty",
+    "interaction-group-name-missing"
+  ],
+  "expected": [
+    {
+      "name": "25C-NBOMe"
+    },
+    {
+      "name": "25I-NBOMe"
+    },
+    {
+      "name": "25I-NBOMe-like"
+    },
+    {
+      "name": "Amphetamine"
+    },
+    {
+      "name": "Caffeine"
+    },
+    {
+      "name": "Kratom"
+    },
+    {
+      "name": "LSD"
+    },
+    {
+      "name": "MDMA"
+    }
+  ],
+  "interactionGroups": [
+    {
+      "id": "25x-nbome",
+      "name": "25x-NBOMe",
+      "members": [
+        "25C-NBOMe",
+        "25I-NBOMe"
+      ]
+    },
+    {
+      "id": "maois",
+      "name": "MAOIs",
+      "members": []
+    },
+    {
+      "id": "ssris",
+      "name": "SSRIs",
+      "members": []
+    },
+    {
+      "id": "stimulants",
+      "name": "Stimulants",
+      "members": [
+        "Caffeine",
+        "Kratom"
+      ]
+    },
+    {
+      "id": "substituted-amphetamines",
+      "name": "Substituted amphetamines",
+      "members": [
+        "Amphetamine",
+        "MDMA"
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "interaction-group",
+      "substance": null,
+      "route": null,
+      "detail": "25x-nbome (2), name matching 25[A-Z]-NBOMe: 25C-NBOMe, 25I-NBOMe"
+    },
+    {
+      "kind": "interaction-group",
+      "substance": null,
+      "route": null,
+      "detail": "maois (0), named Ayahuasca: none"
+    },
+    {
+      "kind": "interaction-group-name-missing",
+      "substance": null,
+      "route": null,
+      "detail": "maois: the named member 'Ayahuasca' is not in the catalog"
+    },
+    {
+      "kind": "interaction-group-empty",
+      "substance": null,
+      "route": null,
+      "detail": "maois: no catalog substance belongs to it, so the app can only show the warning on the substance that lists it"
+    },
+    {
+      "kind": "interaction-group",
+      "substance": null,
+      "route": null,
+      "detail": "ssris (0), no catalog substance belongs to it: none"
+    },
+    {
+      "kind": "interaction-group-empty",
+      "substance": null,
+      "route": null,
+      "detail": "ssris: no catalog substance belongs to it, so the app can only show the warning on the substance that lists it"
+    },
+    {
+      "kind": "interaction-group",
+      "substance": null,
+      "route": null,
+      "detail": "stimulants (2), category stimulant; psychoactive class Stimulant or Stimulants: Caffeine, Kratom"
+    },
+    {
+      "kind": "interaction-group",
+      "substance": null,
+      "route": null,
+      "detail": "substituted-amphetamines (2), chemical class Amphetamine or Substituted amphetamines; named Amphetamine, Dextroamphetamine: Amphetamine, MDMA"
+    },
+    {
+      "kind": "interaction-group-name-missing",
+      "substance": null,
+      "route": null,
+      "detail": "substituted-amphetamines: the named member 'Dextroamphetamine' is not in the catalog"
+    }
+  ]
+}

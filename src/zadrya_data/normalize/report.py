@@ -63,6 +63,18 @@ class Kind(StrEnum):
     CROSS_TOLERANCE_SOURCES_DIFFER = "cross-tolerance-sources-differ"
     CROSS_TOLERANCE_TOKEN_DROPPED = "cross-tolerance-token-dropped"
     CROSS_TOLERANCE_GROUP = "cross-tolerance-group"
+    # Interactions
+    INTERACTION_TARGET_DROPPED = "interaction-target-dropped"
+    INTERACTION_ONLY_IN_ONE_SOURCE = "interaction-only-in-one-source"
+    INTERACTION_SEVERITY_CONFLICT = "interaction-severity-conflict"
+    INTERACTION_TARGET_RESOLVED = "interaction-target-resolved"
+    INTERACTION_TARGET_OTHER = "interaction-target-other"
+    INTERACTION_SYMMETRY_ADDED = "interaction-symmetry-added"
+    INTERACTION_SYMMETRY_RAISED = "interaction-symmetry-raised"
+    INTERACTION_GROUP = "interaction-group"
+    INTERACTION_GROUP_EMPTY = "interaction-group-empty"
+    INTERACTION_GROUP_NAME_MISSING = "interaction-group-name-missing"
+    INTERACTION_OWN_GROUP = "interaction-own-group"
 
 
 @dataclass(frozen=True, slots=True)

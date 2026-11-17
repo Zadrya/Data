@@ -107,7 +107,6 @@ def test_every_base_substance_is_in_the_catalog(base: BaseFile, whole: Normalize
     assert len(names) == 289
     assert set(names) == {substance.name for substance in base.substances}
     assert names == sorted(names)
-    assert whole.document["interactionGroups"] == []
 
 
 def test_categories_are_the_base_categories(base: BaseFile, whole: Normalized) -> None:
@@ -132,11 +131,6 @@ def test_routes_and_lists_are_in_their_documented_order(whole: Normalized) -> No
         lowered = [alias.casefold() for alias in substance["aliases"]]
         assert len(set(lowered)) == len(lowered)
         assert substance["name"].casefold() not in lowered
-
-
-def test_what_the_next_slice_fills_in_is_empty(whole: Normalized) -> None:
-    for substance in whole.document["substances"]:
-        assert substance["interactions"] == {"dangerous": [], "unsafe": [], "uncertain": []}
 
 
 def test_lsd_is_merged_from_both_sources(whole: Normalized) -> None:

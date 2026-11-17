@@ -1,0 +1,129 @@
+{
+  "rule": "Substance targets are made symmetric: when A lists B, B lists A with the same, highest, severity of the pair; each target that was added or raised is reported on the substance that changed. Group targets are not expanded into substance pairs: the app resolves a group through its members in both directions. A substance that lists a group it is a member of keeps the target, and it is reported.",
+  "base": [
+    {
+      "name": "Alcohol",
+      "categories": [
+        "depressant"
+      ],
+      "interactions": {
+        "dangerous": [],
+        "unsafe": [
+          "Depressants"
+        ],
+        "uncertain": [
+          "Tramadol"
+        ]
+      }
+    },
+    {
+      "name": "Tramadol",
+      "categories": [
+        "depressant"
+      ],
+      "interactions": {
+        "dangerous": [
+          "MDMA",
+          "Alcohol"
+        ],
+        "unsafe": [],
+        "uncertain": []
+      }
+    },
+    {
+      "name": "MDMA",
+      "categories": [
+        "stimulant"
+      ]
+    }
+  ],
+  "api": [],
+  "compare": [
+    "interactions"
+  ],
+  "reportKinds": [
+    "interaction-symmetry-added",
+    "interaction-symmetry-raised",
+    "interaction-own-group"
+  ],
+  "expected": [
+    {
+      "name": "Alcohol",
+      "interactions": {
+        "dangerous": [
+          {
+            "kind": "substance",
+            "name": "Tramadol"
+          }
+        ],
+        "unsafe": [
+          {
+            "kind": "group",
+            "groupId": "depressants"
+          }
+        ],
+        "uncertain": []
+      }
+    },
+    {
+      "name": "MDMA",
+      "interactions": {
+        "dangerous": [
+          {
+            "kind": "substance",
+            "name": "Tramadol"
+          }
+        ],
+        "unsafe": [],
+        "uncertain": []
+      }
+    },
+    {
+      "name": "Tramadol",
+      "interactions": {
+        "dangerous": [
+          {
+            "kind": "substance",
+            "name": "Alcohol"
+          },
+          {
+            "kind": "substance",
+            "name": "MDMA"
+          }
+        ],
+        "unsafe": [],
+        "uncertain": []
+      }
+    }
+  ],
+  "interactionGroups": [
+    {
+      "id": "depressants",
+      "name": "Depressants",
+      "members": [
+        "Alcohol",
+        "Tramadol"
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "interaction-symmetry-raised",
+      "substance": "Alcohol",
+      "route": null,
+      "detail": "'Tramadol' raised from uncertain to dangerous: 'Tramadol' lists 'Alcohol' as dangerous"
+    },
+    {
+      "kind": "interaction-symmetry-added",
+      "substance": "MDMA",
+      "route": null,
+      "detail": "'Tramadol' added as dangerous: 'Tramadol' lists 'MDMA' as dangerous"
+    },
+    {
+      "kind": "interaction-own-group",
+      "substance": "Alcohol",
+      "route": null,
+      "detail": "lists its own group 'depressants' (Depressants) as unsafe: kept, it may mean another substance of the same class"
+    }
+  ]
+}

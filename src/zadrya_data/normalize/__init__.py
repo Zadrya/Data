@@ -10,11 +10,8 @@ same document and the same report. One module holds each concern:
 - ``categories`` and ``classes``;
 - ``routes`` with ``dose``, ``duration`` and ``bioavailability``, merged by ``blocks``;
 - ``tolerance`` and ``cross_tolerance``;
+- ``interactions`` with ``interaction_groups``, once the whole catalog is known;
 - ``report``: every drop, fallback and repair.
-
-Interactions are not normalized yet. Until they are, every substance has empty
-interaction lists and ``interactionGroups`` is empty, so the document already has the
-shape of the schema. ``_not_yet_normalized`` is the one place that says so.
 """
 
 from dataclasses import dataclass
@@ -30,6 +27,7 @@ from zadrya_data.normalize.cross_tolerance import (
 )
 from zadrya_data.normalize.errors import NormalizationError
 from zadrya_data.normalize.fields import substance_fields
+from zadrya_data.normalize.interactions import normalize_interactions
 from zadrya_data.normalize.names import aliases
 from zadrya_data.normalize.report import Finding, Kind, Report
 from zadrya_data.normalize.routes import normalize_routes
@@ -53,11 +51,6 @@ class Normalized:
 
     document: dict[str, Any]
     report: Report
-
-
-def _not_yet_normalized() -> dict[str, Any]:
-    """Return the parts of a substance that the next slice fills in."""
-    return {"interactions": {"dangerous": [], "unsafe": [], "uncertain": []}}
 
 
 def _has_number(routes: list[dict[str, Any]]) -> bool:
@@ -89,7 +82,6 @@ def _substance(entry: Entry, known_categories: set[str], report: Report) -> dict
     if tolerance is not None:
         substance["tolerance"] = tolerance
     substance["crossTolerances"] = substance_cross_tolerances(entry.name, base, api, report)
-    substance |= _not_yet_normalized()
     return substance
 
 
@@ -98,7 +90,7 @@ def normalize(base: BaseFile, snapshot: Snapshot) -> Normalized:
     report = Report()
     categories = category_list(base)
     known = {category["id"] for category in categories}
-    substances = []
+    kept: list[tuple[Entry, dict[str, Any]]] = []
     for entry in build_catalog(base, snapshot, report):
         substance = _substance(entry, known, report)
         if entry.base is None and not _has_number(substance["roas"]):
@@ -108,11 +100,13 @@ def normalize(base: BaseFile, snapshot: Snapshot) -> Normalized:
                 substance=entry.name,
             )
             continue
-        substances.append(substance)
+        kept.append((entry, substance))
+    substances = [substance for _, substance in kept]
+    cross_tolerance = cross_tolerance_groups(substances, report)
     document = {
         "categories": categories,
-        "interactionGroups": [],
-        "crossToleranceGroups": cross_tolerance_groups(substances, report),
+        "interactionGroups": normalize_interactions(kept, report),
+        "crossToleranceGroups": cross_tolerance,
         "substances": substances,
     }
     return Normalized(document, report)

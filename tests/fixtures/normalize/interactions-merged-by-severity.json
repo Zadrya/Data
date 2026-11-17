@@ -1,0 +1,154 @@
+{
+  "rule": "The targets of a substance are the union of the base and API lists. A target found under two severities, in one source or across both, keeps the higher one (dangerous over unsafe over uncertain), and the conflict is reported. When both sources list targets, a target that only one source has is reported; when one source lists none at all, that is one finding.",
+  "base": [
+    {
+      "name": "LSD",
+      "interactions": {
+        "dangerous": [
+          "Tramadol"
+        ],
+        "unsafe": [
+          "Lithium"
+        ],
+        "uncertain": [
+          "Cannabis",
+          "MAOI"
+        ]
+      }
+    },
+    {
+      "name": "Cannabis"
+    },
+    {
+      "name": "Tramadol",
+      "interactions": {
+        "dangerous": [],
+        "unsafe": [],
+        "uncertain": [
+          "Cannabis"
+        ]
+      }
+    }
+  ],
+  "api": [
+    {
+      "name": "Tramadol",
+      "dangerousInteractions": [],
+      "unsafeInteractions": null,
+      "uncertainInteractions": []
+    },
+    {
+      "name": "LSD",
+      "dangerousInteractions": [
+        {
+          "name": "Lithium"
+        },
+        {
+          "name": "MAOIs"
+        }
+      ],
+      "unsafeInteractions": [],
+      "uncertainInteractions": [
+        {
+          "name": "Cannabis"
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "interactions"
+  ],
+  "reportKinds": [
+    "interaction-severity-conflict",
+    "interaction-only-in-one-source"
+  ],
+  "expected": [
+    {
+      "name": "Cannabis",
+      "interactions": {
+        "dangerous": [],
+        "unsafe": [],
+        "uncertain": [
+          {
+            "kind": "substance",
+            "name": "LSD"
+          },
+          {
+            "kind": "substance",
+            "name": "Tramadol"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LSD",
+      "interactions": {
+        "dangerous": [
+          {
+            "kind": "substance",
+            "name": "Tramadol"
+          },
+          {
+            "kind": "group",
+            "groupId": "maois"
+          },
+          {
+            "kind": "other",
+            "name": "Lithium"
+          }
+        ],
+        "unsafe": [],
+        "uncertain": [
+          {
+            "kind": "substance",
+            "name": "Cannabis"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Tramadol",
+      "interactions": {
+        "dangerous": [
+          {
+            "kind": "substance",
+            "name": "LSD"
+          }
+        ],
+        "unsafe": [],
+        "uncertain": [
+          {
+            "kind": "substance",
+            "name": "Cannabis"
+          }
+        ]
+      }
+    }
+  ],
+  "report": [
+    {
+      "kind": "interaction-only-in-one-source",
+      "substance": "LSD",
+      "route": null,
+      "detail": "'Tramadol' (dangerous) is only in the base"
+    },
+    {
+      "kind": "interaction-severity-conflict",
+      "substance": "LSD",
+      "route": null,
+      "detail": "'Lithium' is listed as dangerous in API 'Lithium'; unsafe in base 'Lithium': dangerous is kept"
+    },
+    {
+      "kind": "interaction-severity-conflict",
+      "substance": "LSD",
+      "route": null,
+      "detail": "'maois' is listed as dangerous in API 'MAOIs'; uncertain in base 'MAOI': dangerous is kept"
+    },
+    {
+      "kind": "interaction-only-in-one-source",
+      "substance": "Tramadol",
+      "route": null,
+      "detail": "the API lists no interactions: every target (1) is from the base"
+    }
+  ]
+}
