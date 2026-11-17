@@ -18,8 +18,16 @@ from zadrya_data.http import FetchError, PoliteClient
 from zadrya_data.manifest import build_manifest, parse_substances, serialize_manifest, sha256_hex
 from zadrya_data.mediawiki import WikiFormatError
 from zadrya_data.release_check import VerifiedRelease, verify_release
+from zadrya_data.release_download import (
+    LATEST,
+    RELEASES_URL,
+    check_tag,
+    download_release,
+    resolve_tag,
+)
 from zadrya_data.schema import SchemaName, validate
 from zadrya_data.signing import (
+    PinnedKey,
     decode_signature,
     encode_signature,
     load_private_key,
@@ -219,11 +227,22 @@ def build_parser() -> argparse.ArgumentParser:
         "verify",
         help="check a release as the app does: signature, hash, schemas, consistency",
         description="Check the three files of a release (substances.json, substances.json.sig "
-        "and manifest.json in a directory) against the pinned public keys, as the app does. "
-        "Exit code 0: accepted, 1: rejected, 2: a file cannot be read.",
+        "and manifest.json) against the pinned public keys, as the app does: from a directory, "
+        "or downloaded from a GitHub Release of Zadrya/Data with --release (the only network "
+        "use besides fetch; the tag must name the signed datasetVersion). Exit code 0: "
+        "accepted, 1: rejected, 2: a file cannot be read or downloaded.",
     )
-    verify_parser.add_argument(
-        "directory", type=Path, help="directory that holds the three files of the release"
+    verify_source = verify_parser.add_mutually_exclusive_group(required=True)
+    verify_source.add_argument(
+        "directory",
+        type=Path,
+        nargs="?",
+        help="directory that holds the three files of the release",
+    )
+    verify_source.add_argument(
+        "--release",
+        metavar="TAG",
+        help=f"download the release with this tag (dataset-vX.Y.Z) or {LATEST!r} instead",
     )
     verify_parser.add_argument(
         "--dataset-version",
@@ -239,13 +258,22 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _verify_files(files: dict[str, bytes], keys: Path) -> VerifiedRelease:
-    return verify_release(
+def _verify_files(
+    files: dict[str, bytes], pinned: Sequence[PinnedKey], dataset_version: str | None
+) -> VerifiedRelease:
+    verified = verify_release(
         substances=files["substances.json"],
         signature_file=files["substances.json.sig"],
         manifest=files["manifest.json"],
-        public_keys=load_public_keys(keys),
+        public_keys=pinned,
     )
+    if dataset_version is not None and verified.dataset_version != dataset_version:
+        raise _Refused(
+            EXIT_INVALID,
+            f"the signed datasetVersion is {verified.dataset_version}, and "
+            f"{dataset_version} was expected",
+        )
+    return verified
 
 
 def _report(verified: VerifiedRelease, where: str) -> None:
@@ -267,13 +295,7 @@ def run_verify(directory: Path, dataset_version: str | None, keys: Path) -> int:
     """
     try:
         files = {name: _read(directory / name) for name in RELEASE_FILES}
-        verified = _verify_files(files, keys)
-        if dataset_version is not None and verified.dataset_version != dataset_version:
-            raise _Refused(
-                EXIT_INVALID,
-                f"the signed datasetVersion is {verified.dataset_version}, and "
-                f"{dataset_version} was expected",
-            )
+        verified = _verify_files(files, load_public_keys(keys), dataset_version)
     except _Refused as refusal:
         outcome = "rejected" if refusal.code == EXIT_INVALID else "not verified"
         print(f"error: {directory}: {outcome}: {refusal}", file=sys.stderr)
@@ -282,6 +304,35 @@ def run_verify(directory: Path, dataset_version: str | None, keys: Path) -> int:
         print(f"error: {directory}: rejected: {error}", file=sys.stderr)
         return EXIT_INVALID
     _report(verified, str(directory))
+    return EXIT_OK
+
+
+def run_verify_release(requested: str, dataset_version: str | None, keys: Path) -> int:
+    """Download a published release, verify it as the app does, and return the exit code.
+
+    The pinned keys are read first, so nothing is downloaded when none is pinned.
+    Besides the checks of ``run_verify``, the tag must name the signed
+    ``datasetVersion``. As there, only refusals and failed downloads are caught.
+    """
+    where = f"release {requested}"
+    try:
+        pinned = load_public_keys(keys)
+        with make_client() as client:
+            tag = resolve_tag(client, requested)
+            where = f"{RELEASES_URL}/tag/{tag}"
+            files = download_release(client, tag)
+        verified = _verify_files(files, pinned, dataset_version)
+        check_tag(tag, verified.dataset_version)
+    except FetchError as error:
+        print(f"error: {where}: not verified: download failed: {error}", file=sys.stderr)
+        return EXIT_UNREADABLE
+    except _Refused as refusal:
+        print(f"error: {where}: rejected: {refusal}", file=sys.stderr)
+        return refusal.code
+    except ReleaseRejectedError as error:
+        print(f"error: {where}: rejected: {error}", file=sys.stderr)
+        return EXIT_INVALID
+    _report(verified, where)
     return EXIT_OK
 
 
@@ -338,7 +389,7 @@ def run_manifest(
 
 
 def make_client() -> PoliteClient:
-    """Return the client that ``fetch`` uses. Tests replace it with one that replays answers."""
+    """Return the client of ``fetch`` and ``verify --release``. Tests replace it with a replay."""
     return PoliteClient()
 
 
@@ -403,6 +454,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return run_validate(arguments.path, arguments.schema)
     if arguments.command == "fetch":
         return run_fetch(arguments.output, arguments.base)
+    if arguments.command == "verify" and arguments.release is not None:
+        return run_verify_release(arguments.release, arguments.dataset_version, arguments.keys)
     if arguments.command == "verify":
         return run_verify(arguments.directory, arguments.dataset_version, arguments.keys)
     if arguments.command == "sign":

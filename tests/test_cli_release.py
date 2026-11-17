@@ -6,9 +6,11 @@ touches the network: ``verify --release`` runs against a mock transport.
 """
 
 import json
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
+import httpx
 import pytest
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
@@ -16,6 +18,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from tests.schema_cases import substances_valid
 from zadrya_data import cli
 from zadrya_data.cli import main
+from zadrya_data.http import PoliteClient
 from zadrya_data.manifest import parse_manifest, sha256_hex
 from zadrya_data.signing import (
     KEY_FILE_VARIABLE,
@@ -554,3 +557,198 @@ def test_verify_lets_an_unexpected_error_surface(
 
     with pytest.raises(RuntimeError, match="a bug"):
         main(["verify", str(release), "--keys", str(tmp_path / "keys")])
+
+
+RELEASES = "https://github.com/Zadrya/Data/releases"
+TAG_URL = f"{RELEASES}/tag/dataset-v1.0.0"
+DOWNLOAD_URL = f"{RELEASES}/download/dataset-v1.0.0"
+ASSET_HOST = "https://release-assets.githubusercontent.com"
+Handler = Callable[[httpx.Request], httpx.Response]
+
+
+def _published(release: Path, *, tag: str = "dataset-v1.0.0") -> Handler:
+    """Answer like GitHub: latest redirects to the tag, a download to the asset host."""
+
+    def handle(request: httpx.Request) -> httpx.Response:
+        url = str(request.url)
+        if url == f"{RELEASES}/latest":
+            return httpx.Response(302, headers={"location": f"{RELEASES}/tag/{tag}"})
+        prefix = f"{RELEASES}/download/{tag}/"
+        if url.startswith(prefix):
+            location = f"{ASSET_HOST}/asset/{url.removeprefix(prefix)}?token=t"
+            return httpx.Response(302, headers={"location": location})
+        if url.startswith(f"{ASSET_HOST}/asset/"):
+            name = request.url.path.removeprefix("/asset/")
+            return httpx.Response(200, content=(release / name).read_bytes())
+        return httpx.Response(404)
+
+    return handle
+
+
+def _serve(monkeypatch: pytest.MonkeyPatch, handle: Handler) -> list[str]:
+    seen: list[str] = []
+
+    def record(request: httpx.Request) -> httpx.Response:
+        seen.append(str(request.url))
+        return handle(request)
+
+    client = PoliteClient(httpx.MockTransport(record), sleep=lambda _: None)
+    monkeypatch.setattr(cli, "make_client", lambda: client)
+    return seen
+
+
+def _not_found(request: httpx.Request) -> httpx.Response:
+    return httpx.Response(404)
+
+
+@pytest.mark.parametrize("requested", ["dataset-v1.0.0", "latest"])
+def test_verify_release_downloads_and_accepts_a_published_release(
+    signer: Ed25519PrivateKey,
+    substances: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    requested: str,
+) -> None:
+    release = _release(tmp_path, substances)
+    seen = _serve(monkeypatch, _published(release))
+    capsys.readouterr()
+
+    assert main(["verify", "--release", requested, "--keys", str(tmp_path / "keys")]) == 0
+
+    out = capsys.readouterr().out
+    assert out.startswith(f"{TAG_URL}: accepted\n  signed by the pinned key current")
+    assert [url for url in seen if url.startswith(DOWNLOAD_URL)] == [
+        f"{DOWNLOAD_URL}/substances.json",
+        f"{DOWNLOAD_URL}/substances.json.sig",
+        f"{DOWNLOAD_URL}/manifest.json",
+    ]
+    assert len(seen) == (7 if requested == "latest" else 6)
+
+
+def test_verify_release_rejects_a_tag_that_is_not_the_signed_version(
+    signer: Ed25519PrivateKey,
+    substances: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    release = _release(tmp_path, substances)
+    _serve(monkeypatch, _published(release, tag="dataset-v1.0.1"))
+
+    assert main(["verify", "--release", "latest", "--keys", str(tmp_path / "keys")]) == 1
+
+    assert capsys.readouterr().err.strip() == (
+        f"error: {RELEASES}/tag/dataset-v1.0.1: rejected: the release dataset-v1.0.1 holds a "
+        "signed dataset of version 1.0.0: a release is tagged with the version inside its "
+        "dataset (dataset-v1.0.0)"
+    )
+
+
+def test_verify_release_rejects_another_version_than_expected(
+    signer: Ed25519PrivateKey,
+    substances: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    release = _release(tmp_path, substances)
+    _serve(monkeypatch, _published(release))
+    keys = str(tmp_path / "keys")
+
+    assert (
+        main(["verify", "--release", "latest", "--keys", keys, "--dataset-version", "2.0.0"]) == 1
+    )
+
+    assert capsys.readouterr().err.strip() == (
+        f"error: {TAG_URL}: rejected: the signed datasetVersion is 1.0.0, and 2.0.0 was expected"
+    )
+
+
+def test_verify_release_rejects_a_tampered_asset(
+    signer: Ed25519PrivateKey,
+    substances: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    release = _release(tmp_path, substances)
+    (release / "substances.json").write_bytes(substances.read_bytes().replace(b"\n", b"\r\n"))
+    _serve(monkeypatch, _published(release))
+
+    assert main(["verify", "--release", "dataset-v1.0.0", "--keys", str(tmp_path / "keys")]) == 1
+
+    assert "rejected: the signature does not verify" in capsys.readouterr().err
+
+
+def test_verify_release_refuses_a_tag_of_another_form_before_any_request(
+    signer: Ed25519PrivateKey,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    seen = _serve(monkeypatch, _not_found)
+
+    assert main(["verify", "--release", "v1.0.0", "--keys", str(tmp_path / "keys")]) == 1
+
+    assert seen == []
+    assert "'v1.0.0' is not a dataset release tag" in capsys.readouterr().err
+
+
+def test_verify_release_downloads_nothing_without_pinned_keys(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    seen = _serve(monkeypatch, _not_found)
+    empty = tmp_path / "keys"
+    empty.mkdir()
+
+    assert main(["verify", "--release", "latest", "--keys", str(empty)]) == 1
+
+    assert seen == []
+    assert "error: release latest: rejected: no pinned public keys" in capsys.readouterr().err
+
+
+def test_verify_release_reports_a_failed_download(
+    signer: Ed25519PrivateKey,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    _serve(monkeypatch, _not_found)
+
+    assert main(["verify", "--release", "dataset-v1.0.0", "--keys", str(tmp_path / "keys")]) == 2
+
+    assert capsys.readouterr().err.strip() == (
+        f"error: {TAG_URL}: not verified: download failed: {DOWNLOAD_URL}/substances.json: "
+        "HTTP 404"
+    )
+
+
+def test_verify_release_refuses_a_download_redirected_to_another_host(
+    signer: Ed25519PrivateKey,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    def elsewhere(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(302, headers={"location": "https://other.example.test/a"})
+
+    seen = _serve(monkeypatch, elsewhere)
+
+    assert main(["verify", "--release", "dataset-v1.0.0", "--keys", str(tmp_path / "keys")]) == 2
+
+    assert seen == [f"{DOWNLOAD_URL}/substances.json"]
+    assert "redirects to other.example.test, which is not an allowed download host" in (
+        capsys.readouterr().err
+    )
+
+
+def test_verify_needs_a_directory_or_a_release(capsys: pytest.CaptureFixture[str]) -> None:
+    with pytest.raises(SystemExit) as exit_info:
+        main(["verify"])
+    assert exit_info.value.code == 2
+
+    with pytest.raises(SystemExit) as exit_info:
+        main(["verify", "somewhere", "--release", "latest"])
+    assert exit_info.value.code == 2
+    assert "not allowed with argument" in capsys.readouterr().err
