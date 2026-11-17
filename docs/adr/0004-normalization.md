@@ -7,7 +7,7 @@
 
 The dataset is built from two sources: the base file of PsychonautWiki Journal v11.11 (ADR 1 of the base import, `sources/base/Substances.json`) and a raw snapshot of the PsychonautWiki API and wiki (ADR 2). The spec lists what normalization must do (drop class and disambiguation pages, canonical names and aliases, units, routes, dose ranges, durations per phase) and the phase plan fixes the merge policy in one sentence: a value from the API replaces the base value only when it is present and consistent. Neither says what "consistent" means, how the two shapes map to the schema of ADR 1, or what to do with the oddities of the real data.
 
-This ADR covers the first half of normalization: the catalog, names, text, categories, classes and routes. Tolerance, cross tolerance and interactions follow in their own slice; until then every substance has empty `crossTolerances` and interaction lists and no `tolerance`, and both group lists are empty.
+This ADR covers the first half of normalization: the catalog, names, text, categories, classes and routes. Tolerance, cross tolerance and interactions are normalized in the next slice, recorded in ADR 5.
 
 The figures below are from the snapshot fetched on 2026-11-16 (373 API entries) and the base file (289 substances).
 
