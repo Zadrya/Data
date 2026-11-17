@@ -51,19 +51,19 @@ A substance is a member of every group its tokens map to; a group's `members` ar
 
 ### Interactions (`normalize/interactions.py`)
 
-**Merge.** For each substance, the dangerous, unsafe and uncertain lists of both sources are merged as a union. A target found under two severities, in one source or across both, keeps the higher (dangerous over unsafe over uncertain), reported as `interaction-severity-conflict` (14 today, all within one source: nine opioids list MAOIs as both dangerous and uncertain, four stimulants list Stimulants or MDMA as both dangerous and unsafe). When both sources list targets, a target only one has is reported (`interaction-only-in-one-source`); when one source lists none at all, that is one finding (3-FMA has no API interactions).
+**Merge.** For each substance, the dangerous, unsafe and uncertain lists of both sources are merged as a union. A target found under two severities, in one source or across both, keeps the higher (dangerous over unsafe over uncertain), reported as `interaction-severity-conflict` (14 today, all within one source: nine opioids list MAOIs as both dangerous and uncertain, four stimulants list Stimulants or MDMA as both dangerous and unsafe). When both sources list targets, a target only one has is reported (`interaction-only-in-one-source`); when one source lists none at all, that is one finding (2 today: 3-FMA has no API interactions, and Caffeine lists Lithium only in the API).
 
 **Resolution.** Each name is resolved in this order:
 
-1. a catalog substance by its exact name, by its name without case, or by an alias, without case, that only one catalog substance has: `{kind: substance, name}`;
+1. a catalog substance by its exact name, through the table `TARGET_NAMES` of colloquial names of the data (without case), by its name without case, or by an alias, without case, that only one catalog substance has: `{kind: substance, name}`. `TARGET_NAMES` holds only names whose meaning is certain; today one, `Mushrooms` to Psilocybin mushrooms (the API writes it where the base file writes the full name, on ten substances). Without it the two spellings were a substance target and a duplicate `other`, and the warning depended on the base list surviving. No other `other` target or resolved name of the data is a colloquial or plural name of a catalog substance;
 2. a class named in the table `NAME_TO_GROUP` (`normalize/interaction_groups.py`): `{kind: group, groupId}`;
 3. anything else: `{kind: other, name}`, the name as written, one entry per name without case (the first spelling, base before API, is kept). An alias several substances share (`Dex`, `Speed`) is `other`, never a guess.
 
-A substance target that is the substance itself is dropped and reported (none today). Every resolution that is not an exact name is reported once per spelling with the number of substances that list it (`interaction-target-resolved`, 44 today: `DXM`, `MXE`, `5-HTP`, `aMT`, `AMT`, `DPH` by alias, and 38 class spellings), and so is every `other` (`interaction-target-other`).
+A substance target that is the substance itself is dropped and reported (none today). Every resolution that is not an exact name is reported once per spelling with the number of substances that list it (`interaction-target-resolved`, 45 today: `Mushrooms` by the table, `DXM`, `MXE`, `5-HTP`, `aMT`, `AMT`, `DPH` by alias, and 38 class spellings), and so is every `other` (`interaction-target-other`, 5 today: Lithium, Grapefruit, Bupropion, Ritonavir, Trazodone).
 
 **Symmetry.** Substance targets are made symmetric: when A lists B, B lists A with the highest severity of the pair. Each target added (842 today) or raised (3: Tramadol and Alcohol, Tramadol and Methoxetamine, MDMA and αMT, all from uncertain to dangerous) is reported on the substance that changed (`interaction-symmetry-added`, `interaction-symmetry-raised`). Group targets are not expanded into substance pairs: that would multiply the data, and members change when the catalog does.
 
-**Own group.** A substance that lists a group it is a member of (Alcohol lists Depressants) keeps the target: it says not to combine it with another substance of the same class, which is real advice. It is reported (`interaction-own-group`, 88 today).
+**Own group.** A substance that lists a group it is a member of (Alcohol lists Depressants) keeps the target: it says not to combine it with another substance of the same class, which is real advice. It is reported (`interaction-own-group`, 89 today).
 
 **Order.** Within each severity the targets are sorted by kind (substance, group, other), then by name or group id, by code points.
 
@@ -80,28 +80,34 @@ A substance target that is the substance itself is dropped and reported (none to
 | `5-meo-xxt` | 5-MeO-xxT, 5-MeO-xxt | name `5-MeO-[A-Za-z]+T` (5-MeO-DiBF, a benzofuran, excluded) | 4 |
 | `aldh2-inhibitors` | ALDH2 inhibitors | none | 0 |
 | `antidepressants` | Antidepressants | category antidepressant; class Antidepressant(s) | 2 |
-| `antihistamines` | Antihistamine, Antihistamines | Diphenhydramine, Promethazine | 2 |
+| `antihistamines` | Antihistamine, Antihistamines | Diphenhydramine, Promethazine (the two the base file calls antihistamines) | 2 |
 | `barbiturates` | Barbiturates | category barbiturate; chemical class Barbiturates | 3 |
-| `benzodiazepines` | Benzodiazepines | category benzodiazepine; chemical class Benzodiazepines, Thienodiazepines | 23 |
+| `benzodiazepines` | Benzodiazepines | category benzodiazepine; chemical class Benzodiazepines, Thienodiazepines; Chlordiazepoxide, Cinolazepam | 25 |
 | `cyp2c19-substrates` | CYP2C19-substrates | Carisoprodol, Diazepam, Flunitrazepam | 3 |
 | `deliriants` | Deliriant, Deliriants | category deliriant; class Deliriant(s) | 8 |
-| `depressants` | Depressant, Depressants | categories depressant, benzodiazepine, barbiturate; class Depressant(s); Desomorphine | 81 |
+| `depressants` | Depressant, Depressants | categories depressant, benzodiazepine, barbiturate; class Depressant(s); Desomorphine, Tilidin | 82 |
 | `dissociatives` | Dissociatives | category dissociative; class Dissociative(s) | 24 |
 | `dox` | DOx | name `DO[A-Z]` | 4 |
 | `hepatotoxic-drugs` | Hepatotoxic drugs | none | 0 |
 | `hormonal-birth-control` | Hormonal birth control | Progesterone | 1 |
-| `maois` | MAOI, MAOIs | Ayahuasca (harmala alkaloids) | 1 |
-| `opioids` | Opioids | category opioid; class Opioid(s) | 25 |
+| `maois` | MAOI, MAOIs | Ayahuasca (harmala alkaloids), 2C-T-7 (a "possible MAOI" in its base summary) | 2 |
+| `opioids` | Opioids | category opioid; class Opioid(s); Tilidin | 26 |
 | `protease-inhibitors` | Protease Inhibitors | none | 0 |
 | `psychedelics` | Psychedelics | category psychedelic; class Psychedelic(s) | 96 |
-| `serotonin-releasers` | Serotonin releasers | class Entactogen(s); MCPP, NM-2-AI | 26 |
+| `serotonin-releasers` | Serotonin releasers | class Entactogen(s); Ethylone, MCPP, NM-2-AI | 27 |
 | `snris` | SNRIs | none | 0 |
 | `ssris` | SSRI, SSRIs | none | 0 |
 | `stimulants` | Stimulants | category stimulant; class Stimulant(s) | 80 |
 | `substituted-amphetamines` | Amphetamines, Substituted amphetamines | chemical class Amphetamine, Substituted amphetamines; Amphetamine, Dextroamphetamine | 36 |
 | `tricyclic-antidepressants` | Tricyclic antidepressants | Tianeptine (an atypical tricyclic) | 1 |
 
-`serotonin-releasers` uses the API class, not the entactogen category: the category also holds 2C-B, 2C-T, 2C-T-7, 4-AcO-MiPT, 5-MeO-DiPT, Ayahuasca and Psilocin, which act on receptors and release no serotonin, and 5-HTP lists Serotonin releasers as dangerous. Five groups are empty because no catalog substance belongs to them: SSRIs, SNRIs, protease inhibitors, ALDH2 inhibitors and hepatotoxic drugs. They are kept: the warning still shows on the substance that lists them, and a later catalog may fill them.
+**Members a class or category misses.** The catalog was searched (names, aliases, API classes, base categories and base text) for substances a rule should hold and does not. Chlordiazepoxide and Cinolazepam (base-only benzodiazepines without the category), Tilidin (a base-only opioid without any category) and Ethylone (an entactogenic cathinone like Methylone, whose API classes lack Entactogen) are named in their groups.
+
+**MAOIs.** No API class or base category marks an MAOI, so the group is a list of names. The search covered harmala alkaloids (harmine, harmaline, Syrian rue or Peganum harmala, Banisteriopsis caapi) and pharmaceutical MAOIs (moclobemide, selegiline, phenelzine, tranylcypromine, isocarboxazid, rasagiline, linezolid, methylene blue). In the catalog there are only Ayahuasca, which contains harmala alkaloids, and 2C-T-7, which its base summary calls a "possible MAOI" and is included because a missed MAOI warning is the unsafe direction. The API has entries for Peganum harmala (Syrian rue) and Banisteriopsis caapi, but without a single dose, duration or bioavailability number, so ADR 4 keeps them out of the catalog; a user who takes them can only log a custom substance, which no group reaches.
+
+**Antihistamines.** Diphenhydramine and Promethazine are the two substances the base file calls antihistamines. Quetiapine and Mirtazapine are antihistaminic, but the data classes them as an antipsychotic and an antidepressant and no wiki class calls them antihistamines, so they are left out.
+
+**Serotonin releasers.** The group uses the API class, not the entactogen category (accepted by the coordinator): the category also holds 2C-B, 2C-T, 2C-T-7, 4-AcO-MiPT, 5-MeO-DiPT, Ayahuasca and Psilocin, which act on receptors and release no serotonin, and 5-HTP lists Serotonin releasers as dangerous. Five groups are empty because no catalog substance belongs to them: SSRIs, SNRIs, protease inhibitors, ALDH2 inhibitors and hepatotoxic drugs. They are kept: the warning still shows on the substance that lists them, and a later catalog may fill them.
 
 ### The contract for the app
 
@@ -109,6 +115,8 @@ The app phase implements this; it is the only way the data is complete.
 
 - The severity of a pair of two different catalog substances X and Y is the highest of: a `substance` target of X naming Y, a `group` target of X whose group has Y as a member, and the same two from Y's lists with X. Groups are therefore resolved through `members` in both directions: X lists `stimulants`, Y is a member, so logging Y while X is active warns, and so does logging X while Y is active.
 - A `group` target applies to every member, including another member of the substance's own group (Alcohol and GHB both in `depressants`). A substance is never an interaction with itself: a redose is not a combination.
+- Cross tolerance is an estimate built from loose wiki tokens. The app must never use it, or any tolerance estimate, to suggest a larger dose.
+- A warning that comes from a broad group (`stimulants`, `depressants`, `psychedelics` and the like) names the group, for example "MDMA lists Stimulants as dangerous, and Caffeine is a stimulant", so that the user can judge it.
 - An `other` target never matches a catalog substance. It is shown on the substance page and in the manual checker as text. Whether it should match a custom substance by name is open.
 - The pipeline guarantees that substance pairs are symmetric and that every `groupId` exists; the invariant checks of a later slice verify both on the built dataset.
 
@@ -124,13 +132,13 @@ Reference cases in `tests/fixtures/normalize/` (`tolerance-*`, `cross-tolerance-
 
 - The dataset gets 842 interaction targets that the sources do not state in that direction. Each is a finding, so the dataset review sees them.
 - The tables `TOKEN_TO_GROUP`, `NAME_TO_GROUP` and `GROUPS` are hand-maintained. A new token is dropped and reported, and a new class name becomes `other` and is reported, until someone adds it.
-- Groups that depend on API classes miss a substance the API does not have. Categories cover most groups for base-only substances; `serotonin-releasers` and `substituted-amphetamines` rely on classes and names only, and no base-only substance belongs to them today.
+- Groups that depend on API classes miss a substance the API does not have, or whose API classes are incomplete. The search above found four such substances, now named; a new one appears only as a missing member, which no finding reports. The dataset review should look at the members of each group.
 - Membership follows the categories of the base file, which are broad: `stimulants` holds Caffeine, Nicotine, Theacrine, Tyrosine, Oxiracetam, Phenylpiracetam, Benzydamine, Apomorphine and the modafinil family; `depressants` holds Bromantane, Clonidine, Datura, Ibogaine, Nicotine and Salvinorin A; `opioids` holds Naloxone (an antagonist) and Ibogaine; `psychedelics` holds Buspirone and Efavirenz. These follow the data and lean alarmist.
 
 ## Open questions for the owner
 
-1. **"Mushrooms".** Ten substances list `Psilocybin mushrooms` in the base and `Mushrooms` in the API. "Mushrooms" is not an alias, so it is `other`, next to the substance target. No warning is lost today, but if the base list goes away the API name would hide it. Option: a small reported table of target names to substances (`Mushrooms` to Psilocybin mushrooms).
-2. **Judgement calls in group membership**, each written in the code: βk-2C-B in `2c-x`; Desomorphine in `depressants`; Progesterone in `hormonal-birth-control`; Carisoprodol, Diazepam and Flunitrazepam as `cyp2c19-substrates`; Tianeptine as a tricyclic; Ayahuasca as the only MAOI; MCPP and NM-2-AI as serotonin releasers; Diphenhydramine and Promethazine as the only antihistamines (Quetiapine and Mirtazapine are antihistaminic but left out). Naloxone stays in `opioids` because its category says so.
-3. **Cross tolerance tokens are joined, not combined.** "Cross tolerance with dopaminergic stimulants" arrives as `dopamine` and `stimulant`, and the substance becomes a member of both groups, so the app sees cross tolerance between, for example, Tyrosine and Cocaine through `dopaminergic`. For tolerance, an overestimate is not the safe direction: a user who believes their tolerance is high may take more. The app's tolerance chart should present cross tolerance as an estimate and never suggest a larger dose.
-4. **Single-member cross tolerance groups** (`deliriants`, `entactogens`, `hallucinogens`, `noradrenergic`, `tricyclic-antidepressants`) relate a substance only to itself today. They are kept so that the meaning of the token is not lost.
-5. **`other` targets and custom substances**: whether the app should match an `other` name (Lithium, Grapefruit) against a custom substance the user created.
+1. **Judgement calls in group membership**, each written in the code: βk-2C-B in `2c-x`; Desomorphine in `depressants`; Progesterone in `hormonal-birth-control`; Carisoprodol, Diazepam and Flunitrazepam as `cyp2c19-substrates`; Tianeptine as a tricyclic; 2C-T-7 as an MAOI; MCPP, NM-2-AI and Ethylone as serotonin releasers; Diphenhydramine and Promethazine as the only antihistamines. Naloxone stays in `opioids` because its category says so. Myristicin (nutmeg) and 2C-T-2 are reported in the literature as weak MAO inhibitors, but nothing in the data says so, and they are not in `maois`.
+2. **Cross tolerance tokens are joined, not combined.** "Cross tolerance with dopaminergic stimulants" arrives as `dopamine` and `stimulant`, and the substance becomes a member of both groups, so the app sees cross tolerance between, for example, Tyrosine and Cocaine through `dopaminergic`. For tolerance, an overestimate is not the safe direction: a user who believes their tolerance is high may take more. The app's tolerance chart should present cross tolerance as an estimate and never suggest a larger dose.
+3. **Single-member cross tolerance groups** (`deliriants`, `entactogens`, `hallucinogens`, `noradrenergic`, `tricyclic-antidepressants`) relate a substance only to itself today. They are kept so that the meaning of the token is not lost.
+4. **`other` targets and custom substances**: whether the app should match an `other` name (Lithium, Grapefruit) against a custom substance the user created.
+5. **Syrian rue and Banisteriopsis caapi** are not in the catalog because their API entries have no numbers. Whether they should enter the catalog without dose data, so that the MAOI warnings reach them, is the owner's decision (`ALLOWED_API_ONLY`).
