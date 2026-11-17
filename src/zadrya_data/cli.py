@@ -15,9 +15,18 @@ from zadrya_data.base import BaseFormatError, load_base
 from zadrya_data.graphql import ApiFormatError, ApiQueryError
 from zadrya_data.errors import ReleaseRejectedError
 from zadrya_data.http import FetchError, PoliteClient
-from zadrya_data.manifest import build_manifest, parse_substances, serialize_manifest
+from zadrya_data.manifest import build_manifest, parse_substances, serialize_manifest, sha256_hex
 from zadrya_data.mediawiki import WikiFormatError
 from zadrya_data.schema import SchemaName, validate
+from zadrya_data.signing import (
+    decode_signature,
+    encode_signature,
+    load_private_key,
+    load_public_keys,
+    private_key_path_from_env,
+    sign,
+    verify,
+)
 from zadrya_data.snapshot import SnapshotError, check_destination, fetch_raw, write_snapshot
 from zadrya_data.strict_json import loads
 
@@ -27,6 +36,7 @@ EXIT_UNREADABLE = 2
 EXIT_FETCH_FAILED = 1
 
 DEFAULT_BASE = Path("sources/base/Substances.json")
+DEFAULT_KEYS = Path("keys")
 
 _SEMVER = re.compile(r"(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)", re.ASCII)
 _DATE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", re.ASCII)
@@ -176,7 +186,59 @@ def build_parser() -> argparse.ArgumentParser:
     manifest_parser.add_argument(
         "--output", type=Path, required=True, help="where to write manifest.json"
     )
+
+    sign_parser = commands.add_parser(
+        "sign",
+        help="write the substances.json.sig of a release",
+        description="Sign the exact bytes of a dataset with the private key in the file that "
+        "ZADRYA_SIGNING_KEY_FILE names (its password, if any, in ZADRYA_SIGNING_KEY_PASSWORD), "
+        "and write substances.json.sig. The signature is written only if a pinned public key "
+        "verifies it, so signing with a key that is not pinned fails. Exit code 0: written, "
+        "1: the dataset, the key or the signature is refused, 2: a file cannot be read or "
+        "written.",
+    )
+    sign_parser.add_argument("substances", type=Path, help="the substances.json to sign")
+    sign_parser.add_argument(
+        "--output", type=Path, required=True, help="where to write substances.json.sig"
+    )
+    sign_parser.add_argument(
+        "--dataset-version",
+        type=_version_argument,
+        help="refuse a dataset that does not state this datasetVersion",
+    )
+    sign_parser.add_argument(
+        "--keys",
+        type=Path,
+        default=DEFAULT_KEYS,
+        help="directory of the pinned public keys (default: %(default)s)",
+    )
     return parser
+
+
+def run_sign(substances: Path, output: Path, dataset_version: str | None, keys: Path) -> int:
+    """Sign a dataset, check the signature against the pinned keys, write it, return the exit code.
+
+    The private key never reaches a message: the errors of ``zadrya_data.signing``
+    name the reason only, and this function prints nothing about the key but the
+    name of the pinned key that matched.
+    """
+    try:
+        data = _release_dataset(substances, dataset_version)
+        pinned = load_public_keys(keys)
+        signature_file = encode_signature(sign(data, load_private_key(private_key_path_from_env())))
+        matched = verify(data, decode_signature(signature_file), pinned)
+        _write(output, signature_file, source=substances)
+    except _Refused as refusal:
+        print(f"error: signature not written: {refusal}", file=sys.stderr)
+        return refusal.code
+    except ReleaseRejectedError as error:
+        print(f"error: signature not written: {error}", file=sys.stderr)
+        return EXIT_INVALID
+    print(
+        f"{output}: signature of {substances} (sha256 {sha256_hex(data)}), "
+        f"verified with the pinned key {matched.name}"
+    )
+    return EXIT_OK
 
 
 def run_manifest(
@@ -271,6 +333,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         return run_validate(arguments.path, arguments.schema)
     if arguments.command == "fetch":
         return run_fetch(arguments.output, arguments.base)
+    if arguments.command == "sign":
+        return run_sign(
+            arguments.substances, arguments.output, arguments.dataset_version, arguments.keys
+        )
     if arguments.command == "manifest":
         return run_manifest(
             arguments.substances,
