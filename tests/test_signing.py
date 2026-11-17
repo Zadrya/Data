@@ -9,6 +9,7 @@ committed vectors are public material only (public keys, messages, signatures).
 import base64
 from collections.abc import Callable
 from pathlib import Path
+from types import TracebackType
 
 import pytest
 from cryptography.hazmat.primitives import serialization
@@ -624,6 +625,14 @@ def test_a_key_put_in_the_path_variable_is_never_shown(
     assert not [piece for piece in pieces if piece in shown]
     assert "BEGIN" not in shown and "\n" not in shown
     assert error.__cause__ is None and error.__context__ is None
+    # What pytest --showlocals or an error reporter would print: the locals of every
+    # frame between this test and the raise. Only this test's own frame (which set
+    # the variable) may hold the value; it is left out by starting below it.
+    below_the_test = error.__traceback__.tb_next if error.__traceback__ else None
+    assert below_the_test is not None
+    for frame_value in _frame_values_from(below_the_test):
+        printed = repr(frame_value)
+        assert not [piece for piece in pieces if piece in printed], printed[:60]
 
 
 def test_an_error_of_the_file_system_about_the_value_is_not_shown(
@@ -836,8 +845,12 @@ def test_a_password_that_is_not_text_is_a_signing_error(
 
 def _frame_values(error: BaseException) -> list[object]:
     """Return every local variable of every frame of the traceback of the error."""
+    return _frame_values_from(error.__traceback__)
+
+
+def _frame_values_from(traceback: TracebackType | None) -> list[object]:
+    """Return every local variable of this traceback entry and of those below it."""
     values: list[object] = []
-    traceback = error.__traceback__
     while traceback is not None:
         values.extend(traceback.tb_frame.f_locals.values())
         traceback = traceback.tb_next

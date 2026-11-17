@@ -233,22 +233,36 @@ def decode_signature(encoded: bytes) -> bytes:
 
 
 def private_key_path_from_env() -> Path:
-    """Return the path of the private key file that ``ZADRYA_SIGNING_KEY_FILE`` names."""
+    """Return the path of the private key file that ``ZADRYA_SIGNING_KEY_FILE`` names.
+
+    The value of the variable is read and judged in ``_try_private_key_path``, which
+    returns the path or a reason. This frame, the one the error is raised from,
+    never holds the value: the likely mistake is to put the key itself in the
+    variable, and a traceback that shows locals must not show it.
+    """
+    found = _try_private_key_path()
+    if isinstance(found, Path):
+        return found
+    error, reason = found
+    raise error(reason)
+
+
+def _try_private_key_path() -> Path | tuple[type[SigningError], str]:
+    """Return the path the variable names, or the error class and reason to raise."""
     value = os.environ.get(KEY_FILE_VARIABLE, "")
     if value == "":
-        raise SigningKeyNotConfiguredError(
+        return SigningKeyNotConfiguredError, (
             f"{KEY_FILE_VARIABLE} is not set: it must hold the path of the private key file "
             "(the key itself never goes in a variable of this name, nor in the repository)"
         )
     if not _is_existing_file(value):
-        # The value is never shown: the likely mistake is to put the key itself here.
         hint = ""
         if _looks_like_key_material(value):
             hint = (
                 ": its value looks like the key itself, not a path. Write the key to a file "
                 "that only you can read and put the path of that file in the variable"
             )
-        raise KeyLoadError(f"{KEY_FILE_VARIABLE} does not name an existing file{hint}")
+        return KeyLoadError, f"{KEY_FILE_VARIABLE} does not name an existing file{hint}"
     return Path(value)
 
 
