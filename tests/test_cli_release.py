@@ -14,6 +14,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 from tests.schema_cases import substances_valid
+from zadrya_data import cli
 from zadrya_data.cli import main
 from zadrya_data.manifest import parse_manifest, sha256_hex
 from zadrya_data.signing import (
@@ -421,3 +422,135 @@ def test_sign_fails_on_a_missing_dataset(
     assert main(_sign_args(tmp_path / "absent.json", tmp_path / "s.sig", tmp_path / "keys")) == 2
 
     assert "error: signature not written: cannot read" in capsys.readouterr().err
+
+
+def _release(tmp_path: Path, substances: Path) -> Path:
+    """Write a complete release of the dataset with the commands themselves."""
+    directory = tmp_path / "release"
+    directory.mkdir()
+    (directory / "substances.json").write_bytes(substances.read_bytes())
+    assert main(_manifest_args(substances, directory / "manifest.json")) == 0
+    sign_args = _sign_args(substances, directory / "substances.json.sig", tmp_path / "keys")
+    assert main(sign_args) == 0
+    return directory
+
+
+def test_verify_accepts_a_release_and_says_what_it_checked(
+    signer: Ed25519PrivateKey,
+    substances: Path,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    release = _release(tmp_path, substances)
+    capsys.readouterr()
+    keys = str(tmp_path / "keys")
+
+    assert main(["verify", str(release), "--keys", keys, "--dataset-version", "1.0.0"]) == 0
+
+    pinned = PinnedKey(name="current", public_key=signer.public_key())
+    assert capsys.readouterr().out == (
+        f"{release}: accepted\n"
+        f"  signed by the pinned key current ({pinned.base64})\n"
+        "  datasetVersion 1.0.0, schemaVersion 1.0.0 (signed)\n"
+        f"  sha256 {sha256_hex(substances.read_bytes())}\n"
+        "  minAppVersion 1.2.0 (unsigned, from the manifest)\n"
+    )
+
+
+def test_verify_rejects_a_dataset_changed_after_signing(
+    signer: Ed25519PrivateKey,
+    substances: Path,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    release = _release(tmp_path, substances)
+    (release / "substances.json").write_bytes(substances.read_bytes() + b"\n")
+    capsys.readouterr()
+
+    assert main(["verify", str(release), "--keys", str(tmp_path / "keys")]) == 1
+
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert captured.err.startswith(
+        f"error: {release}: rejected: the signature does not verify with any pinned key"
+    )
+
+
+def test_verify_rejects_a_manifest_of_another_dataset(
+    signer: Ed25519PrivateKey,
+    substances: Path,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    release = _release(tmp_path, substances)
+    manifest = json.loads((release / "manifest.json").read_text())
+    manifest["sha256"] = "0" * 64
+    (release / "manifest.json").write_text(json.dumps(manifest))
+
+    assert main(["verify", str(release), "--keys", str(tmp_path / "keys")]) == 1
+
+    assert "rejected: the manifest states the SHA-256 0000" in capsys.readouterr().err
+
+
+def test_verify_rejects_another_signed_version_than_expected(
+    signer: Ed25519PrivateKey,
+    substances: Path,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    release = _release(tmp_path, substances)
+    keys = str(tmp_path / "keys")
+
+    assert main(["verify", str(release), "--keys", keys, "--dataset-version", "1.1.0"]) == 1
+
+    assert capsys.readouterr().err.strip() == (
+        f"error: {release}: rejected: the signed datasetVersion is 1.0.0, and 1.1.0 was expected"
+    )
+
+
+def test_verify_rejects_everything_without_pinned_keys(
+    signer: Ed25519PrivateKey,
+    substances: Path,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    release = _release(tmp_path, substances)
+    empty = tmp_path / "no-keys"
+    empty.mkdir()
+
+    assert main(["verify", str(release), "--keys", str(empty)]) == 1
+
+    assert "rejected: no pinned public keys" in capsys.readouterr().err
+
+
+def test_verify_reports_a_missing_file(
+    signer: Ed25519PrivateKey,
+    substances: Path,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    release = _release(tmp_path, substances)
+    (release / "substances.json.sig").unlink()
+
+    assert main(["verify", str(release), "--keys", str(tmp_path / "keys")]) == 2
+
+    assert f"not verified: cannot read {release / 'substances.json.sig'}" in (
+        capsys.readouterr().err
+    )
+
+
+def test_verify_lets_an_unexpected_error_surface(
+    signer: Ed25519PrivateKey,
+    substances: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    release = _release(tmp_path, substances)
+
+    def broken(**_: object) -> None:
+        raise RuntimeError("a bug")
+
+    monkeypatch.setattr(cli, "verify_release", broken)
+
+    with pytest.raises(RuntimeError, match="a bug"):
+        main(["verify", str(release), "--keys", str(tmp_path / "keys")])

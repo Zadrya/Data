@@ -17,6 +17,7 @@ from zadrya_data.errors import ReleaseRejectedError
 from zadrya_data.http import FetchError, PoliteClient
 from zadrya_data.manifest import build_manifest, parse_substances, serialize_manifest, sha256_hex
 from zadrya_data.mediawiki import WikiFormatError
+from zadrya_data.release_check import VerifiedRelease, verify_release
 from zadrya_data.schema import SchemaName, validate
 from zadrya_data.signing import (
     decode_signature,
@@ -37,6 +38,7 @@ EXIT_FETCH_FAILED = 1
 
 DEFAULT_BASE = Path("sources/base/Substances.json")
 DEFAULT_KEYS = Path("keys")
+RELEASE_FILES = ("substances.json", "substances.json.sig", "manifest.json")
 
 _SEMVER = re.compile(r"(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)", re.ASCII)
 _DATE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", re.ASCII)
@@ -212,7 +214,75 @@ def build_parser() -> argparse.ArgumentParser:
         default=DEFAULT_KEYS,
         help="directory of the pinned public keys (default: %(default)s)",
     )
+
+    verify_parser = commands.add_parser(
+        "verify",
+        help="check a release as the app does: signature, hash, schemas, consistency",
+        description="Check the three files of a release (substances.json, substances.json.sig "
+        "and manifest.json in a directory) against the pinned public keys, as the app does. "
+        "Exit code 0: accepted, 1: rejected, 2: a file cannot be read.",
+    )
+    verify_parser.add_argument(
+        "directory", type=Path, help="directory that holds the three files of the release"
+    )
+    verify_parser.add_argument(
+        "--dataset-version",
+        type=_version_argument,
+        help="also reject a release whose signed datasetVersion is not this one",
+    )
+    verify_parser.add_argument(
+        "--keys",
+        type=Path,
+        default=DEFAULT_KEYS,
+        help="directory of the pinned public keys (default: %(default)s)",
+    )
     return parser
+
+
+def _verify_files(files: dict[str, bytes], keys: Path) -> VerifiedRelease:
+    return verify_release(
+        substances=files["substances.json"],
+        signature_file=files["substances.json.sig"],
+        manifest=files["manifest.json"],
+        public_keys=load_public_keys(keys),
+    )
+
+
+def _report(verified: VerifiedRelease, where: str) -> None:
+    print(
+        f"{where}: accepted\n"
+        f"  signed by the pinned key {verified.key.name} ({verified.key.base64})\n"
+        f"  datasetVersion {verified.dataset_version}, schemaVersion {verified.schema_version} "
+        "(signed)\n"
+        f"  sha256 {verified.sha256}\n"
+        f"  minAppVersion {verified.unsigned_min_app_version} (unsigned, from the manifest)"
+    )
+
+
+def run_verify(directory: Path, dataset_version: str | None, keys: Path) -> int:
+    """Verify the release files in a directory and return the exit code.
+
+    Only refusals (``ReleaseRejectedError``) and unreadable files are caught: any
+    other exception is a bug and is not hidden.
+    """
+    try:
+        files = {name: _read(directory / name) for name in RELEASE_FILES}
+        verified = _verify_files(files, keys)
+        if dataset_version is not None and verified.dataset_version != dataset_version:
+            raise _Refused(
+                EXIT_INVALID,
+                f"the signed datasetVersion is {verified.dataset_version}, and "
+                f"{dataset_version} was expected",
+            )
+    except _Refused as refusal:
+        outcome = "rejected" if refusal.code == EXIT_INVALID else "not verified"
+        print(f"error: {directory}: {outcome}: {refusal}", file=sys.stderr)
+        return refusal.code
+    except ReleaseRejectedError as error:
+        print(f"error: {directory}: rejected: {error}", file=sys.stderr)
+        return EXIT_INVALID
+    _report(verified, str(directory))
+    return EXIT_OK
 
 
 def run_sign(substances: Path, output: Path, dataset_version: str | None, keys: Path) -> int:
@@ -333,6 +403,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return run_validate(arguments.path, arguments.schema)
     if arguments.command == "fetch":
         return run_fetch(arguments.output, arguments.base)
+    if arguments.command == "verify":
+        return run_verify(arguments.directory, arguments.dataset_version, arguments.keys)
     if arguments.command == "sign":
         return run_sign(
             arguments.substances, arguments.output, arguments.dataset_version, arguments.keys
