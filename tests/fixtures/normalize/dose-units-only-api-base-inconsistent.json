@@ -1,0 +1,72 @@
+{
+  "rule": "When the API states only the units and the base block is inconsistent, the units are kept and the loss of the base block is reported with its reason: nothing is dropped without a report.",
+  "base": [
+    {
+      "name": "Examplamine",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg",
+            "lightMin": 10,
+            "commonMin": 20,
+            "strongMin": 80,
+            "heavyMin": 40
+          }
+        }
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "Examplamine",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg"
+          }
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "roas"
+  ],
+  "reportKinds": [
+    "api-block-rejected",
+    "base-block-used",
+    "block-dropped",
+    "dose-boundary-filled",
+    "dose-fill-discarded",
+    "dose-equal-boundaries",
+    "dose-label-differs",
+    "unit-repaired",
+    "unit-not-mass",
+    "duration-rounded",
+    "api-phase-ignored",
+    "route-only-in-base",
+    "route-only-in-api"
+  ],
+  "expected": [
+    {
+      "name": "Examplamine",
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {
+            "units": "mg"
+          }
+        }
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "block-dropped",
+      "substance": "Examplamine",
+      "route": "oral",
+      "detail": "dose: the base block is not used (strongMin 80 is above heavyMin 40); the API states units only, and they are kept"
+    }
+  ]
+}
