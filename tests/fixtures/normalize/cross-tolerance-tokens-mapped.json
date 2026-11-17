@@ -1,5 +1,5 @@
 {
-  "rule": "The cross tolerance tokens of a substance are the union of both sources, compared without case; a token only one source has is reported when the substance is in both. Each token maps, without case, through the explicit table TOKEN_TO_GROUP to a group id, and the substance is a member of every group its tokens map to. A token that names no group (analog) or is not in the table is dropped and reported, never guessed. A token that is not valid text is reported and dropped. The ids are sorted.",
+  "rule": "The cross tolerance tokens of a substance are the union of both sources, compared without case; a token only one source has is reported when the substance is in both. Each token maps, without case, through the explicit table TOKEN_TO_GROUP to a group id, and the substance is a member of every group its tokens map to. A token that names no group (analog) or is not in the table is dropped and reported, never guessed. A token that is not valid text is reported and dropped. The ids are sorted. Only groups with members are listed, by id, with their members sorted.",
   "base": [
     {
       "name": "MDMA",
@@ -97,6 +97,47 @@
       "name": "N-Methylbisfluoromodafinil",
       "crossTolerances": [
         "modafinil-analogs"
+      ]
+    }
+  ],
+  "crossToleranceGroups": [
+    {
+      "id": "dopaminergic",
+      "name": "Dopaminergic substances",
+      "members": [
+        "3-FMA",
+        "MDMA"
+      ]
+    },
+    {
+      "id": "modafinil-analogs",
+      "name": "Modafinil and its benzhydryl analogs",
+      "members": [
+        "N-Methylbisfluoromodafinil"
+      ]
+    },
+    {
+      "id": "opioids",
+      "name": "Opioids",
+      "members": [
+        "Kratom",
+        "Morphine"
+      ]
+    },
+    {
+      "id": "serotonergic",
+      "name": "Serotonergic substances",
+      "members": [
+        "3-FMA",
+        "MDMA"
+      ]
+    },
+    {
+      "id": "stimulants",
+      "name": "Stimulants",
+      "members": [
+        "3-FMA",
+        "MDMA"
       ]
     }
   ],
