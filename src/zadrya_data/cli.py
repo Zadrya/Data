@@ -13,7 +13,7 @@ from zadrya_data.graphql import ApiFormatError, ApiQueryError
 from zadrya_data.http import FetchError, PoliteClient
 from zadrya_data.mediawiki import WikiFormatError
 from zadrya_data.schema import SchemaName, validate
-from zadrya_data.snapshot import SnapshotError, fetch_raw, write_snapshot
+from zadrya_data.snapshot import SnapshotError, check_destination, fetch_raw, write_snapshot
 from zadrya_data.strict_json import loads
 
 EXIT_OK = 0
@@ -81,6 +81,7 @@ def run_fetch(output: Path, base: Path) -> int:
     Nothing is written unless every request succeeded and every answer was understood.
     """
     try:
+        check_destination(output)
         base_names = [substance.name for substance in load_base(base).substances]
         with make_client() as client:
             data, pages = fetch_raw(client, base_names)

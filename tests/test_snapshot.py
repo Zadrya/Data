@@ -282,6 +282,22 @@ def test_a_directory_with_other_files_is_never_replaced(tmp_path: Path) -> None:
     assert _files(directory) == {"notes.txt": b"keep me"}
 
 
+@pytest.mark.parametrize("dangling", [False, True])
+def test_a_symbolic_link_is_not_a_destination(tmp_path: Path, dangling: bool) -> None:
+    target = tmp_path / "real"
+    if not dangling:
+        _write(target)
+    link = tmp_path / "link"
+    link.symlink_to(target, target_is_directory=True)
+    data, pages = _fetched()
+
+    with pytest.raises(SnapshotError, match="a symbolic link, refusing to replace it"):
+        write_snapshot(link, data, pages, BASE_NAMES, DAY)
+
+    assert link.is_symlink() and target.exists() is not dangling
+    assert _leftovers(tmp_path) == []
+
+
 def test_a_file_is_not_a_destination(tmp_path: Path) -> None:
     path = tmp_path / "snapshot"
     path.write_text("", encoding="utf-8")
