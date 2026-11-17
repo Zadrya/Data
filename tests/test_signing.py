@@ -26,6 +26,7 @@ from zadrya_data.signing import (
     PinnedKey,
     SignatureFormatError,
     SignatureMismatchError,
+    SigningError,
     SigningKeyNotConfiguredError,
     TooManyPinnedKeysError,
     decode_signature,
@@ -82,6 +83,11 @@ def _encrypted_pem(private_key: Ed25519PrivateKey, password: bytes) -> bytes:
         serialization.PrivateFormat.PKCS8,
         serialization.BestAvailableEncryption(password),
     )
+
+
+def _write_key(path: Path, content: bytes, mode: int = 0o600) -> None:
+    path.write_bytes(content)
+    path.chmod(mode)
 
 
 def _public_pem(private_key: Ed25519PrivateKey | ec.EllipticCurvePrivateKey) -> bytes:
@@ -499,7 +505,7 @@ def test_private_key_path_comes_from_the_environment(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     path = tmp_path / "signing.pem"
-    path.write_bytes(_private_pem(Ed25519PrivateKey.generate()))
+    _write_key(path, _private_pem(Ed25519PrivateKey.generate()))
     monkeypatch.setenv(KEY_FILE_VARIABLE, str(path))
 
     assert KEY_FILE_VARIABLE == "ZADRYA_SIGNING_KEY_FILE"
@@ -605,7 +611,7 @@ def test_an_unencrypted_private_key_round_trips(
 ) -> None:
     private_key = Ed25519PrivateKey.generate()
     path = tmp_path / "signing.pem"
-    path.write_bytes(_private_pem(private_key))
+    _write_key(path, _private_pem(private_key))
     monkeypatch.delenv(KEY_PASSWORD_VARIABLE, raising=False)
 
     loaded = load_private_key(path)
@@ -618,7 +624,7 @@ def test_an_encrypted_private_key_needs_its_password_from_the_environment(
 ) -> None:
     private_key = Ed25519PrivateKey.generate()
     path = tmp_path / "signing.pem"
-    path.write_bytes(_encrypted_pem(private_key, b"throwaway test password"))
+    _write_key(path, _encrypted_pem(private_key, b"throwaway test password"))
 
     monkeypatch.setenv(KEY_PASSWORD_VARIABLE, "throwaway test password")
     loaded = load_private_key(path)
@@ -641,7 +647,7 @@ def test_a_password_for_an_unencrypted_key_is_an_error(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     path = tmp_path / "signing.pem"
-    path.write_bytes(_private_pem(Ed25519PrivateKey.generate()))
+    _write_key(path, _private_pem(Ed25519PrivateKey.generate()))
     monkeypatch.setenv(KEY_PASSWORD_VARIABLE, "throwaway test password")
 
     with pytest.raises(KeyLoadError, match="is set and the key is not encrypted"):
@@ -652,7 +658,7 @@ def test_a_private_key_of_another_type_is_rejected(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     path = tmp_path / "signing.pem"
-    path.write_bytes(_private_pem(ec.generate_private_key(ec.SECP256R1())))
+    _write_key(path, _private_pem(ec.generate_private_key(ec.SECP256R1())))
     monkeypatch.delenv(KEY_PASSWORD_VARIABLE, raising=False)
 
     with pytest.raises(KeyLoadError, match="does not hold an Ed25519 key"):
@@ -664,32 +670,169 @@ def test_a_missing_private_key_file_is_reported(
 ) -> None:
     monkeypatch.delenv(KEY_PASSWORD_VARIABLE, raising=False)
 
-    with pytest.raises(KeyLoadError, match="cannot read the private key file"):
+    with pytest.raises(KeyLoadError, match="missing.pem: it cannot be read: No such file"):
         load_private_key(tmp_path / "missing.pem")
 
 
-@pytest.mark.parametrize("damage", ["truncate", "corrupt", "public"])
+@pytest.mark.parametrize("mode", [0o644, 0o640, 0o604, 0o620, 0o602, 0o610, 0o601, 0o777])
+def test_a_key_file_open_to_group_or_others_is_refused(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, mode: int
+) -> None:
+    path = tmp_path / "signing.pem"
+    _write_key(path, _private_pem(Ed25519PrivateKey.generate()), mode)
+    monkeypatch.delenv(KEY_PASSWORD_VARIABLE, raising=False)
+
+    with pytest.raises(KeyLoadError, match=f"its mode is {mode:04o}, .*chmod 600"):
+        load_private_key(path)
+
+
+@pytest.mark.parametrize("mode", [0o600, 0o400])
+def test_a_key_file_only_its_owner_can_read_is_accepted(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, mode: int
+) -> None:
+    path = tmp_path / "signing.pem"
+    _write_key(path, _private_pem(Ed25519PrivateKey.generate()), mode)
+    monkeypatch.delenv(KEY_PASSWORD_VARIABLE, raising=False)
+
+    assert isinstance(load_private_key(path), Ed25519PrivateKey)
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        pytest.param(lambda pem: pem + pem, id="second-key"),
+        pytest.param(lambda pem: pem + _private_pem(Ed25519PrivateKey.generate()), id="other-key"),
+        pytest.param(lambda pem: pem + b"trailing text\n", id="trailing-text"),
+        pytest.param(lambda pem: pem + b"\n", id="trailing-blank-line"),
+        pytest.param(lambda pem: b"# my signing key\n" + pem, id="leading-comment"),
+        pytest.param(lambda pem: b"\n" + pem, id="leading-blank-line"),
+        pytest.param(lambda pem: pem + _public_pem(Ed25519PrivateKey.generate()), id="public-key"),
+        pytest.param(
+            lambda pem: pem.replace(b"BEGIN PRIVATE", b"BEGIN ENCRYPTED PRIVATE"),
+            id="labels-that-differ",
+        ),
+    ],
+)
+def test_a_key_file_holds_one_key_and_nothing_else(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, change: Callable[[bytes], bytes]
+) -> None:
+    path = tmp_path / "signing.pem"
+    _write_key(path, change(_private_pem(Ed25519PrivateKey.generate())))
+    monkeypatch.delenv(KEY_PASSWORD_VARIABLE, raising=False)
+
+    with pytest.raises(KeyLoadError, match="it is not exactly one PEM"):
+        load_private_key(path)
+
+
+def test_the_traditional_and_openssh_forms_are_refused(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    traditional = ec.generate_private_key(ec.SECP256R1()).private_bytes(
+        serialization.Encoding.PEM,
+        serialization.PrivateFormat.TraditionalOpenSSL,
+        serialization.NoEncryption(),
+    )
+    openssh = Ed25519PrivateKey.generate().private_bytes(
+        serialization.Encoding.PEM,
+        serialization.PrivateFormat.OpenSSH,
+        serialization.NoEncryption(),
+    )
+    monkeypatch.delenv(KEY_PASSWORD_VARIABLE, raising=False)
+
+    for content in (traditional, openssh):
+        path = tmp_path / "signing.pem"
+        _write_key(path, content)
+        with pytest.raises(KeyLoadError, match="it is not exactly one PEM"):
+            load_private_key(path)
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        pytest.param(lambda pem: pem[:-1], id="no-final-line-feed"),
+        pytest.param(lambda pem: pem.replace(b"\n", b"\r\n"), id="carriage-returns"),
+    ],
+)
+def test_the_line_endings_of_a_key_file_may_vary(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, change: Callable[[bytes], bytes]
+) -> None:
+    private_key = Ed25519PrivateKey.generate()
+    path = tmp_path / "signing.pem"
+    _write_key(path, change(_private_pem(private_key)))
+    monkeypatch.delenv(KEY_PASSWORD_VARIABLE, raising=False)
+
+    assert public_key_raw(load_private_key(path).public_key()) == public_key_raw(
+        private_key.public_key()
+    )
+
+
+def test_a_password_that_is_not_text_is_a_signing_error(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    path = tmp_path / "signing.pem"
+    _write_key(path, _encrypted_pem(Ed25519PrivateKey.generate(), b"throwaway test password"))
+    # What the environment gives for a byte that is not UTF-8: a lone surrogate.
+    monkeypatch.setenv(KEY_PASSWORD_VARIABLE, "hunter\udcff")
+
+    with pytest.raises(SigningError, match="is not text that can be encoded as UTF-8") as caught:
+        load_private_key(path)
+
+    assert "hunter" not in str(caught.value) + repr(caught.value)
+    assert caught.value.__cause__ is None and caught.value.__context__ is None
+
+
+def _frame_values(error: BaseException) -> list[object]:
+    """Return every local variable of every frame of the traceback of the error."""
+    values: list[object] = []
+    traceback = error.__traceback__
+    while traceback is not None:
+        values.extend(traceback.tb_frame.f_locals.values())
+        traceback = traceback.tb_next
+    return values
+
+
+@pytest.mark.parametrize(
+    "damage", ["truncate", "corrupt", "public", "two-keys", "wrong-password", "no-password"]
+)
 def test_errors_about_a_private_key_never_show_its_content(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, damage: str
 ) -> None:
     private_key = Ed25519PrivateKey.generate()
     pem = _private_pem(private_key)
+    encrypted = _encrypted_pem(private_key, b"throwaway test password")
     body = pem.splitlines()[1]
     content = {
         "truncate": pem[:-30],
-        "corrupt": pem.replace(body, body[:20] + b"!!!!" + body[24:]),
+        "corrupt": pem.replace(body, body[:20] + b"AAAA" + body[24:]),
         "public": _public_pem(private_key),
+        "two-keys": pem + pem,
+        "wrong-password": encrypted,
+        "no-password": encrypted,
     }[damage]
     path = tmp_path / "signing.pem"
-    path.write_bytes(content)
+    _write_key(path, content)
     monkeypatch.delenv(KEY_PASSWORD_VARIABLE, raising=False)
+    if damage == "wrong-password":
+        monkeypatch.setenv(KEY_PASSWORD_VARIABLE, "a wrong and secret password")
 
-    with pytest.raises(KeyLoadError) as caught:
-        load_private_key(path)
+    error = _load_error(path)
 
-    shown = str(caught.value) + repr(caught.value)
+    shown = str(error) + repr(error) + repr(error.args)
     assert str(path) in shown
     assert body[:16].decode("ascii") not in shown
-    # The parser's own error is not chained, so a traceback cannot show more.
-    assert caught.value.__cause__ is None
-    assert caught.value.__suppress_context__ is True
+    assert "secret password" not in shown
+    # Nothing the error carries leads back to the key or the password: no cause, no
+    # context, and no frame of its traceback that holds either.
+    assert error.__cause__ is None and error.__context__ is None
+    for value in _frame_values(error):
+        assert not (isinstance(value, bytes) and b"PRIVATE" in value)
+        assert not (isinstance(value, (str, bytes)) and "secret password" in str(value))
+
+
+def _load_error(path: Path) -> KeyLoadError:
+    """Load the key in a frame that holds nothing of it, and return the error."""
+    try:
+        load_private_key(path)
+    except KeyLoadError as error:
+        return error
+    raise AssertionError("the key was loaded")
