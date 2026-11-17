@@ -564,3 +564,22 @@ def test_a_missing_file_fails(tmp_path: Path, name: str) -> None:
 
     with pytest.raises(SnapshotError, match=name):
         load_snapshot(directory)
+
+
+@pytest.mark.parametrize("name", ["notes.txt", ".DS_Store", "graphql.json.bak", "old"])
+def test_a_directory_with_an_extra_entry_is_not_a_snapshot(tmp_path: Path, name: str) -> None:
+    directory = _write(tmp_path / "s")
+    if name == "old":
+        (directory / name).mkdir()
+    else:
+        (directory / name).write_text("", encoding="utf-8")
+
+    with pytest.raises(SnapshotError) as error:
+        load_snapshot(directory)
+
+    assert str(error.value) == f"{directory}: holds '{name}', which is not a snapshot file"
+
+
+def test_a_directory_that_does_not_exist_is_not_a_snapshot(tmp_path: Path) -> None:
+    with pytest.raises(SnapshotError, match="No such file or directory"):
+        load_snapshot(tmp_path / "absent")

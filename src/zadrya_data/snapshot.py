@@ -163,11 +163,18 @@ def write_snapshot(
 def load_snapshot(directory: Path) -> Snapshot:
     """Read a snapshot directory into typed objects, or raise ``SnapshotError``.
 
-    Beyond the shape of each file, this checks that the three belong together: the
+    The directory must hold the three snapshot files and nothing else. Beyond the shape
+    of each file, this checks that the three belong together: the
     hashes and counts in ``snapshot.json`` match the other two files, the endpoints
     and the query are the ones this code uses, and the looked up titles are exactly
     the substance names of the API and of the base file.
     """
+    try:
+        extra = sorted(path.name for path in directory.iterdir() if path.name not in FILES)
+    except OSError as error:
+        raise SnapshotError(f"{directory}: {error}") from error
+    if extra:
+        raise SnapshotError(f"{directory}: holds '{extra[0]}', which is not a snapshot file")
     where = directory / INFO_FILE
     info = _info(loads_file(where), where)
     blobs = {name: _bytes(directory / name) for name in (GRAPHQL_FILE, MEDIAWIKI_FILE)}
