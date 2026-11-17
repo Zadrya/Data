@@ -47,17 +47,39 @@ def test_inconsistent_api_doses(dose: ApiDose, problem: str) -> None:
 
 
 def test_a_fill_that_is_not_a_usable_number_is_discarded() -> None:
-    dose = _api_dose(common=ApiRange(10.0, 20.0), strong=ApiRange(20.0, -5.0))
+    dose = _api_dose(common=ApiRange(10.0, 20.0), strong=ApiRange(None, -5.0))
 
     candidate = from_api(dose, None)
 
     assert candidate.value == {"units": "mg", "commonMin": 10, "strongMin": 20}
     assert candidate.notes == (
+        (Kind.DOSE_BOUNDARY_FILLED, "strongMin 20 filled from common.max"),
         (
             Kind.DOSE_FILL_DISCARDED,
             "heavyMin is not filled from strong.max -5: it is negative or not finite",
         ),
     )
+
+
+@pytest.mark.parametrize("name", ["light", "common", "strong"])
+def test_an_inverted_api_range_makes_the_block_inconsistent(name: str) -> None:
+    dose = _api_dose(**{name: ApiRange(40.0, 20.0)}, threshold=1.0)
+
+    assert from_api(dose, None) == Candidate(problem=f"{name}.min 40 is above {name}.max 20")
+
+
+def test_a_range_with_equal_or_one_bound_is_not_inverted() -> None:
+    dose = _api_dose(
+        light=ApiRange(5.0, 5.0), common=ApiRange(None, 10.0), strong=ApiRange(20.0, None)
+    )
+
+    # commonMin has no direct value, so it is filled from light.max.
+    assert from_api(dose, None).value == {
+        "units": "mg",
+        "lightMin": 5,
+        "commonMin": 5,
+        "strongMin": 20,
+    }
 
 
 def test_a_label_difference_needs_a_lowest_base_boundary() -> None:
