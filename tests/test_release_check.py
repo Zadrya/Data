@@ -28,7 +28,7 @@ from zadrya_data.manifest import (
     serialize_manifest,
     sha256_hex,
 )
-from zadrya_data.release_check import ReleaseSchemaError, verify_release
+from zadrya_data.release_check import ReleaseSchemaError, VerifiedRelease, verify_release
 from zadrya_data.schema import SchemaName
 from zadrya_data.signing import (
     NoPinnedKeysError,
@@ -111,7 +111,7 @@ def test_a_release_signed_with_a_pinned_key_is_accepted(key: Ed25519PrivateKey, 
     assert verified.key.name == name
     assert verified.dataset_version == "1.4.2"
     assert verified.schema_version == "1.0.0"
-    assert verified.min_app_version == "1.2.0"
+    assert verified.unsigned_min_app_version == "1.2.0"
     assert verified.sha256 == sha256_hex(release.substances)
 
 
@@ -255,11 +255,30 @@ def test_a_valid_manifest_that_contradicts_the_signed_dataset_is_rejected(
         _release(manifest_changes=changes).verify()
 
 
+def test_signed_values_are_read_from_the_signed_bytes() -> None:
+    fields = set(VerifiedRelease.__dataclass_fields__)
+
+    assert fields == {
+        "key",
+        "dataset_version",
+        "schema_version",
+        "unsigned_min_app_version",
+        "sha256",
+    }
+    release = _release(_document(datasetVersion="3.2.1"))
+    signed = json.loads(release.substances)
+    verified = release.verify()
+    assert (verified.dataset_version, verified.schema_version) == (
+        signed["datasetVersion"],
+        signed["schemaVersion"],
+    )
+
+
 def test_what_only_the_manifest_holds_is_not_protected() -> None:
     """Documents the limit recorded in the ADR: the date and minAppVersion can be altered."""
     release = _release(manifest_changes={"minAppVersion": "0.0.1", "date": "1999-01-01"})
 
-    assert release.verify().min_app_version == "0.0.1"
+    assert release.verify().unsigned_min_app_version == "0.0.1"
 
 
 # ---- one base class
