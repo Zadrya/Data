@@ -13,7 +13,10 @@ from pathlib import Path
 import pytest
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec
-from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+from cryptography.hazmat.primitives.asymmetric.ed25519 import (
+    Ed25519PrivateKey,
+    Ed25519PublicKey,
+)
 
 from zadrya_data.signing import (
     KEY_FILE_VARIABLE,
@@ -27,6 +30,7 @@ from zadrya_data.signing import (
     TooManyPinnedKeysError,
     decode_signature,
     encode_signature,
+    is_small_order,
     load_private_key,
     load_public_keys,
     private_key_path_from_env,
@@ -271,6 +275,111 @@ def test_raw_and_base64_forms_of_a_public_key() -> None:
 def test_a_raw_public_key_of_another_length_is_rejected(length: int) -> None:
     with pytest.raises(KeyLoadError, match=f"32 bytes, found {length} bytes"):
         public_key_from_raw(bytes(length))
+
+
+# ---- points of small order
+
+_P = 2**255 - 19
+_D = -121665 * pow(121666, -1, _P) % _P
+
+# Every encoding of the eight points of small order: the seven y values (two of
+# them, p and p + 1, are non-canonical spellings of 0 and 1), each with both signs.
+SMALL_ORDER_Y = [
+    0,
+    1,
+    _P - 1,
+    _P,
+    _P + 1,
+    int.from_bytes(
+        bytes.fromhex("26e8958fc2b227b045c3f489f2ef98f0d5dfac05d3c63339b13802886d53fc05"), "little"
+    ),
+    int.from_bytes(
+        bytes.fromhex("c7176a703d4dd84fba3c0b760d10670f2a2053fa2c39ccc64ec7fd7792ac037a"), "little"
+    ),
+]
+SMALL_ORDER_ENCODINGS = [
+    (y | (sign << 255)).to_bytes(32, "little") for y in SMALL_ORDER_Y for sign in (0, 1)
+]
+
+# R is the neutral point and S is zero: with the neutral point as the public key,
+# this "signature" verifies for every message.
+FORGED_SIGNATURE = (1).to_bytes(32, "little") + bytes(32)
+
+
+def _add(first: tuple[int, int], second: tuple[int, int]) -> tuple[int, int]:
+    """Add two points of the twisted Edwards curve of Ed25519."""
+    (x1, y1), (x2, y2) = first, second
+    k = _D * x1 * x2 * y1 * y2 % _P
+    return (
+        (x1 * y2 + x2 * y1) * pow(1 + k, -1, _P) % _P,
+        (y1 * y2 + x1 * x2) * pow(1 - k, -1, _P) % _P,
+    )
+
+
+def _x(y: int) -> int:
+    """Recover an x coordinate of the point with this y (RFC 8032, section 5.1.3)."""
+    x_squared = (y * y - 1) * pow(_D * y * y + 1, -1, _P) % _P
+    x = pow(x_squared, (_P + 3) // 8, _P)
+    if x * x % _P != x_squared:
+        x = x * pow(2, (_P - 1) // 4, _P) % _P
+    assert x * x % _P == x_squared
+    return x
+
+
+@pytest.mark.parametrize("y", SMALL_ORDER_Y)
+def test_the_listed_points_really_have_small_order(y: int) -> None:
+    point = (_x(y % _P), y % _P)
+    multiple, order = point, 1
+    while multiple != (0, 1):
+        multiple, order = _add(multiple, point), order + 1
+        assert order <= 8
+
+    assert order in (1, 2, 4, 8)
+
+
+def test_the_forgery_works_against_the_library_without_the_check() -> None:
+    """Why the check exists: the library accepts the key and the forged signature."""
+    neutral = Ed25519PublicKey.from_public_bytes((1).to_bytes(32, "little"))
+
+    neutral.verify(FORGED_SIGNATURE, b"any message")
+    neutral.verify(FORGED_SIGNATURE, DATA)
+
+
+@pytest.mark.parametrize(
+    "raw", SMALL_ORDER_ENCODINGS, ids=lambda raw: raw.hex()[:8] + raw.hex()[-2:]
+)
+def test_a_point_of_small_order_is_refused_wherever_a_key_enters(
+    tmp_path: Path, raw: bytes
+) -> None:
+    assert is_small_order(raw)
+    with pytest.raises(KeyLoadError, match="point of small order"):
+        public_key_from_raw(raw)
+
+    key = Ed25519PublicKey.from_public_bytes(raw)
+    (tmp_path / "current.pem").write_bytes(
+        key.public_bytes(
+            serialization.Encoding.PEM, serialization.PublicFormat.SubjectPublicKeyInfo
+        )
+    )
+    with pytest.raises(KeyLoadError, match="current.pem is a point of small order"):
+        load_public_keys(tmp_path)
+
+    honest = _pinned("current", Ed25519PrivateKey.generate())
+    with pytest.raises(KeyLoadError, match="the pinned key weak is a point of small order"):
+        verify(DATA, FORGED_SIGNATURE, [honest, PinnedKey(name="weak", public_key=key)])
+
+
+def test_the_forged_signature_is_rejected_for_real_keys() -> None:
+    pinned = [_pinned("current", Ed25519PrivateKey.generate())]
+
+    with pytest.raises(SignatureMismatchError):
+        verify(DATA, FORGED_SIGNATURE, pinned)
+
+
+def test_real_keys_are_not_points_of_small_order() -> None:
+    assert not is_small_order(RFC_8032_PUBLIC_KEY)
+    assert not is_small_order(base64.b64decode(VECTOR_PUBLIC_KEY_BASE64))
+    assert len(set(SMALL_ORDER_ENCODINGS)) == 14
 
 
 # ---- pinned public keys
