@@ -5,7 +5,9 @@ Each case is a small JSON file that documents one rule: ``rule`` states it, ``ba
 and ``api`` give only the keys the rule is about (``tests/normalize_cases.py`` fills
 in the rest), ``pages`` overrides wiki page records, ``expected`` lists the substances
 of the result with the keys named in ``compare``, and ``report`` lists the findings of
-the kinds named in ``reportKinds``, in order. The files are maintained by hand.
+the kinds named in ``reportKinds``, in order. ``interactionGroups`` and
+``crossToleranceGroups``, when a case gives them, are compared with the lists of the
+document. The files are maintained by hand.
 """
 
 from dataclasses import asdict
@@ -29,6 +31,9 @@ def test_reference_case(name: str) -> None:
         for substance in result.document["substances"]
     ]
     assert found == case["expected"]
+    for groups in ("interactionGroups", "crossToleranceGroups"):
+        if groups in case:
+            assert result.document[groups] == case[groups]
     kinds = {Kind(kind) for kind in case["reportKinds"]}
     findings = [asdict(finding) for finding in result.report.findings if finding.kind in kinds]
     assert findings == case["report"]
@@ -48,6 +53,8 @@ def test_reference_case_states_its_rule(name: str) -> None:
         "reportKinds",
         "expected",
         "report",
+        "interactionGroups",
+        "crossToleranceGroups",
     }
 
 
