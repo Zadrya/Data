@@ -85,13 +85,16 @@ def test_the_real_groups(relations: Normalized) -> None:
     assert groups["2c-t-x"] == ["2C-T", "2C-T-2", "2C-T-21", "2C-T-7"]
     assert groups["5-meo-xxt"] == ["5-MeO-DALT", "5-MeO-DMT", "5-MeO-DiPT", "5-MeO-MiPT"]
     assert groups["dox"] == ["DOB", "DOC", "DOI", "DOM"]
-    assert groups["maois"] == ["Ayahuasca"]
+    assert groups["maois"] == ["2C-T-7", "Ayahuasca"]
     assert "Βk-2C-B" in groups["2c-x"] and "2C-B-FLY" in groups["2c-x"]
     assert {"Amphetamine", "Dextroamphetamine", "3-FMA"} <= set(groups["substituted-amphetamines"])
-    assert {"3-FMA", "MCPP", "NM-2-AI"} <= set(groups["serotonin-releasers"])
+    assert {"3-FMA", "Ethylone", "MCPP", "NM-2-AI"} <= set(groups["serotonin-releasers"])
     assert not {"2C-B", "Psilocin", "Ayahuasca"} & set(groups["serotonin-releasers"])
-    assert {"Oxazepam", "Triazolam", "Etizolam"} <= set(groups["benzodiazepines"])
-    assert "Desomorphine" in groups["depressants"]
+    assert {"Chlordiazepoxide", "Cinolazepam", "Oxazepam", "Triazolam", "Etizolam"} <= set(
+        groups["benzodiazepines"]
+    )
+    assert {"Desomorphine", "Tilidin"} <= set(groups["depressants"])
+    assert "Tilidin" in groups["opioids"]
     assert len(relations.report.of(Kind.INTERACTION_GROUP)) == len(groups)
 
 

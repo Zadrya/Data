@@ -137,7 +137,13 @@
       "kind": "interaction-group",
       "substance": null,
       "route": null,
-      "detail": "maois (0), named Ayahuasca: none"
+      "detail": "maois (0), named 2C-T-7, Ayahuasca: none"
+    },
+    {
+      "kind": "interaction-group-name-missing",
+      "substance": null,
+      "route": null,
+      "detail": "maois: the named member '2C-T-7' is not in the catalog"
     },
     {
       "kind": "interaction-group-name-missing",
