@@ -136,7 +136,7 @@ def write_snapshot(
     }
     texts = {GRAPHQL_FILE: graphql_text, MEDIAWIKI_FILE: mediawiki_text, INFO_FILE: dump_json(info)}
 
-    _refuse_foreign_directory(directory)
+    check_destination(directory)
     directory.parent.mkdir(parents=True, exist_ok=True)
     staging = directory.with_name(f".{directory.name}.new-{os.getpid()}")
     previous = directory.with_name(f".{directory.name}.old-{os.getpid()}")
@@ -222,7 +222,15 @@ def _sha256(blob: bytes) -> str:
     return hashlib.sha256(blob).hexdigest()
 
 
-def _refuse_foreign_directory(directory: Path) -> None:
+def check_destination(directory: Path) -> None:
+    """Refuse a destination that ``write_snapshot`` must not replace.
+
+    A symbolic link is refused, because replacing it would swap the link, not what it
+    points to. An existing path must be a directory that holds snapshot files only.
+    ``fetch`` calls this before its first request, so a wrong path costs no requests.
+    """
+    if directory.is_symlink():
+        raise SnapshotError(f"{directory}: a symbolic link, refusing to replace it")
     if not directory.exists():
         return
     if not directory.is_dir():

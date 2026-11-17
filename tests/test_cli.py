@@ -195,16 +195,35 @@ def test_fetch_keeps_the_previous_snapshot_when_a_later_fetch_fails(
     assert sorted(path.name for path in tmp_path.iterdir()) == ["snapshot"]
 
 
-def test_fetch_refuses_to_replace_a_directory_that_is_not_a_snapshot(
+def test_fetch_refuses_a_directory_that_is_not_a_snapshot_before_any_request(
     tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
 ) -> None:
     (tmp_path / "notes.txt").write_text("keep me", encoding="utf-8")
-    monkeypatch.setattr(cli, "make_client", lambda: replay(api_handler)[0])
+    client, seen = replay(api_handler)
+    monkeypatch.setattr(cli, "make_client", lambda: client)
 
     assert main(["fetch", "--output", str(tmp_path), "--base", str(BASE_FIXTURE)]) == 1
 
+    assert seen == []
     assert (tmp_path / "notes.txt").read_text(encoding="utf-8") == "keep me"
     assert "which is not a snapshot file" in capsys.readouterr().err
+
+
+def test_fetch_refuses_a_symbolic_link_as_output_before_any_request(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    target = tmp_path / "real"
+    target.mkdir()
+    link = tmp_path / "link"
+    link.symlink_to(target, target_is_directory=True)
+    client, seen = replay(api_handler)
+    monkeypatch.setattr(cli, "make_client", lambda: client)
+
+    assert main(["fetch", "--output", str(link), "--base", str(BASE_FIXTURE)]) == 1
+
+    assert seen == []
+    assert link.is_symlink() and list(target.iterdir()) == []
+    assert f"{link}: a symbolic link, refusing to replace it" in capsys.readouterr().err
 
 
 def test_fetch_help_states_the_number_of_requests(capsys: pytest.CaptureFixture[str]) -> None:
