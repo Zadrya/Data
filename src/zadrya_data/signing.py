@@ -8,7 +8,8 @@ signature bytes, followed by one line feed. The format and the reasons are in
 
 Two rules hold for everything in this module:
 
-- Nothing fails open. Every function returns a result or raises a ``SigningError``.
+- Nothing fails open. Every function returns a result or raises a ``SigningError``
+  (a ``zadrya_data.errors.ReleaseRejectedError``).
 - The private key is only ever read. Its content never reaches a message, a log or
   a file: errors about it name the file and the reason, never the bytes, they have
   no cause or context, and the frames they are raised from do not hold the key.
@@ -31,6 +32,8 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
     Ed25519PrivateKey,
     Ed25519PublicKey,
 )
+
+from zadrya_data.errors import ReleaseRejectedError
 
 SIGNATURE_LENGTH = 64
 PUBLIC_KEY_LENGTH = 32
@@ -72,7 +75,7 @@ _SMALL_ORDER_Y = frozenset(
 )
 
 
-class SigningError(Exception):
+class SigningError(ReleaseRejectedError):
     """Base of every error of this module."""
 
 

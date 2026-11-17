@@ -13,9 +13,13 @@ import pytest
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 from tests.schema_cases import substances_valid
+from zadrya_data import manifest as manifest_module
+from zadrya_data import release_check, signing
+from zadrya_data.errors import ReleaseRejectedError
 from zadrya_data.manifest import (
     ManifestAttributionMismatchError,
     ManifestDatasetVersionMismatchError,
+    ManifestError,
     ManifestFormatError,
     ManifestHashMismatchError,
     ManifestSchemaVersionMismatchError,
@@ -31,6 +35,7 @@ from zadrya_data.signing import (
     PinnedKey,
     SignatureFormatError,
     SignatureMismatchError,
+    SigningError,
     encode_signature,
     sign,
 )
@@ -255,6 +260,44 @@ def test_what_only_the_manifest_holds_is_not_protected() -> None:
     release = _release(manifest_changes={"minAppVersion": "0.0.1", "date": "1999-01-01"})
 
     assert release.verify().min_app_version == "0.0.1"
+
+
+# ---- one base class
+
+
+def _every_subclass(base: type) -> set[type]:
+    found: set[type] = set(base.__subclasses__())
+    return found | {deeper for subclass in found for deeper in _every_subclass(subclass)}
+
+
+def test_every_refusal_has_the_same_base_class() -> None:
+    rejected = _every_subclass(ReleaseRejectedError)
+
+    assert {SigningError, ManifestError, ReleaseSchemaError} <= rejected
+    for module in (signing, manifest_module, release_check):
+        for name, member in vars(module).items():
+            defined_here = getattr(member, "__module__", None) == module.__name__
+            if isinstance(member, type) and issubclass(member, Exception) and defined_here:
+                assert member in rejected | {ReleaseRejectedError}, name
+
+
+@pytest.mark.parametrize(
+    "broken",
+    [
+        pytest.param({"signature_file": b""}, id="signature-format"),
+        pytest.param({"substances": b"other bytes"}, id="signature"),
+        pytest.param({"public_keys": ()}, id="no-keys"),
+        pytest.param({"manifest": b"{"}, id="manifest-format"),
+        pytest.param({"manifest": b'{"sha256": "x"}'}, id="hash"),
+    ],
+)
+def test_one_except_clause_catches_every_refusal(broken: dict[str, Any]) -> None:
+    with pytest.raises(ReleaseRejectedError):
+        replace(_release(), **broken).verify()
+    later: list[dict[str, object]] = [{"extra": 1}, {"datasetVersion": "9.0.0"}]
+    for changes in later:
+        with pytest.raises(ReleaseRejectedError):
+            _release(manifest_changes=changes).verify()
 
 
 # ---- order

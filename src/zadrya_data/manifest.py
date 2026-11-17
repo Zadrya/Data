@@ -14,13 +14,14 @@ import json
 from collections.abc import Mapping
 
 from zadrya_data import strict_json
+from zadrya_data.errors import ReleaseRejectedError
 from zadrya_data.schema import SchemaName, SchemaViolation, validate
 
 # What the manifest repeats from the signed document.
 _SIGNED_FIELDS = ("schemaVersion", "datasetVersion", "attribution")
 
 
-class ManifestError(Exception):
+class ManifestError(ReleaseRejectedError):
     """Base of every error of this module."""
 
 
@@ -96,6 +97,17 @@ def _require_valid(manifest: Mapping[str, object]) -> None:
     violations = validate(dict(manifest), SchemaName.MANIFEST)
     if violations:
         raise ManifestInvalidError(violations)
+    try:
+        _text(manifest).encode("utf-8")
+    except UnicodeEncodeError:
+        # JSON can spell half of a surrogate pair ("\\ud800"), which is not text.
+        raise ManifestFormatError(
+            "the manifest holds text that is not valid Unicode (a lone surrogate)"
+        ) from None
+
+
+def _text(manifest: Mapping[str, object]) -> str:
+    return json.dumps(manifest, sort_keys=True, indent=2, ensure_ascii=False, allow_nan=False)
 
 
 def build_manifest(
@@ -123,11 +135,11 @@ def serialize_manifest(manifest: Mapping[str, object]) -> bytes:
 
     Keys are sorted at every level, the indent is two spaces, text is UTF-8 and not
     escaped, and the file ends with one line feed. A manifest that breaks the schema
-    is not written.
+    (``ManifestInvalidError``) or holds text that is not valid Unicode
+    (``ManifestFormatError``) is not written.
     """
     _require_valid(manifest)
-    text = json.dumps(manifest, sort_keys=True, indent=2, ensure_ascii=False, allow_nan=False)
-    return (text + "\n").encode("utf-8")
+    return (_text(manifest) + "\n").encode("utf-8")
 
 
 def check_hash(manifest: Mapping[str, object], substances_bytes: bytes) -> None:

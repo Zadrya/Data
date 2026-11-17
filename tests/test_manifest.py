@@ -9,6 +9,7 @@ from typing import Any
 import pytest
 
 from tests.schema_cases import substances_valid
+from zadrya_data.errors import ReleaseRejectedError
 from zadrya_data.manifest import (
     ManifestAttributionMismatchError,
     ManifestDatasetVersionMismatchError,
@@ -168,6 +169,21 @@ def test_an_invalid_manifest_is_not_written() -> None:
         serialize_manifest(_manifest(sha256="ABC"))
     with pytest.raises(ManifestInvalidError, match="unexpected"):
         serialize_manifest(_manifest(unexpected=float("nan")))
+
+
+def test_text_that_is_not_unicode_is_a_manifest_error_not_an_encoding_error() -> None:
+    """JSON can spell a lone surrogate, and strict JSON reads it."""
+    lone = [{"name": "Wiki \ud800", "url": "https://example.org", "license": "CC0-1.0"}]
+    data = json.dumps(_document(attribution=lone)).encode("ascii")
+    assert b"\\ud800" in data
+
+    with pytest.raises(ManifestFormatError, match="not valid Unicode"):
+        build_manifest(data, min_app_version="1.0.0", date=DATE)
+    with pytest.raises(ManifestFormatError, match="not valid Unicode") as caught:
+        serialize_manifest(_manifest(attribution=lone))
+
+    assert isinstance(caught.value, ReleaseRejectedError)
+    assert caught.value.__cause__ is None
 
 
 # ---- check

@@ -18,6 +18,7 @@ The order and its reasons are in ``docs/adr/0003-dataset-signature.md``.
 from collections.abc import Sequence
 from dataclasses import dataclass
 
+from zadrya_data.errors import ReleaseRejectedError
 from zadrya_data.manifest import (
     check_hash,
     check_versions,
@@ -29,7 +30,7 @@ from zadrya_data.schema import SchemaName, SchemaViolation, validate
 from zadrya_data.signing import PinnedKey, decode_signature, verify
 
 
-class ReleaseSchemaError(Exception):
+class ReleaseSchemaError(ReleaseRejectedError):
     """A file of the release breaks its schema."""
 
     def __init__(self, name: SchemaName, violations: list[SchemaViolation]) -> None:
@@ -66,7 +67,8 @@ def verify_release(
 ) -> VerifiedRelease:
     """Accept the three files of a release, given as their exact bytes, or raise.
 
-    Raises a ``zadrya_data.signing.SigningError`` for step 1, a
+    Every refusal is a ``zadrya_data.errors.ReleaseRejectedError``: a
+    ``zadrya_data.signing.SigningError`` for step 1, a
     ``zadrya_data.manifest.ManifestError`` for steps 2 and 4 (and for a file that is
     not strict JSON), and ``ReleaseSchemaError`` for step 3. There is no other
     outcome: a release is never partly accepted.
