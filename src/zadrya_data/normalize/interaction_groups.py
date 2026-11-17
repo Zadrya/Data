@@ -81,7 +81,10 @@ GROUPS = {
         psychoactive=("Antidepressant", "Antidepressants"),
         chemical=("Antidepressants",),
     ),
-    # No class marks antihistamines: the H1 antihistamines of the catalog by name.
+    # No class marks antihistamines: the H1 antihistamines of the catalog by name, the
+    # two whose base summary says "antihistamine". Quetiapine and Mirtazapine are
+    # antihistaminic but classed as an antipsychotic and an antidepressant, and no wiki
+    # class calls them antihistamines, so they are left out.
     "antihistamines": GroupRule("Antihistamines", names=("Diphenhydramine", "Promethazine")),
     "barbiturates": GroupRule(
         "Barbiturates", categories=("barbiturate",), chemical=("Barbiturates",)
@@ -90,6 +93,8 @@ GROUPS = {
         "Benzodiazepines",
         categories=("benzodiazepine",),
         chemical=("Benzodiazepines", "Thienodiazepines"),
+        # Base-only benzodiazepines without the category or an API class.
+        names=("Chlordiazepoxide", "Cinolazepam"),
     ),
     # Substrates of CYP2C19 in the catalog whose main metabolism goes through it.
     "cyp2c19-substrates": GroupRule(
@@ -98,12 +103,13 @@ GROUPS = {
     "deliriants": GroupRule(
         "Deliriants", categories=("deliriant",), psychoactive=("Deliriant", "Deliriants")
     ),
-    # Desomorphine is an opioid without the depressant category or class.
+    # Desomorphine is an opioid without the depressant category or class, and Tilidin
+    # a base-only opioid without any category.
     "depressants": GroupRule(
         "Depressants",
         categories=("depressant", "benzodiazepine", "barbiturate"),
         psychoactive=("Depressant", "Depressants"),
-        names=("Desomorphine",),
+        names=("Desomorphine", "Tilidin"),
     ),
     "dissociatives": GroupRule(
         "Dissociatives",
@@ -114,22 +120,30 @@ GROUPS = {
     "hepatotoxic-drugs": GroupRule("Hepatotoxic drugs"),
     # Progesterone is a hormone used in hormonal birth control.
     "hormonal-birth-control": GroupRule("Hormonal birth control", names=("Progesterone",)),
-    # Ayahuasca contains harmala alkaloids, which are MAO inhibitors.
-    "maois": GroupRule("MAOIs", names=("Ayahuasca",)),
-    "opioids": GroupRule("Opioids", categories=("opioid",), psychoactive=("Opioid", "Opioids")),
+    # No class marks MAOIs. Ayahuasca contains harmala alkaloids, which are MAO
+    # inhibitors; the base summary of 2C-T-7 calls it a "possible MAOI", included because
+    # a missed MAOI warning is the unsafe direction. Syrian rue (Peganum harmala) and
+    # Banisteriopsis caapi have API entries without any number, so they are not in the
+    # catalog (ADR 4); no pharmaceutical MAOI is in the catalog.
+    "maois": GroupRule("MAOIs", names=("2C-T-7", "Ayahuasca")),
+    # Tilidin is a base-only opioid without any category.
+    "opioids": GroupRule(
+        "Opioids", categories=("opioid",), psychoactive=("Opioid", "Opioids"), names=("Tilidin",)
+    ),
     "protease-inhibitors": GroupRule("Protease inhibitors"),
     "psychedelics": GroupRule(
         "Psychedelics", categories=("psychedelic",), psychoactive=("Psychedelic", "Psychedelics")
     ),
     # The entactogen class of the API (MDMA, the cathinones, the benzofurans, αMT), and
-    # mCPP, a serotonin releaser classed as a stimulant. NM-2-AI is in the entactogen
+    # mCPP, a serotonin releaser classed as a stimulant, and Ethylone, an entactogenic
+    # cathinone like Methylone whose API classes lack the class. NM-2-AI is in the entactogen
     # category without the class and is included because its action is not clear. The
     # entactogen category is not used: it also holds 2C-B, 2C-T, 2C-T-7, 4-AcO-MiPT,
     # 5-MeO-DiPT, Ayahuasca and Psilocin, which act on receptors and release no serotonin.
     "serotonin-releasers": GroupRule(
         "Serotonin releasers",
         psychoactive=("Entactogen", "Entactogens"),
-        names=("MCPP", "NM-2-AI"),
+        names=("Ethylone", "MCPP", "NM-2-AI"),
     ),
     "snris": GroupRule("SNRIs"),
     "ssris": GroupRule("SSRIs"),
