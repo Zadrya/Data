@@ -1,0 +1,122 @@
+{
+  "rule": "When a consistent API block is used and the base block for the same route and block is inconsistent, the base block is reported with its reason: it loses nothing usable, but it is an error in the source data that the dataset review should see. Here the base dose decreases (strong 80, heavy 40) and the base onset has its minimum above its maximum.",
+  "base": [
+    {
+      "name": "Examplamine",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg",
+            "lightMin": 10,
+            "commonMin": 20,
+            "strongMin": 80,
+            "heavyMin": 40
+          },
+          "duration": {
+            "onset": {
+              "min": 40,
+              "max": 20,
+              "units": "minutes"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "Examplamine",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg",
+            "threshold": 10,
+            "light": {
+              "min": 15,
+              "max": 20
+            },
+            "common": {
+              "min": 20,
+              "max": 40
+            },
+            "strong": {
+              "min": 40,
+              "max": 80
+            },
+            "heavy": 80
+          },
+          "duration": {
+            "onset": {
+              "min": 20,
+              "max": 40,
+              "units": "minutes"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "roas"
+  ],
+  "reportKinds": [
+    "api-block-rejected",
+    "base-block-used",
+    "block-dropped",
+    "dose-boundary-filled",
+    "dose-fill-discarded",
+    "dose-equal-boundaries",
+    "dose-label-differs",
+    "unit-repaired",
+    "unit-not-mass",
+    "duration-rounded",
+    "api-phase-ignored",
+    "route-only-in-base",
+    "route-only-in-api",
+    "unit-qualifier-not-adopted",
+    "unit-changed",
+    "dose-changed",
+    "duration-changed",
+    "base-block-inconsistent"
+  ],
+  "expected": [
+    {
+      "name": "Examplamine",
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {
+            "units": "mg",
+            "thresholdMin": 10,
+            "lightMin": 15,
+            "commonMin": 20,
+            "strongMin": 40,
+            "heavyMin": 80
+          },
+          "duration": {
+            "onset": {
+              "min": 20,
+              "max": 40
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "base-block-inconsistent",
+      "substance": "Examplamine",
+      "route": "oral",
+      "detail": "dose: the base block is inconsistent (strongMin 80 is above heavyMin 40); the API block is used"
+    },
+    {
+      "kind": "base-block-inconsistent",
+      "substance": "Examplamine",
+      "route": "oral",
+      "detail": "duration onset: the base block is inconsistent (min 40 is above max 20 minutes); the API block is used"
+    }
+  ]
+}

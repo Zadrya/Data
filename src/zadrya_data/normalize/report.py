@@ -36,6 +36,7 @@ class Kind(StrEnum):
     ROUTE_ONLY_IN_API = "route-only-in-api"
     API_BLOCK_REJECTED = "api-block-rejected"
     BASE_BLOCK_USED = "base-block-used"
+    BASE_BLOCK_INCONSISTENT = "base-block-inconsistent"
     BLOCK_DROPPED = "block-dropped"
     API_PHASE_IGNORED = "api-phase-ignored"
     DOSE_BOUNDARY_FILLED = "dose-boundary-filled"

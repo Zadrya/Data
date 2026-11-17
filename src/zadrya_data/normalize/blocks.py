@@ -9,8 +9,10 @@ Each source offers a candidate for the block. The policy is:
 
 A block is never assembled from both sources. Whatever is not plain case 1 is
 reported: an API block that was rejected, a base block used because the API has none,
-a block dropped because neither source has a consistent one, and a base block that is
-lost because it is inconsistent while the API only states units. A candidate can be
+a block dropped because neither source has a consistent one, a base block that is
+lost because it is inconsistent while the API only states units, and a base block
+that is inconsistent while a consistent API block is used. The last loses nothing
+usable, but it is an error in the source data that the dataset review should see. A candidate can be
 "weak" (a dose that only states units): a weak candidate is used only when the other
 source has nothing better.
 """
@@ -75,14 +77,23 @@ def choose[T](
                     substance=substance,
                     route=route,
                 )
-        if source == "API" and candidate.weak and base.problem is not None:
-            report.add(
-                Kind.BLOCK_DROPPED,
-                f"{what}: the base block is not used ({base.problem}); the API states units "
-                "only, and they are kept",
-                substance=substance,
-                route=route,
-            )
+        if source == "API" and base.problem is not None:
+            if candidate.weak:
+                report.add(
+                    Kind.BLOCK_DROPPED,
+                    f"{what}: the base block is not used ({base.problem}); the API states "
+                    "units only, and they are kept",
+                    substance=substance,
+                    route=route,
+                )
+            else:
+                report.add(
+                    Kind.BASE_BLOCK_INCONSISTENT,
+                    f"{what}: the base block is inconsistent ({base.problem}); the API block "
+                    "is used",
+                    substance=substance,
+                    route=route,
+                )
         for kind, detail in candidate.notes:
             report.add(kind, f"{what}: {detail}", substance=substance, route=route)
         return candidate.value
