@@ -10,13 +10,17 @@ Two rules hold for everything in this module:
 
 - Nothing fails open. Every function returns a result or raises a ``SigningError``.
 - The private key is only ever read. Its content never reaches a message, a log or
-  a file: errors about it name the file and the reason, never the bytes, and the
-  exceptions of the parser are not chained.
+  a file: errors about it name the file and the reason, never the bytes, they have
+  no cause or context, and the frames they are raised from do not hold the key.
+  That limits what a traceback can show. It is not a defense against a debugger
+  or a memory dump of the process.
 """
 
 import base64
 import binascii
 import os
+import re
+import stat
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -39,6 +43,14 @@ KEY_FILE_VARIABLE = "ZADRYA_SIGNING_KEY_FILE"
 KEY_PASSWORD_VARIABLE = "ZADRYA_SIGNING_KEY_PASSWORD"
 
 _ENCODED_SIGNATURE_LENGTH = 89  # 88 base64 characters and the line feed
+
+# A private key file from its first byte to its last: one PKCS#8 block, plain or
+# encrypted, and at most the line break that ends it.
+_PRIVATE_KEY_FILE = re.compile(
+    rb"-----BEGIN (ENCRYPTED )?PRIVATE KEY-----\r?\n"
+    rb"(?:[A-Za-z0-9+/=]+\r?\n)+"
+    rb"-----END (?(1)ENCRYPTED )PRIVATE KEY-----(?:\r?\n)?"
+)
 
 # The eight points of small order of the curve, as the y coordinate of their encoding
 # (the top bit, the sign of x, is cleared before comparing). The last two entries are
@@ -251,30 +263,54 @@ def _looks_like_key_material(value: str) -> bool:
 def load_private_key(path: Path) -> Ed25519PrivateKey:
     """Read an Ed25519 private key from a PEM file (PKCS#8).
 
-    An encrypted key needs its password in ``ZADRYA_SIGNING_KEY_PASSWORD``. Every
-    failure raises ``KeyLoadError`` with the path and the reason, and nothing of the
-    file content: the errors of the parser are deliberately not chained.
+    The file holds exactly one key and nothing else, and only its owner may have
+    any access to it (mode 0600 or stricter). An encrypted key needs its password
+    in ``ZADRYA_SIGNING_KEY_PASSWORD``. Every failure raises ``KeyLoadError`` with
+    the path and the reason, and nothing of the file content or the password.
     """
-    password = os.environ.get(KEY_PASSWORD_VARIABLE, "").encode("utf-8") or None
+    loaded = _try_load_private_key(path)
+    if isinstance(loaded, str):
+        raise KeyLoadError(f"cannot use the private key file {path}: {loaded}")
+    return loaded
+
+
+def _try_load_private_key(path: Path) -> Ed25519PrivateKey | str:
+    """Return the key of the file, or the reason it cannot be used.
+
+    The file content and the password exist only in this frame, which is gone when
+    ``load_private_key`` raises: the error has no cause, no context and no frame
+    that holds them.
+    """
     try:
-        content = path.read_bytes()
+        password = os.environ.get(KEY_PASSWORD_VARIABLE, "").encode("utf-8") or None
+    except UnicodeEncodeError:
+        return f"{KEY_PASSWORD_VARIABLE} is not text that can be encoded as UTF-8"
+    try:
+        with path.open("rb") as file:
+            mode = stat.S_IMODE(os.fstat(file.fileno()).st_mode)
+            if mode & 0o077:
+                return (
+                    f"its mode is {mode:04o}, which gives access to the group or to others: "
+                    "it must be 0600 or stricter (chmod 600)"
+                )
+            content = file.read()
     except OSError as error:
-        raise KeyLoadError(f"cannot read the private key file {path}: {error.strerror}") from None
+        return f"it cannot be read: {error.strerror}"
+    if _PRIVATE_KEY_FILE.fullmatch(content) is None:
+        return (
+            "it is not exactly one PEM (PKCS#8) private key: other text, a second key "
+            "and other kinds of PEM are refused"
+        )
     try:
         key = serialization.load_pem_private_key(content, password=password)
     except TypeError:
         if password is None:
-            reason = f"it is encrypted and {KEY_PASSWORD_VARIABLE} is not set"
-        else:
-            reason = f"{KEY_PASSWORD_VARIABLE} is set and the key is not encrypted"
-        raise KeyLoadError(f"cannot use the private key file {path}: {reason}") from None
+            return f"it is encrypted and {KEY_PASSWORD_VARIABLE} is not set"
+        return f"{KEY_PASSWORD_VARIABLE} is set and the key is not encrypted"
     except (ValueError, UnsupportedAlgorithm):
-        raise KeyLoadError(
-            f"cannot use the private key file {path}: it is not a PEM (PKCS#8) private key, "
-            "or the password is wrong"
-        ) from None
+        return "it is not a PEM (PKCS#8) private key, or the password is wrong"
     if not isinstance(key, Ed25519PrivateKey):
-        raise KeyLoadError(f"the private key file {path} does not hold an Ed25519 key")
+        return "it does not hold an Ed25519 key"
     return key
 
 
