@@ -420,6 +420,9 @@ def test_real_dose_blocks_against_the_base_file(doses: Normalized) -> None:
     label = sorted((f.substance, f.route) for f in doses.report.of(Kind.DOSE_LABEL_DIFFERS))
     assert len(not_in_api) == 8 and not_in_api == label
     assert doses.report.of(Kind.UNIT_CHANGED) == []
+    # Meclofenoxate oral is inconsistent in both sources, so it is dropped, not reported
+    # as an inconsistent base block next to a used API block.
+    assert doses.report.of(Kind.BASE_BLOCK_INCONSISTENT) == []
     assert doses.report.of(Kind.UNIT_QUALIFIER_NOT_ADOPTED) == []
 
 

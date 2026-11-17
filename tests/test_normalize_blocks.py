@@ -136,6 +136,31 @@ def test_no_block_and_no_problem_is_silent() -> None:
     assert _choose(Candidate(), Candidate()) == (None, [])
 
 
+def test_an_inconsistent_base_block_next_to_a_consistent_api_block_is_reported() -> None:
+    assert _choose(Candidate("api"), Candidate(problem="inverted")) == (
+        "api",
+        [
+            (
+                Kind.BASE_BLOCK_INCONSISTENT,
+                "dose: the base block is inconsistent (inverted); the API block is used",
+            )
+        ],
+    )
+
+
+def test_an_inconsistent_base_block_behind_units_only_is_reported_as_dropped() -> None:
+    assert _choose(Candidate("api units", weak=True), Candidate(problem="inverted")) == (
+        "api units",
+        [
+            (
+                Kind.BLOCK_DROPPED,
+                "dose: the base block is not used (inverted); the API states units only, "
+                "and they are kept",
+            )
+        ],
+    )
+
+
 def test_a_block_neither_source_has_consistently_is_dropped_with_both_reasons() -> None:
     value, findings = _choose(Candidate(problem="inverted"), Candidate(problem="no units"))
 
