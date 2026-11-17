@@ -1,0 +1,198 @@
+{
+  "rule": "A target name is resolved in this order: a catalog substance by exact name, by name without case, or by an alias (without case) that only one catalog substance has; a class named in the group table NAME_TO_GROUP; anything else is other, with the name as written and one entry per name without case (first spelling kept). An alias several substances share is other. Every resolution that is not an exact name, and every other, is reported once per spelling with the number of substances listing it. A target that is the substance itself, and a name that is not valid text, are reported and dropped. Within a severity, targets are sorted by kind (substance, group, other), then by name or group id.",
+  "base": [
+    {
+      "name": "Dextromethorphan",
+      "commonNames": [
+        "DXM",
+        "Dex"
+      ]
+    },
+    {
+      "name": "Dextroamphetamine",
+      "commonNames": [
+        "Dex"
+      ]
+    },
+    {
+      "name": "ΑMT",
+      "url": "https://psychonautwiki.org/wiki/%CE%91MT",
+      "commonNames": [
+        "AMT"
+      ]
+    },
+    {
+      "name": "LSD",
+      "interactions": {
+        "dangerous": [
+          "Lithium",
+          "MAOIs",
+          "dxm",
+          "LSD"
+        ],
+        "unsafe": [
+          "Dex",
+          "aMT"
+        ],
+        "uncertain": [
+          "Grapefruit",
+          "grapefruit",
+          "dextroamphetamine",
+          " "
+        ]
+      }
+    }
+  ],
+  "api": [],
+  "compare": [
+    "interactions"
+  ],
+  "reportKinds": [
+    "interaction-target-resolved",
+    "interaction-target-other",
+    "interaction-target-dropped",
+    "text-dropped"
+  ],
+  "expected": [
+    {
+      "name": "Dextroamphetamine",
+      "interactions": {
+        "dangerous": [],
+        "unsafe": [],
+        "uncertain": [
+          {
+            "kind": "substance",
+            "name": "LSD"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Dextromethorphan",
+      "interactions": {
+        "dangerous": [
+          {
+            "kind": "substance",
+            "name": "LSD"
+          }
+        ],
+        "unsafe": [],
+        "uncertain": []
+      }
+    },
+    {
+      "name": "LSD",
+      "interactions": {
+        "dangerous": [
+          {
+            "kind": "substance",
+            "name": "Dextromethorphan"
+          },
+          {
+            "kind": "group",
+            "groupId": "maois"
+          },
+          {
+            "kind": "other",
+            "name": "Lithium"
+          }
+        ],
+        "unsafe": [
+          {
+            "kind": "substance",
+            "name": "ΑMT"
+          },
+          {
+            "kind": "other",
+            "name": "Dex"
+          }
+        ],
+        "uncertain": [
+          {
+            "kind": "substance",
+            "name": "Dextroamphetamine"
+          },
+          {
+            "kind": "other",
+            "name": "Grapefruit"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ΑMT",
+      "interactions": {
+        "dangerous": [],
+        "unsafe": [
+          {
+            "kind": "substance",
+            "name": "LSD"
+          }
+        ],
+        "uncertain": []
+      }
+    }
+  ],
+  "report": [
+    {
+      "kind": "interaction-target-dropped",
+      "substance": "LSD",
+      "route": null,
+      "detail": "the dangerous target 'LSD' of the base is the substance itself"
+    },
+    {
+      "kind": "text-dropped",
+      "substance": "LSD",
+      "route": null,
+      "detail": "uncertain interaction of the base (empty) is not valid text"
+    },
+    {
+      "kind": "interaction-target-resolved",
+      "substance": null,
+      "route": null,
+      "detail": "'aMT' is the substance 'ΑMT' by an alias only it has (listed by 1 substance)"
+    },
+    {
+      "kind": "interaction-target-other",
+      "substance": null,
+      "route": null,
+      "detail": "'Dex' is an alias or name of several substances (Dextroamphetamine, Dextromethorphan): kept as other (listed by 1 substance)"
+    },
+    {
+      "kind": "interaction-target-resolved",
+      "substance": null,
+      "route": null,
+      "detail": "'dextroamphetamine' is the substance 'Dextroamphetamine' by its name without case (listed by 1 substance)"
+    },
+    {
+      "kind": "interaction-target-resolved",
+      "substance": null,
+      "route": null,
+      "detail": "'dxm' is the substance 'Dextromethorphan' by an alias only it has (listed by 1 substance)"
+    },
+    {
+      "kind": "interaction-target-other",
+      "substance": null,
+      "route": null,
+      "detail": "'Grapefruit' is neither a catalog substance nor a group: kept as other (listed by 1 substance)"
+    },
+    {
+      "kind": "interaction-target-other",
+      "substance": null,
+      "route": null,
+      "detail": "'grapefruit' is neither a catalog substance nor a group: kept as other (listed by 1 substance)"
+    },
+    {
+      "kind": "interaction-target-other",
+      "substance": null,
+      "route": null,
+      "detail": "'Lithium' is neither a catalog substance nor a group: kept as other (listed by 1 substance)"
+    },
+    {
+      "kind": "interaction-target-resolved",
+      "substance": null,
+      "route": null,
+      "detail": "'MAOIs' is the group 'maois' by the group table (listed by 1 substance)"
+    }
+  ]
+}

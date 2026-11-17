@@ -1,11 +1,15 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Tolerance and cross tolerance of the real base file with a recorded API answer. No network.
+"""Tolerance, cross tolerance and interactions of the real base file with a recorded API answer.
 
-``graphql-relations.json`` holds the whole real entries (snapshot of 2026-11-16) of the
-substances whose relations normalization does something worth pinning: 3-FMA (the API
-has no tolerance and no cross tolerance), Morphine (a token only the API has),
-N-Methylbisfluoromodafinil (``modafanil`` and ``analog``), Metizolam and Tianeptine
-(misspelled tokens).
+No network. ``graphql-relations.json`` holds the whole real entries (snapshot of
+2026-11-16) of the substances whose relations normalization does something worth
+pinning: 3-FMA (the API has no tolerance, no cross tolerance and no interactions),
+Morphine (a token only the API has), N-Methylbisfluoromodafinil (``modafanil`` and
+``analog``), Metizolam and Tianeptine (misspelled tokens), Acetylfentanyl and
+2-Aminoindane (a target under two severities), Cannabis ("Mushrooms"), Caffeine (a
+target only the API has), Dextromethorphan ("Antihistamine" and "Antihistamines"),
+Modafinil and Alcohol (groups without members), Mirtazapine (its own group), Myristicin
+("DPH") and Pregabalin ("SSRI").
 """
 
 from typing import Any

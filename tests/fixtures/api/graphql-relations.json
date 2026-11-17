@@ -2,6 +2,126 @@
  "data": {
   "substances": [
    {
+    "addictionPotential": "moderately addictive with a high potential for abuse",
+    "class": {
+     "chemical": [
+      "Aminoindane"
+     ],
+     "psychoactive": [
+      "Stimulants"
+     ]
+    },
+    "commonNames": [
+     "2-AI"
+    ],
+    "crossTolerances": [
+     "dopamine",
+     "stimulant"
+    ],
+    "dangerousInteractions": [
+     {
+      "name": "25x-NBOMe"
+     },
+     {
+      "name": "25x-NBOH"
+     },
+     {
+      "name": "Tramadol"
+     },
+     {
+      "name": "MAOIs"
+     },
+     {
+      "name": "Stimulants"
+     },
+     {
+      "name": "MDMA"
+     },
+     {
+      "name": "Cocaine"
+     }
+    ],
+    "featured": true,
+    "name": "2-Aminoindane",
+    "roas": [
+     {
+      "bioavailability": null,
+      "dose": {
+       "common": {
+        "max": 20.0,
+        "min": 10.0
+       },
+       "heavy": 40.0,
+       "light": {
+        "max": 10.0,
+        "min": 5.0
+       },
+       "strong": {
+        "max": 40.0,
+        "min": 20.0
+       },
+       "threshold": 3.0,
+       "units": "mg"
+      },
+      "duration": {
+       "afterglow": {
+        "max": 4.0,
+        "min": 2.0,
+        "units": "hours"
+       },
+       "comeup": null,
+       "duration": null,
+       "offset": null,
+       "onset": {
+        "max": 30.0,
+        "min": 10.0,
+        "units": "minutes"
+       },
+       "peak": null,
+       "total": {
+        "max": 2.0,
+        "min": 1.0,
+        "units": "hours"
+       }
+      },
+      "name": "oral"
+     }
+    ],
+    "summary": "Summary sheet: 2-Aminoindane 2-Aminoindane",
+    "systematicName": "2,3-Dihydro-1H-inden-2-amine",
+    "tolerance": {
+     "full": "develops with prolonged and repeated use",
+     "half": "3 - 7 days",
+     "zero": "1 - 2 weeks"
+    },
+    "toxicity": [
+     "exact toxic dosage is unknown"
+    ],
+    "uncertainInteractions": [
+     {
+      "name": "Alcohol"
+     },
+     {
+      "name": "MXE"
+     },
+     {
+      "name": "Dissociatives"
+     }
+    ],
+    "unsafeInteractions": [
+     {
+      "name": "DXM"
+     },
+     {
+      "name": "MDMA"
+     },
+     {
+      "name": "Stimulants"
+     }
+    ],
+    "url": "https://psychonautwiki.org/wiki/2-Aminoindane"
+   },
+   {
     "addictionPotential": null,
     "class": {
      "chemical": [
@@ -85,6 +205,939 @@
     "url": "https://psychonautwiki.org/wiki/3-FMA"
    },
    {
+    "addictionPotential": "extremely addictive with a high potential for abuse",
+    "class": {
+     "chemical": [
+      "Anilidopiperidine"
+     ],
+     "psychoactive": [
+      "Opioids"
+     ]
+    },
+    "commonNames": [
+     "Acetylfentanyl"
+    ],
+    "crossTolerances": [
+     "opioids"
+    ],
+    "dangerousInteractions": [
+     {
+      "name": "SNRIs"
+     },
+     {
+      "name": "Alcohol"
+     },
+     {
+      "name": "Benzodiazepines"
+     },
+     {
+      "name": "DXM"
+     },
+     {
+      "name": "GHB"
+     },
+     {
+      "name": "GBL"
+     },
+     {
+      "name": "Ketamine"
+     },
+     {
+      "name": "MXE"
+     },
+     {
+      "name": "Tramadol"
+     },
+     {
+      "name": "Grapefruit"
+     },
+     {
+      "name": "MAOIs"
+     },
+     {
+      "name": "Serotonin releasers"
+     },
+     {
+      "name": "SSRIs"
+     },
+     {
+      "name": "5-HTP"
+     }
+    ],
+    "featured": true,
+    "name": "Acetylfentanyl",
+    "roas": [
+     {
+      "bioavailability": null,
+      "dose": {
+       "common": {
+        "max": 15.0,
+        "min": 10.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 10.0,
+        "min": 5.0
+       },
+       "strong": {
+        "max": 20.0,
+        "min": 15.0
+       },
+       "threshold": 2.0,
+       "units": "mg"
+      },
+      "duration": {
+       "afterglow": null,
+       "comeup": null,
+       "duration": null,
+       "offset": null,
+       "onset": {
+        "max": 10.0,
+        "min": 7.0,
+        "units": "minutes"
+       },
+       "peak": null,
+       "total": {
+        "max": 4.0,
+        "min": 3.0,
+        "units": "hours"
+       }
+      },
+      "name": "insufflated"
+     },
+     {
+      "bioavailability": null,
+      "dose": {
+       "common": {
+        "max": 15.0,
+        "min": 10.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 10.0,
+        "min": 5.0
+       },
+       "strong": {
+        "max": 20.0,
+        "min": 15.0
+       },
+       "threshold": 2.0,
+       "units": "mg"
+      },
+      "duration": {
+       "afterglow": null,
+       "comeup": null,
+       "duration": null,
+       "offset": null,
+       "onset": {
+        "max": 40.0,
+        "min": 20.0,
+        "units": "minutes"
+       },
+       "peak": null,
+       "total": {
+        "max": 4.0,
+        "min": 1.0,
+        "units": "hours"
+       }
+      },
+      "name": "sublingual"
+     }
+    ],
+    "summary": "Death may occur when Acetylfentanyl is combined with depressants such as opiates, benzodiazepines, barbiturates, gabapentinoids, thienodiazepines or other GABAergic substances.[1] It is strongly discouraged to combine either heavy or moderate dosages of these substances together.",
+    "systematicName": null,
+    "tolerance": {
+     "full": "develops with prolonged and repeated use",
+     "half": "3 - 7 days",
+     "zero": "1 - 2 weeks"
+    },
+    "toxicity": [
+     "potentially fatal at heavy dosages",
+     "potentially lethal when mixed with depressants like alcohol or benzodiazepines",
+     "unintentionally spilling a very small amount of acetylfentanyl on one's skin could result in a fatal overdose."
+    ],
+    "uncertainInteractions": [
+     {
+      "name": "MAOIs"
+     },
+     {
+      "name": "Nitrous"
+     },
+     {
+      "name": "PCP"
+     },
+     {
+      "name": "Stimulants"
+     }
+    ],
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Acetylfentanyl"
+   },
+   {
+    "addictionPotential": "extremely addictive with a high potential for abuse",
+    "class": {
+     "chemical": [
+      "Alcohol"
+     ],
+     "psychoactive": [
+      "Depressant"
+     ]
+    },
+    "commonNames": [
+     "Alcohol",
+     "Booze",
+     "Liquor",
+     "Moonshine",
+     "Sauce",
+     "Juice",
+     "Bevvy"
+    ],
+    "crossTolerances": [
+     "GABA",
+     "depressants"
+    ],
+    "dangerousInteractions": [
+     {
+      "name": "Depressants"
+     },
+     {
+      "name": "Dissociatives"
+     },
+     {
+      "name": "Benzodiazepines"
+     },
+     {
+      "name": "DXM"
+     },
+     {
+      "name": "GHB"
+     },
+     {
+      "name": "GBL"
+     },
+     {
+      "name": "Ketamine"
+     },
+     {
+      "name": "MXE"
+     },
+     {
+      "name": "Opioids"
+     },
+     {
+      "name": "Tramadol"
+     }
+    ],
+    "featured": true,
+    "name": "Alcohol",
+    "roas": [
+     {
+      "bioavailability": null,
+      "dose": {
+       "common": {
+        "max": 30.0,
+        "min": 20.0
+       },
+       "heavy": 40.0,
+       "light": {
+        "max": 20.0,
+        "min": 10.0
+       },
+       "strong": {
+        "max": 40.0,
+        "min": 30.0
+       },
+       "threshold": 10.0,
+       "units": "g"
+      },
+      "duration": {
+       "afterglow": {
+        "max": 48.0,
+        "min": 6.0,
+        "units": "hours"
+       },
+       "comeup": {
+        "max": 45.0,
+        "min": 15.0,
+        "units": "minutes"
+       },
+       "duration": null,
+       "offset": {
+        "max": 120.0,
+        "min": 45.0,
+        "units": "minutes"
+       },
+       "onset": {
+        "max": 5.0,
+        "min": 2.0,
+        "units": "minutes"
+       },
+       "peak": {
+        "max": 90.0,
+        "min": 30.0,
+        "units": "minutes"
+       },
+       "total": {
+        "max": 5.0,
+        "min": 1.5,
+        "units": "hours"
+       }
+      },
+      "name": "oral"
+     }
+    ],
+    "summary": "Fatal overdose may occur when alcohol is combined with other depressants such as opiates, benzodiazepines, barbiturates, gabapentinoids, thienodiazepines or other GABAergic substances.[1] It is strongly discouraged to combine these substances, particularly in common to heavy doses.",
+    "systematicName": null,
+    "tolerance": {
+     "full": "develops with prolonged and repeated use",
+     "half": "3 - 7 days",
+     "zero": "1 - 2 weeks"
+    },
+    "toxicity": [
+     "Death from ethanol consumption is possible when blood alcohol levels reach 0.4%"
+    ],
+    "uncertainInteractions": [
+     {
+      "name": "Stimulants"
+     },
+     {
+      "name": "Cannabis"
+     },
+     {
+      "name": "Amphetamines"
+     },
+     {
+      "name": "AMT"
+     },
+     {
+      "name": "MDMA"
+     },
+     {
+      "name": "Nitrous"
+     },
+     {
+      "name": "SSRIs"
+     }
+    ],
+    "unsafeInteractions": [
+     {
+      "name": "Cocaine"
+     },
+     {
+      "name": "MAOIs"
+     },
+     {
+      "name": "PCP"
+     },
+     {
+      "name": "ALDH2 inhibitors"
+     },
+     {
+      "name": "Hepatotoxic drugs"
+     }
+    ],
+    "url": "https://psychonautwiki.org/wiki/Alcohol"
+   },
+   {
+    "addictionPotential": "develop with regular consumption, leading to cravings and withdrawal effects upon sudden cessation, but has low abuse potential",
+    "class": {
+     "chemical": [
+      "Xanthines"
+     ],
+     "psychoactive": [
+      "Stimulants"
+     ]
+    },
+    "commonNames": [
+     "Caffeine"
+    ],
+    "crossTolerances": [],
+    "dangerousInteractions": null,
+    "featured": true,
+    "name": "Caffeine",
+    "roas": [
+     {
+      "bioavailability": null,
+      "dose": {
+       "common": {
+        "max": 40.0,
+        "min": 25.0
+       },
+       "heavy": 80.0,
+       "light": {
+        "max": 25.0,
+        "min": 10.0
+       },
+       "strong": {
+        "max": 80.0,
+        "min": 40.0
+       },
+       "threshold": 2.5,
+       "units": "mg"
+      },
+      "duration": {
+       "afterglow": {
+        "max": 24.0,
+        "min": 6.0,
+        "units": "hours"
+       },
+       "comeup": {
+        "max": 2.0,
+        "min": 0.5,
+        "units": "minutes"
+       },
+       "duration": null,
+       "offset": {
+        "max": 10.0,
+        "min": 6.0,
+        "units": "hours"
+       },
+       "onset": {
+        "max": 2.0,
+        "min": 0.5,
+        "units": "minutes"
+       },
+       "peak": {
+        "max": 1.0,
+        "min": 0.5,
+        "units": "hours"
+       },
+       "total": {
+        "max": 2.5,
+        "min": 1.0,
+        "units": "hours"
+       }
+      },
+      "name": "insufflated"
+     },
+     {
+      "bioavailability": null,
+      "dose": {
+       "common": {
+        "max": 150.0,
+        "min": 50.0
+       },
+       "heavy": 500.0,
+       "light": {
+        "max": 50.0,
+        "min": 20.0
+       },
+       "strong": {
+        "max": 500.0,
+        "min": 150.0
+       },
+       "threshold": 10.0,
+       "units": "mg"
+      },
+      "duration": {
+       "afterglow": {
+        "max": 4.0,
+        "min": 2.0,
+        "units": "hours"
+       },
+       "comeup": {
+        "max": 60.0,
+        "min": 10.0,
+        "units": "minutes"
+       },
+       "duration": null,
+       "offset": {
+        "max": 10.0,
+        "min": 6.0,
+        "units": "hours"
+       },
+       "onset": {
+        "max": 10.0,
+        "min": 5.0,
+        "units": "minutes"
+       },
+       "peak": {
+        "max": 2.0,
+        "min": 1.0,
+        "units": "hours"
+       },
+       "total": {
+        "max": 5.0,
+        "min": 2.0,
+        "units": "hours"
+       }
+      },
+      "name": "oral"
+     },
+     {
+      "bioavailability": null,
+      "dose": {
+       "common": {
+        "max": 125.0,
+        "min": 75.0
+       },
+       "heavy": 175.0,
+       "light": {
+        "max": 75.0,
+        "min": 25.0
+       },
+       "strong": {
+        "max": 175.0,
+        "min": 125.0
+       },
+       "threshold": 25.0,
+       "units": "mg"
+      },
+      "duration": {
+       "afterglow": {
+        "max": 4.0,
+        "min": 2.0,
+        "units": "hours"
+       },
+       "comeup": null,
+       "duration": null,
+       "offset": {
+        "max": 45.0,
+        "min": 30.0,
+        "units": "minutes"
+       },
+       "onset": {
+        "max": 5.0,
+        "min": 2.0,
+        "units": "minutes"
+       },
+       "peak": {
+        "max": 20.0,
+        "min": 10.0,
+        "units": "minutes"
+       },
+       "total": {
+        "max": 70.0,
+        "min": 45.0,
+        "units": "minutes"
+       }
+      },
+      "name": "smoked"
+     }
+    ],
+    "summary": "For the coffee plant, see Coffea (botany). Summary sheet: Caffeine",
+    "systematicName": null,
+    "tolerance": {
+     "full": "develops with prolonged and repeated use",
+     "half": "3 - 7 days",
+     "zero": "1 - 2 weeks"
+    },
+    "toxicity": [
+     "The LD50 of caffeine in humans is dependent on individual sensitivity, but is estimated to be about 150 to 200 milligrams per kilogram of body mass or roughly 80 to 100 cups of coffee for an average adult"
+    ],
+    "uncertainInteractions": [
+     {
+      "name": "DOx"
+     },
+     {
+      "name": "25x-NBOMe"
+     },
+     {
+      "name": "ΑMT"
+     },
+     {
+      "name": "PCP"
+     },
+     {
+      "name": "Amphetamines"
+     },
+     {
+      "name": "MDMA"
+     },
+     {
+      "name": "Cocaine"
+     },
+     {
+      "name": "Lithium"
+     }
+    ],
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Caffeine"
+   },
+   {
+    "addictionPotential": "moderately habit-forming",
+    "class": {
+     "chemical": [
+      "Cannabinoid"
+     ],
+     "psychoactive": null
+    },
+    "commonNames": [
+     "Cannabis",
+     "Marijuana",
+     "Weed",
+     "Pot",
+     "Mary Jane",
+     "Grass",
+     "Herb",
+     "Green",
+     "Bud",
+     "Tree",
+     "THC"
+    ],
+    "crossTolerances": [
+     "cannabinoids"
+    ],
+    "dangerousInteractions": [
+     {
+      "name": "Lithium"
+     }
+    ],
+    "featured": true,
+    "name": "Cannabis",
+    "roas": [
+     {
+      "bioavailability": null,
+      "dose": {
+       "common": {
+        "max": 10.0,
+        "min": 5.0
+       },
+       "heavy": 25.0,
+       "light": {
+        "max": 5.0,
+        "min": 2.5
+       },
+       "strong": {
+        "max": 25.0,
+        "min": 10.0
+       },
+       "threshold": 1.0,
+       "units": "mg"
+      },
+      "duration": {
+       "afterglow": {
+        "max": 12.0,
+        "min": 6.0,
+        "units": "hours"
+       },
+       "comeup": {
+        "max": 60.0,
+        "min": 30.0,
+        "units": "minutes"
+       },
+       "duration": null,
+       "offset": {
+        "max": 6.0,
+        "min": 4.0,
+        "units": "hours"
+       },
+       "onset": {
+        "max": 60.0,
+        "min": 20.0,
+        "units": "minutes"
+       },
+       "peak": {
+        "max": 2.0,
+        "min": 1.0,
+        "units": "hours"
+       },
+       "total": {
+        "max": 10.0,
+        "min": 4.0,
+        "units": "hours"
+       }
+      },
+      "name": "oral"
+     },
+     {
+      "bioavailability": null,
+      "dose": {
+       "common": {
+        "max": 4.0,
+        "min": 2.0
+       },
+       "heavy": 10.0,
+       "light": {
+        "max": 2.0,
+        "min": 0.4
+       },
+       "strong": {
+        "max": 10.0,
+        "min": 4.0
+       },
+       "threshold": 0.4,
+       "units": "mg"
+      },
+      "duration": {
+       "afterglow": {
+        "max": 180.0,
+        "min": 45.0,
+        "units": "minutes"
+       },
+       "comeup": {
+        "max": 10.0,
+        "min": 5.0,
+        "units": "minutes"
+       },
+       "duration": null,
+       "offset": {
+        "max": 4.0,
+        "min": 3.0,
+        "units": "hours"
+       },
+       "onset": {
+        "max": 10.0,
+        "min": 0.1,
+        "units": "minutes"
+       },
+       "peak": {
+        "max": 45.0,
+        "min": 15.0,
+        "units": "minutes"
+       },
+       "total": {
+        "max": 5.0,
+        "min": 2.5,
+        "units": "hours"
+       }
+      },
+      "name": "smoked"
+     },
+     {
+      "bioavailability": null,
+      "dose": null,
+      "duration": {
+       "afterglow": null,
+       "comeup": {
+        "max": 30.0,
+        "min": 15.0,
+        "units": "minutes"
+       },
+       "duration": null,
+       "offset": {
+        "max": 6.0,
+        "min": 4.0,
+        "units": "hours"
+       },
+       "onset": {
+        "max": 10.0,
+        "min": 1.0,
+        "units": "minutes"
+       },
+       "peak": {
+        "max": 60.0,
+        "min": 30.0,
+        "units": "minutes"
+       },
+       "total": {
+        "max": 7.0,
+        "min": 3.0,
+        "units": "hours"
+       }
+      },
+      "name": "sublingual"
+     }
+    ],
+    "summary": "Summary sheet: Cannabis Cannabis",
+    "systematicName": null,
+    "tolerance": {
+     "full": "develops with prolonged and repeated use",
+     "half": "1 - 2 weeks",
+     "zero": "2 - 3 weeks"
+    },
+    "toxicity": null,
+    "uncertainInteractions": [
+     {
+      "name": "2C-T-x"
+     },
+     {
+      "name": "2C-x"
+     },
+     {
+      "name": "5-MeO-xxT"
+     },
+     {
+      "name": "Amphetamines"
+     },
+     {
+      "name": "aMT"
+     },
+     {
+      "name": "Cocaine"
+     },
+     {
+      "name": "DMT"
+     },
+     {
+      "name": "DOx"
+     },
+     {
+      "name": "LSD"
+     },
+     {
+      "name": "Mescaline"
+     },
+     {
+      "name": "Mushrooms"
+     },
+     {
+      "name": "25x-NBOMe"
+     }
+    ],
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Cannabis"
+   },
+   {
+    "addictionPotential": "produces dependence with chronic use and has moderate abuse potential",
+    "class": {
+     "chemical": [
+      "Substituted morphinans"
+     ],
+     "psychoactive": [
+      "Dissociatives"
+     ]
+    },
+    "commonNames": [
+     "DXM",
+     "DMO",
+     "DM",
+     "Dex",
+     "Robitussin",
+     "Delsym",
+     "DexAlone",
+     "Duract"
+    ],
+    "crossTolerances": [
+     "dissociatives"
+    ],
+    "dangerousInteractions": [
+     {
+      "name": "ΑMT"
+     },
+     {
+      "name": "PCP"
+     },
+     {
+      "name": "MDMA"
+     },
+     {
+      "name": "Alcohol"
+     },
+     {
+      "name": "GHB"
+     },
+     {
+      "name": "GBL"
+     },
+     {
+      "name": "Opioids"
+     },
+     {
+      "name": "Tramadol"
+     },
+     {
+      "name": "MAOIs"
+     },
+     {
+      "name": "SSRIs"
+     },
+     {
+      "name": "Antihistamines"
+     }
+    ],
+    "featured": true,
+    "name": "Dextromethorphan",
+    "roas": [
+     {
+      "bioavailability": null,
+      "dose": {
+       "common": {
+        "max": 400.0,
+        "min": 200.0
+       },
+       "heavy": 700.0,
+       "light": {
+        "max": 200.0,
+        "min": 100.0
+       },
+       "strong": {
+        "max": 700.0,
+        "min": 400.0
+       },
+       "threshold": 75.0,
+       "units": "mg"
+      },
+      "duration": {
+       "afterglow": {
+        "max": 24.0,
+        "min": 4.0,
+        "units": "hours"
+       },
+       "comeup": {
+        "max": 120.0,
+        "min": 60.0,
+        "units": "minutes"
+       },
+       "duration": null,
+       "offset": {
+        "max": 4.0,
+        "min": 2.0,
+        "units": "hours"
+       },
+       "onset": {
+        "max": 120.0,
+        "min": 30.0,
+        "units": "minutes"
+       },
+       "peak": {
+        "max": 6.0,
+        "min": 3.0,
+        "units": "hours"
+       },
+       "total": {
+        "max": 12.0,
+        "min": 8.0,
+        "units": "hours"
+       }
+      },
+      "name": "oral"
+     }
+    ],
+    "summary": "Summary sheet: Dextromethorphan Dextromethorphan",
+    "systematicName": null,
+    "tolerance": {
+     "full": "develops with prolonged and repeated use",
+     "half": "3 - 7 days",
+     "zero": "1 - 2 weeks"
+    },
+    "toxicity": [
+     "exact toxic dosage is unknown"
+    ],
+    "uncertainInteractions": [
+     {
+      "name": "Benzodiazepines"
+     },
+     {
+      "name": "Cannabis"
+     }
+    ],
+    "unsafeInteractions": [
+     {
+      "name": "DOx"
+     },
+     {
+      "name": "25x-NBOMe"
+     },
+     {
+      "name": "2C-T-x"
+     },
+     {
+      "name": "5-MeO-xxT"
+     },
+     {
+      "name": "Amphetamines"
+     },
+     {
+      "name": "Cocaine"
+     },
+     {
+      "name": "Bupropion"
+     }
+    ],
+    "url": "https://psychonautwiki.org/wiki/Dextromethorphan"
+   },
+   {
     "addictionPotential": "extremely addictive",
     "class": {
      "chemical": [
@@ -162,6 +1215,229 @@
     "uncertainInteractions": null,
     "unsafeInteractions": null,
     "url": "https://psychonautwiki.org/wiki/Metizolam"
+   },
+   {
+    "addictionPotential": "not habit-forming",
+    "class": {
+     "chemical": [
+      "Piperazinoazepine"
+     ],
+     "psychoactive": [
+      "Deliriant",
+      "Depressant",
+      "Antidepressants"
+     ]
+    },
+    "commonNames": [
+     "Avanza",
+     "Axit",
+     "Mirtaz",
+     "Mirtazon",
+     "Remeron",
+     "Zispin"
+    ],
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": true,
+    "name": "Mirtazapine",
+    "roas": [
+     {
+      "bioavailability": null,
+      "dose": {
+       "common": {
+        "max": 190.0,
+        "min": 130.0
+       },
+       "heavy": 250.0,
+       "light": {
+        "max": 130.0,
+        "min": 70.0
+       },
+       "strong": {
+        "max": 250.0,
+        "min": 190.0
+       },
+       "threshold": 3.5,
+       "units": "mg"
+      },
+      "duration": {
+       "afterglow": null,
+       "comeup": null,
+       "duration": null,
+       "offset": {
+        "max": 6.0,
+        "min": 2.0,
+        "units": "hours"
+       },
+       "onset": {
+        "max": 30.0,
+        "min": 15.0,
+        "units": "minutes"
+       },
+       "peak": {
+        "max": 180.0,
+        "min": 90.0,
+        "units": "minutes"
+       },
+       "total": {
+        "max": 24.0,
+        "min": 14.0,
+        "units": "hours"
+       }
+      },
+      "name": "oral"
+     }
+    ],
+    "summary": "Summary sheet: Mirtazapine Mirtazapine",
+    "systematicName": null,
+    "tolerance": {
+     "full": "almost immediately after ingestion",
+     "half": "3 days",
+     "zero": "7 days"
+    },
+    "toxicity": null,
+    "uncertainInteractions": [
+     {
+      "name": "Antidepressants"
+     }
+    ],
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Mirtazapine"
+   },
+   {
+    "addictionPotential": "not addictive with a low potential for abuse",
+    "class": {
+     "chemical": [
+      "Benzhydryl"
+     ],
+     "psychoactive": [
+      "Stimulants",
+      "Eugeroics"
+     ]
+    },
+    "commonNames": [
+     "Modafinil",
+     "Alertec",
+     "Modavigil",
+     "Modiodal",
+     "Provigil",
+     "Modalert"
+    ],
+    "crossTolerances": [
+     "benzhydryl",
+     "nootropic|nootropics"
+    ],
+    "dangerousInteractions": [
+     {
+      "name": "25x-NBOMe"
+     },
+     {
+      "name": "25x-NBOH"
+     },
+     {
+      "name": "Tramadol"
+     },
+     {
+      "name": "MAOIs"
+     },
+     {
+      "name": "Hormonal Birth Control"
+     },
+     {
+      "name": "CYP2C19-substrates"
+     }
+    ],
+    "featured": true,
+    "name": "Modafinil",
+    "roas": [
+     {
+      "bioavailability": null,
+      "dose": {
+       "common": {
+        "max": 200.0,
+        "min": 100.0
+       },
+       "heavy": 300.0,
+       "light": {
+        "max": 100.0,
+        "min": 50.0
+       },
+       "strong": {
+        "max": 300.0,
+        "min": 200.0
+       },
+       "threshold": 25.0,
+       "units": "mg"
+      },
+      "duration": {
+       "afterglow": {
+        "max": 6.0,
+        "min": 2.0,
+        "units": "hours"
+       },
+       "comeup": {
+        "max": 60.0,
+        "min": 20.0,
+        "units": "minutes"
+       },
+       "duration": null,
+       "offset": {
+        "max": 3.0,
+        "min": 1.0,
+        "units": "hours"
+       },
+       "onset": {
+        "max": 60.0,
+        "min": 20.0,
+        "units": "minutes"
+       },
+       "peak": {
+        "max": 5.0,
+        "min": 3.5,
+        "units": "hours"
+       },
+       "total": {
+        "max": 10.0,
+        "min": 5.0,
+        "units": "hours"
+       }
+      },
+      "name": "oral"
+     }
+    ],
+    "summary": "Summary sheet: Modafinil Modafinil",
+    "systematicName": null,
+    "tolerance": {
+     "full": "develops with prolonged and repeated use",
+     "half": "3 - 7 days",
+     "zero": "1 - 2 weeks"
+    },
+    "toxicity": [
+     "The median lethal dose at which 50% of participants die (LD50) from modafinil for human beings has never been reached"
+    ],
+    "uncertainInteractions": [
+     {
+      "name": "Alcohol"
+     },
+     {
+      "name": "MXE"
+     },
+     {
+      "name": "Dissociatives"
+     }
+    ],
+    "unsafeInteractions": [
+     {
+      "name": "DXM"
+     },
+     {
+      "name": "MDMA"
+     },
+     {
+      "name": "Stimulants"
+     }
+    ],
+    "url": "https://psychonautwiki.org/wiki/Modafinil"
    },
    {
     "addictionPotential": null,
@@ -342,6 +1618,117 @@
     "url": "https://psychonautwiki.org/wiki/Morphine"
    },
    {
+    "addictionPotential": "is not known to be addictive",
+    "class": {
+     "chemical": [
+      "Phenylpropenes"
+     ],
+     "psychoactive": [
+      "Deliriant"
+     ]
+    },
+    "commonNames": [
+     "Nutmeg"
+    ],
+    "crossTolerances": null,
+    "dangerousInteractions": [
+     {
+      "name": "Opioids"
+     },
+     {
+      "name": "DXM"
+     },
+     {
+      "name": "DPH"
+     }
+    ],
+    "featured": null,
+    "name": "Myristicin",
+    "roas": [
+     {
+      "bioavailability": null,
+      "dose": {
+       "common": {
+        "max": 500.0,
+        "min": 200.0
+       },
+       "heavy": 800.0,
+       "light": {
+        "max": 200.0,
+        "min": 50.0
+       },
+       "strong": {
+        "max": 800.0,
+        "min": 500.0
+       },
+       "threshold": null,
+       "units": "mg"
+      },
+      "duration": {
+       "afterglow": {
+        "max": 72.0,
+        "min": 24.0,
+        "units": "hours"
+       },
+       "comeup": {
+        "max": 4.0,
+        "min": 1.0,
+        "units": "hours"
+       },
+       "duration": null,
+       "offset": {
+        "max": 48.0,
+        "min": 12.0,
+        "units": "hours"
+       },
+       "onset": {
+        "max": 8.0,
+        "min": 3.0,
+        "units": "hours"
+       },
+       "peak": {
+        "max": 12.0,
+        "min": 9.0,
+        "units": "hours"
+       },
+       "total": {
+        "max": 72.0,
+        "min": 12.0,
+        "units": "hours"
+       }
+      },
+      "name": "oral"
+     }
+    ],
+    "summary": "Summary sheet: Myristicin Myristicin",
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": [
+     "is neurotoxic",
+     "can be fatal in extremely high doses"
+    ],
+    "uncertainInteractions": [
+     {
+      "name": "Benzodiazepines"
+     },
+     {
+      "name": "Depressants"
+     }
+    ],
+    "unsafeInteractions": [
+     {
+      "name": "Stimulants"
+     },
+     {
+      "name": "Alcohol"
+     },
+     {
+      "name": "Serotonin releasers"
+     }
+    ],
+    "url": "https://psychonautwiki.org/wiki/Myristicin"
+   },
+   {
     "addictionPotential": "mildly addictive with a low potential for abuse",
     "class": {
      "chemical": [
@@ -447,6 +1834,162 @@
      }
     ],
     "url": "https://psychonautwiki.org/wiki/N-Methylbisfluoromodafinil"
+   },
+   {
+    "addictionPotential": null,
+    "class": {
+     "chemical": [
+      "Gabapentinoids"
+     ],
+     "psychoactive": [
+      "Depressant"
+     ]
+    },
+    "commonNames": [
+     "Pregabalin",
+     "Lyrica",
+     "Nervalin"
+    ],
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": true,
+    "name": "Pregabalin",
+    "roas": [
+     {
+      "bioavailability": {
+       "max": 90.0,
+       "min": null
+      },
+      "dose": {
+       "common": {
+        "max": 600.0,
+        "min": 225.0
+       },
+       "heavy": 900.0,
+       "light": {
+        "max": 225.0,
+        "min": 50.0
+       },
+       "strong": {
+        "max": 900.0,
+        "min": 600.0
+       },
+       "threshold": 50.0,
+       "units": "mg"
+      },
+      "duration": {
+       "afterglow": {
+        "max": 10.0,
+        "min": 4.0,
+        "units": "hours"
+       },
+       "comeup": {
+        "max": 2.0,
+        "min": 1.0,
+        "units": "hours"
+       },
+       "duration": null,
+       "offset": {
+        "max": 8.0,
+        "min": 4.0,
+        "units": "hours"
+       },
+       "onset": {
+        "max": 45.0,
+        "min": 30.0,
+        "units": "minutes"
+       },
+       "peak": {
+        "max": 6.0,
+        "min": 4.0,
+        "units": "hours"
+       },
+       "total": {
+        "max": 17.0,
+        "min": 9.0,
+        "units": "hours"
+       }
+      },
+      "name": "oral"
+     },
+     {
+      "bioavailability": null,
+      "dose": {
+       "common": {
+        "max": 450.0,
+        "min": 200.0
+       },
+       "heavy": 600.0,
+       "light": {
+        "max": 200.0,
+        "min": 40.0
+       },
+       "strong": {
+        "max": 600.0,
+        "min": 450.0
+       },
+       "threshold": 40.0,
+       "units": "mg"
+      },
+      "duration": {
+       "afterglow": {
+        "max": 12.0,
+        "min": 6.0,
+        "units": "hours"
+       },
+       "comeup": {
+        "max": 120.0,
+        "min": 30.0,
+        "units": "minutes"
+       },
+       "duration": null,
+       "offset": {
+        "max": 5.0,
+        "min": 3.0,
+        "units": "hours"
+       },
+       "onset": {
+        "max": 30.0,
+        "min": 15.0,
+        "units": "minutes"
+       },
+       "peak": {
+        "max": 3.0,
+        "min": 2.0,
+        "units": "hours"
+       },
+       "total": {
+        "max": 8.0,
+        "min": 5.0,
+        "units": "hours"
+       }
+      },
+      "name": "rectal"
+     }
+    ],
+    "summary": "Fatal overdose may occur when gabapentinoids are combined with other depressants such as opiates, benzodiazepines, barbiturates, thienodiazepines, alcohol or other GABAergic substances.[1] It is strongly discouraged to combine these substances, particularly in common to heavy doses.",
+    "systematicName": null,
+    "tolerance": {
+     "full": "within several months of continuous use",
+     "half": null,
+     "zero": "7 - 14 days"
+    },
+    "toxicity": [
+     "low toxicity"
+    ],
+    "uncertainInteractions": [
+     {
+      "name": "Oxycodone"
+     },
+     {
+      "name": "SSRI"
+     },
+     {
+      "name": "MDMA"
+     }
+    ],
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Pregabalin"
    },
    {
     "addictionPotential": "mildly addictive",
