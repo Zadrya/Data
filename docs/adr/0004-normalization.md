@@ -57,13 +57,15 @@ Each route has up to eight blocks: the dose, the six duration phases and the bio
 
 A block is never assembled half from one source and half from the other, with the single exception of the unit qualifier below. An API block that was rejected, a base block used because the API has none, and a block dropped because neither is consistent are reported. A dose that states units only is "weak": it is used only when the other source has no boundaries either. When the API states units only and the base block is inconsistent, the units are kept and the loss of the base block is reported as `block-dropped`, with the reason the base block was unusable; nothing is lost without a finding.
 
-**What changed against the base file.** When the chosen block comes from the API and the base has a consistent block for the same route, every difference is reported, so that the dataset review sees each one:
+**What changed against the base file.** When the chosen block comes from the API and the base has a consistent block for the same route, every difference is reported, so that the dataset review sees each one. That includes every value the base states and the chosen API block does not, so no base value disappears without a finding:
 
 - `dose-changed`, one finding per boundary, with its direction (`lower` or `higher`). A higher `strongMin` or `heavyMin` is the risky direction, because the doses between the two values now show in the class below; such a finding says `HIGHER (risky)` and names those doses. When the units differ, the numbers are listed without a direction, because they cannot be compared.
 - `unit-changed` when the units differ.
+- `dose-boundary-not-in-api`, one finding per boundary the base dose states and the chosen API dose does not. Under the rules above this can only be `thresholdMin` (or `lightMin`, which the base never states): a missing upper boundary rejects the API block instead.
 - `duration-changed`, one finding per bound of a phase, in minutes, with its direction.
+- `duration-bound-not-in-api`, one finding per bound the base phase states and the chosen API phase does not.
 
-Today: Clonazolam oral (common 200 to 125 µg, strong 400 to 300, heavy 999 to 500) and N-Ethylhexedrone insufflated (30, 40, 50 to 24, 30, 40 mg), all lower; durations of Cocaine insufflated, NEP insufflated (total), Oxycodone oral and insufflated. No higher `strongMin` or `heavyMin`, and no change of unit.
+Today: Clonazolam oral (common 200 to 125 µg, strong 400 to 300, heavy 999 to 500) and N-Ethylhexedrone insufflated (30, 40, 50 to 24, 30, 40 mg), all lower; durations of Cocaine insufflated, NEP insufflated (total), Oxycodone oral and insufflated. No higher `strongMin` or `heavyMin`, and no change of unit. `dose-boundary-not-in-api` occurs on 8 routes, the same 8 that carry `dose-label-differs` below: the API has no threshold and states the base threshold as its light minimum, so the number is kept under another label and both findings say so. `duration-bound-not-in-api` does not occur.
 
 ### Dose
 
@@ -83,7 +85,7 @@ The schema stores five boundaries (ADR 1). They come from the API as:
 
 From the base file: `thresholdMin` is the base `lightMin` (the lowest number of the Journal app is the wiki threshold, ADR 1), `lightMin` is absent, and `commonMin`, `strongMin`, `heavyMin` are as named.
 
-On 8 routes the API has no threshold and a light minimum: `lightMin` is set, `thresholdMin` is absent, and the difference in label against the base file, which calls the same number the threshold, is reported.
+On 8 routes the API has no threshold and a light minimum: `lightMin` is set, `thresholdMin` is absent, and the difference in label against the base file, which calls the same number the threshold, is reported (`dose-label-differs`). The base `thresholdMin` is also reported as not in the API block (`dose-boundary-not-in-api`). On all 8 routes the two numbers are equal (4-HO-EPT oral, EPT insufflated, JWH-073 smoked, Methylnaphthidate insufflated, Metizolam oral, Myristicin oral, Progesterone oral and rectal).
 
 A block is **consistent** when it has usable units, every API range (light, common, strong) has its minimum at or below its maximum, and every boundary is finite, not negative and not below the one before it, in the order threshold, light, common, strong, heavy, skipping absent ones. An inverted range makes the whole API block inconsistent before anything is mapped or filled, since neither its minimum nor its maximum can be trusted. The order check runs on the direct values first and then on each fill. Equal neighbours are allowed and reported: 100 today, 98 of them a threshold equal to the light minimum, plus 4-MeO-PCP insufflated (strong and heavy both 150) and Theacrine insufflated (threshold and common both 25).
 
