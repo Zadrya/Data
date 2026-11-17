@@ -1,0 +1,90 @@
+{
+  "rule": "When the API dose is chosen, every boundary the base dose states and the API block does not is reported, so that no base value disappears without a finding. Here the API has no threshold, so the base thresholdMin 10 is not in the result. The upper boundaries are all present, so the API block is kept.",
+  "base": [
+    {
+      "name": "Examplamine",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg",
+            "lightMin": 10,
+            "commonMin": 20,
+            "strongMin": 40,
+            "heavyMin": 80
+          }
+        }
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "Examplamine",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg",
+            "common": {
+              "min": 20,
+              "max": 40
+            },
+            "strong": {
+              "min": 40,
+              "max": 80
+            },
+            "heavy": 80
+          }
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "roas"
+  ],
+  "reportKinds": [
+    "api-block-rejected",
+    "base-block-used",
+    "block-dropped",
+    "dose-boundary-filled",
+    "dose-fill-discarded",
+    "dose-equal-boundaries",
+    "dose-label-differs",
+    "unit-repaired",
+    "unit-not-mass",
+    "duration-rounded",
+    "api-phase-ignored",
+    "route-only-in-base",
+    "route-only-in-api",
+    "unit-qualifier-not-adopted",
+    "unit-changed",
+    "dose-changed",
+    "duration-changed",
+    "dose-boundary-not-in-api",
+    "duration-bound-not-in-api"
+  ],
+  "expected": [
+    {
+      "name": "Examplamine",
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {
+            "units": "mg",
+            "commonMin": 20,
+            "strongMin": 40,
+            "heavyMin": 80
+          }
+        }
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "dose-boundary-not-in-api",
+      "substance": "Examplamine",
+      "route": "oral",
+      "detail": "dose: thresholdMin 10 mg, not in the API block"
+    }
+  ]
+}

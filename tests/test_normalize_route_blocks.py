@@ -176,6 +176,26 @@ def test_dose_changes_in_other_units_are_listed_without_a_direction() -> None:
     assert dose_changes(chosen, base) == [
         (Kind.UNIT_CHANGED, "units 'mg' to 'g'"),
         (Kind.DOSE_CHANGED, "commonMin 1000 mg to 1 g, in other units: not compared"),
+        (Kind.DOSE_BOUNDARY_NOT_IN_API, "heavyMin 5 mg, not in the API block"),
+    ]
+
+
+def test_base_boundaries_missing_from_the_api_dose_are_findings() -> None:
+    chosen: Dose = {"units": "mg", "lightMin": 2, "commonMin": 5}
+    base: Dose = {"units": "mg", "thresholdMin": 2, "commonMin": 5, "heavyMin": 20}
+
+    assert dose_changes(chosen, base) == [
+        (Kind.DOSE_BOUNDARY_NOT_IN_API, "thresholdMin 2 mg, not in the API block"),
+        (Kind.DOSE_BOUNDARY_NOT_IN_API, "heavyMin 20 mg, not in the API block"),
+    ]
+
+
+def test_base_bounds_missing_from_the_api_phase_are_findings() -> None:
+    assert duration_changes("total", {"min": 60}, {"min": 60, "max": 240}) == [
+        (Kind.DURATION_BOUND_NOT_IN_API, "total max 240 minutes, not in the API phase"),
+    ]
+    assert duration_changes("onset", {"max": 30}, {"min": 10, "max": 30}) == [
+        (Kind.DURATION_BOUND_NOT_IN_API, "onset min 10 minutes, not in the API phase"),
     ]
 
 
@@ -184,7 +204,9 @@ def test_duration_changes_name_each_bound_and_its_direction() -> None:
         (Kind.DURATION_CHANGED, "total min 120 to 60 minutes, lower"),
         (Kind.DURATION_CHANGED, "total max 240 to 300 minutes, higher"),
     ]
-    assert duration_changes("peak", {"min": 60}, {"max": 90}) == []
+    assert duration_changes("peak", {"min": 60}, {"max": 90}) == [
+        (Kind.DURATION_BOUND_NOT_IN_API, "peak max 90 minutes, not in the API phase"),
+    ]
     assert duration_changes("peak", {"min": 0.75}, {"min": 0.75}) == []
 
 

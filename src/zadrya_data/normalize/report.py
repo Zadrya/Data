@@ -48,7 +48,9 @@ class Kind(StrEnum):
     UNIT_QUALIFIER_NOT_ADOPTED = "unit-qualifier-not-adopted"
     UNIT_CHANGED = "unit-changed"
     DOSE_CHANGED = "dose-changed"
+    DOSE_BOUNDARY_NOT_IN_API = "dose-boundary-not-in-api"
     DURATION_CHANGED = "duration-changed"
+    DURATION_BOUND_NOT_IN_API = "duration-bound-not-in-api"
     DURATION_ROUNDED = "duration-rounded"
 
 
