@@ -1,0 +1,142 @@
+{
+  "rule": "half and zero keep the wording of the wiki as text and, when it reads as a time (a number or two numbers joined by a hyphen, then minute, hour, day, week or month in singular or plural, without case), add the range in minutes: a minute is 1, an hour 60, a day 1440, a week 10080 and a month 30 days (43200), never a calendar month. A single number gives min equal to max. A wording that is not a time, or whose first number is above the second, keeps its text without numbers and is reported.",
+  "base": [
+    {
+      "name": "A",
+      "tolerance": {
+        "half": "1-1.5 months",
+        "zero": "2 Weeks"
+      }
+    },
+    {
+      "name": "B",
+      "tolerance": {
+        "half": "1 hour",
+        "zero": "3 - 7 days"
+      }
+    },
+    {
+      "name": "C",
+      "tolerance": {
+        "half": "45 minutes",
+        "zero": "2.5 month"
+      }
+    },
+    {
+      "name": "D",
+      "tolerance": {
+        "half": "a few days",
+        "zero": "7 - 3 days"
+      }
+    },
+    {
+      "name": "E",
+      "tolerance": {
+        "half": "1 year",
+        "zero": "about 2 weeks"
+      }
+    }
+  ],
+  "api": [],
+  "compare": [
+    "tolerance"
+  ],
+  "reportKinds": [
+    "tolerance-not-parsed"
+  ],
+  "expected": [
+    {
+      "name": "A",
+      "tolerance": {
+        "half": {
+          "text": "1-1.5 months",
+          "min": 43200,
+          "max": 64800
+        },
+        "zero": {
+          "text": "2 Weeks",
+          "min": 20160,
+          "max": 20160
+        }
+      }
+    },
+    {
+      "name": "B",
+      "tolerance": {
+        "half": {
+          "text": "1 hour",
+          "min": 60,
+          "max": 60
+        },
+        "zero": {
+          "text": "3 - 7 days",
+          "min": 4320,
+          "max": 10080
+        }
+      }
+    },
+    {
+      "name": "C",
+      "tolerance": {
+        "half": {
+          "text": "45 minutes",
+          "min": 45,
+          "max": 45
+        },
+        "zero": {
+          "text": "2.5 month",
+          "min": 108000,
+          "max": 108000
+        }
+      }
+    },
+    {
+      "name": "D",
+      "tolerance": {
+        "half": {
+          "text": "a few days"
+        },
+        "zero": {
+          "text": "7 - 3 days"
+        }
+      }
+    },
+    {
+      "name": "E",
+      "tolerance": {
+        "half": {
+          "text": "1 year"
+        },
+        "zero": {
+          "text": "about 2 weeks"
+        }
+      }
+    }
+  ],
+  "report": [
+    {
+      "kind": "tolerance-not-parsed",
+      "substance": "D",
+      "route": null,
+      "detail": "half: 'a few days' does not read as a time, the text is kept without numbers"
+    },
+    {
+      "kind": "tolerance-not-parsed",
+      "substance": "D",
+      "route": null,
+      "detail": "zero: '7 - 3 days' does not read as a time, the text is kept without numbers"
+    },
+    {
+      "kind": "tolerance-not-parsed",
+      "substance": "E",
+      "route": null,
+      "detail": "half: '1 year' does not read as a time, the text is kept without numbers"
+    },
+    {
+      "kind": "tolerance-not-parsed",
+      "substance": "E",
+      "route": null,
+      "detail": "zero: 'about 2 weeks' does not read as a time, the text is kept without numbers"
+    }
+  ]
+}

@@ -139,7 +139,6 @@ def test_what_the_next_slice_fills_in_is_empty(whole: Normalized) -> None:
     for substance in whole.document["substances"]:
         assert substance["crossTolerances"] == []
         assert substance["interactions"] == {"dangerous": [], "unsafe": [], "uncertain": []}
-        assert "tolerance" not in substance
 
 
 def test_lsd_is_merged_from_both_sources(whole: Normalized) -> None:

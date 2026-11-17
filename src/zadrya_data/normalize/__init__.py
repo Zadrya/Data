@@ -9,12 +9,13 @@ same document and the same report. One module holds each concern:
 - ``fields``: summary, risks, safer use, addiction potential, toxicities;
 - ``categories`` and ``classes``;
 - ``routes`` with ``dose``, ``duration`` and ``bioavailability``, merged by ``blocks``;
+- ``tolerance``;
 - ``report``: every drop, fallback and repair.
 
-Tolerance, cross tolerance and interactions are not normalized yet. Until they are,
-every substance has empty ``crossTolerances`` and interaction lists and no
-``tolerance``, and both group lists are empty, so the document already has the shape
-of the schema. ``_not_yet_normalized`` is the one place that says so.
+Cross tolerance and interactions are not normalized yet. Until they are, every
+substance has empty ``crossTolerances`` and interaction lists, and both group lists
+are empty, so the document already has the shape of the schema.
+``_not_yet_normalized`` is the one place that says so.
 """
 
 from dataclasses import dataclass
@@ -29,6 +30,7 @@ from zadrya_data.normalize.fields import substance_fields
 from zadrya_data.normalize.names import aliases
 from zadrya_data.normalize.report import Finding, Kind, Report
 from zadrya_data.normalize.routes import normalize_routes
+from zadrya_data.normalize.tolerance import substance_tolerance
 from zadrya_data.snapshot import Snapshot
 
 __all__ = ["Finding", "Kind", "NormalizationError", "Normalized", "Report", "normalize"]
@@ -83,6 +85,9 @@ def _substance(entry: Entry, known_categories: set[str], report: Report) -> dict
     }
     substance |= substance_fields(entry.name, base, api, report)
     substance["roas"] = normalize_routes(entry.name, base, api, report)
+    tolerance = substance_tolerance(entry.name, base, api, report)
+    if tolerance is not None:
+        substance["tolerance"] = tolerance
     substance |= _not_yet_normalized()
     return substance
 
