@@ -7,7 +7,13 @@ from zadrya_data.base import BaseDose
 from zadrya_data.graphql import ApiDose, ApiRange
 from zadrya_data.normalize.bioavailability import bioavailability
 from zadrya_data.normalize.blocks import Candidate
-from zadrya_data.normalize.dose import from_api, from_base
+from zadrya_data.normalize.dose import (
+    Dose,
+    from_api,
+    from_base,
+    lost_upper_boundaries,
+    require_upper_boundaries,
+)
 from zadrya_data.normalize.duration import phase
 from zadrya_data.normalize.report import Kind
 
@@ -80,6 +86,50 @@ def test_a_range_with_equal_or_one_bound_is_not_inverted() -> None:
         "commonMin": 5,
         "strongMin": 20,
     }
+
+
+# ---- upper boundaries the base has
+
+
+def _dose(**values: object) -> Candidate[Dose]:
+    return Candidate({"units": "mg"} | values)  # type: ignore[arg-type]
+
+
+def test_an_api_block_without_an_upper_boundary_of_the_base_is_rejected() -> None:
+    api = _dose(thresholdMin=1, commonMin=5, strongMin=10)
+    base = _dose(thresholdMin=1, commonMin=5, strongMin=10, heavyMin=20)
+
+    assert require_upper_boundaries(api, base) == Candidate(
+        problem="missing upper boundaries the base has (heavyMin)"
+    )
+    assert require_upper_boundaries(_dose(heavyMin=20), base).problem == (
+        "missing upper boundaries the base has (commonMin, strongMin)"
+    )
+
+
+@pytest.mark.parametrize(
+    ("api", "base"),
+    [
+        (_dose(lightMin=2, commonMin=5), _dose(thresholdMin=1, commonMin=5)),
+        (_dose(commonMin=5, heavyMin=9), _dose(commonMin=5)),
+        (Candidate({"units": "mg"}, weak=True), _dose(heavyMin=9)),
+        (_dose(commonMin=5), Candidate({"units": "mg"}, weak=True)),
+        (_dose(commonMin=5), Candidate(problem="inverted")),
+        (Candidate(problem="inverted"), _dose(heavyMin=9)),
+    ],
+)
+def test_other_differences_keep_the_api_block(api: Candidate[Dose], base: Candidate[Dose]) -> None:
+    assert require_upper_boundaries(api, base) is api
+
+
+def test_lost_upper_boundaries() -> None:
+    base = _dose(commonMin=5, strongMin=10, heavyMin=20)
+
+    assert lost_upper_boundaries(base, {"units": "mg", "commonMin": 5}) == ["strongMin", "heavyMin"]
+    assert lost_upper_boundaries(base, None) == ["commonMin", "strongMin", "heavyMin"]
+    assert lost_upper_boundaries(base, base.value) == []
+    assert lost_upper_boundaries(Candidate(problem="inverted"), None) == []
+    assert lost_upper_boundaries(Candidate({"units": "mg"}, weak=True), None) == []
 
 
 def test_a_label_difference_needs_a_lowest_base_boundary() -> None:
