@@ -95,14 +95,14 @@ def parse_answer(answer: object, titles: Iterable[str]) -> list[WikiPage]:
     pages = []
     for requested in titles:
         title = normalized.get(requested, requested)
-        for _ in range(MAX_REDIRECTS):
-            if title not in redirects:
-                break
+        hops = 0
+        while title in redirects:
+            if hops == MAX_REDIRECTS:
+                raise WikiFormatError(
+                    f"$.query.redirects: more than {MAX_REDIRECTS} redirects from '{requested}'"
+                )
             title = redirects[title]
-        else:
-            raise WikiFormatError(
-                f"$.query.redirects: more than {MAX_REDIRECTS} redirects from '{requested}'"
-            )
+            hops += 1
         if title not in by_title:
             raise WikiFormatError(f"$.query.pages: no page for the requested title '{requested}'")
         found = by_title[title]
