@@ -51,6 +51,8 @@ class Kind(StrEnum):
     DOSE_BOUNDARY_NOT_IN_API = "dose-boundary-not-in-api"
     DURATION_CHANGED = "duration-changed"
     DURATION_BOUND_NOT_IN_API = "duration-bound-not-in-api"
+    BIOAVAILABILITY_CHANGED = "bioavailability-changed"
+    BIOAVAILABILITY_BOUND_NOT_IN_API = "bioavailability-bound-not-in-api"
     DURATION_ROUNDED = "duration-rounded"
 
 
