@@ -55,7 +55,15 @@ Each route has up to eight blocks: the dose, the six duration phases and the bio
 2. otherwise the base block, when it is present and consistent;
 3. otherwise no block.
 
-A block is never assembled half from one source and half from the other, with the single exception of the unit qualifier below. An API block that was rejected, a base block used because the API has none, and a block dropped because neither is consistent are reported. A dose that states units only is "weak": it is used only when the other source has no boundaries either.
+A block is never assembled half from one source and half from the other, with the single exception of the unit qualifier below. An API block that was rejected, a base block used because the API has none, and a block dropped because neither is consistent are reported. A dose that states units only is "weak": it is used only when the other source has no boundaries either. When the API states units only and the base block is inconsistent, the units are kept and the loss of the base block is reported as `block-dropped`, with the reason the base block was unusable; nothing is lost without a finding.
+
+**What changed against the base file.** When the chosen block comes from the API and the base has a consistent block for the same route, every difference is reported, so that the dataset review sees each one:
+
+- `dose-changed`, one finding per boundary, with its direction (`lower` or `higher`). A higher `strongMin` or `heavyMin` is the risky direction, because the doses between the two values now show in the class below; such a finding says `HIGHER (risky)` and names those doses. When the units differ, the numbers are listed without a direction, because they cannot be compared.
+- `unit-changed` when the units differ.
+- `duration-changed`, one finding per bound of a phase, in minutes, with its direction.
+
+Today: Clonazolam oral (common 200 to 125 µg, strong 400 to 300, heavy 999 to 500) and N-Ethylhexedrone insufflated (30, 40, 50 to 24, 30, 40 mg), all lower; durations of Cocaine insufflated, NEP insufflated (total), Oxycodone oral and insufflated. No higher `strongMin` or `heavyMin`, and no change of unit.
 
 ### Dose
 
@@ -71,11 +79,15 @@ The schema stores five boundaries (ADR 1). They come from the API as:
 
 **Why maxima are used as fills, and only as fills.** Range maxima are not stored, because adjacent ranges leave gaps (ADR 1). But dropping them entirely loses information: on 41 routes the API has no `heavy` value and a `strong.max`, and on 11 it has no `strong` range and a `common.max`. Without the fill those routes would have no `heavyMin` (or `strongMin`), and the app would show any dose above the last boundary, however large, in the lower class. They include Fentanyl insufflated (75 µg), Acetylfentanyl, 25I-NBOMe sublingual (1000 µg) and the other NBOMe and NBOH compounds, PCP, PCE and Rolicyclidine on all routes, Pentobarbital, Phenobarbital and Secobarbital (300 mg), Methaqualone, Pethidine and 5-MeO-DMT insufflated; and for `strongMin`, PMA, PMMA, Ibogaine and Naloxone. The base file has exactly the filled number on all 40 and 11 routes it shares with the API, so the Journal app did the same. A fill is used only when the direct value is absent, moves one step only, and is discarded and reported if it would break the order (none today). Each fill is reported.
 
+**Upper boundaries the base has are never lost.** For a route in both sources, after fills, an API block that lacks `commonMin`, `strongMin` or `heavyMin` while the consistent base block has it is rejected, and the whole base block is used, reported as `api-block-rejected` with the reason "missing upper boundaries the base has". Losing an upper boundary is the unsafe direction (larger doses would show in a lower class), so a stale but complete block is preferred to a fresh but truncated one. Differences only in `thresholdMin` or `lightMin` keep the API block and are reported as label differences. Normalization then checks every route with a consistent base dose: if its result lacks an upper boundary the base has, it stops with an error instead of producing the output. This guard runs on whatever input normalization is given, not only on the recorded data. Today the rule changes no route: the fills already supply every upper boundary the base has.
+
 From the base file: `thresholdMin` is the base `lightMin` (the lowest number of the Journal app is the wiki threshold, ADR 1), `lightMin` is absent, and `commonMin`, `strongMin`, `heavyMin` are as named.
 
 On 8 routes the API has no threshold and a light minimum: `lightMin` is set, `thresholdMin` is absent, and the difference in label against the base file, which calls the same number the threshold, is reported.
 
-A block is **consistent** when it has usable units and every boundary is finite, not negative and not below the one before it, in the order threshold, light, common, strong, heavy, skipping absent ones. Equal neighbours are allowed and reported (101 today, 99 of them a threshold equal to the light minimum). The check runs on the direct values first and then on each fill.
+A block is **consistent** when it has usable units, every API range (light, common, strong) has its minimum at or below its maximum, and every boundary is finite, not negative and not below the one before it, in the order threshold, light, common, strong, heavy, skipping absent ones. An inverted range makes the whole API block inconsistent before anything is mapped or filled, since neither its minimum nor its maximum can be trusted. The order check runs on the direct values first and then on each fill. Equal neighbours are allowed and reported: 100 today, 98 of them a threshold equal to the light minimum, plus 4-MeO-PCP insufflated (strong and heavy both 150) and Theacrine insufflated (threshold and common both 25).
+
+One real API block has an inverted range: **HXE insufflated**, whose light range is 40 to 20. The base block (20, 40, 70, 120 mg) is used and the rejection is reported. Before this rule the API block was used, with a light minimum of 40 equal to its common minimum.
 
 Two real dose blocks are inconsistent and are dropped:
 
@@ -86,7 +98,9 @@ Two real dose blocks are inconsistent and are dropped:
 
 Units are stripped and kept as written, with one repair: the Greek letter mu becomes the micro sign (6 routes: Clonidine, Fentanyl on three routes, Flubromazolam, Sufentanil). Every final unit other than `µg`, `mg` and `g` is reported and left alone: `mL` (1,4-Butanediol, 2M2B, GBL), `Mg#` (Apomorphine), `mg/kg of body weight` (Ibogaine), `seeds` (LSA, two routes), `mg THC` and `mg Psilocybin`. Boundaries without units are inconsistent.
 
-**The unit qualifier: the single, deliberate exception to "never mix sources".** When a route is in both sources, the API block is the one chosen, and the base unit is exactly the API unit, one space and a qualifier (after the Greek mu repair), the dose keeps every API number and takes the base unit. Only the unit string crosses; no number ever does. It happens on three routes, the only ones where the units of the two sources differ: Cannabis oral and smoked (`mg` against `mg THC`) and Psilocybin mushrooms oral (`mg` against `mg Psilocybin`). The numbers are milligrams of the active compound, not of the material a user weighs. Plain `mg` is a mass unit the app may convert (ADR 1), so half a gram of flower or two grams of dried mushrooms would be compared with 10 mg and 50 mg and shown as far beyond heavy. With the qualifier the unit is opaque, never converted, and says what the number measures. An unrelated base unit (`seeds` against `mg`) is not adopted. Each adoption is reported.
+**The unit qualifier: the single, deliberate exception to "never mix sources".** When a route is in both sources, the API block is the one chosen, and the base unit is in the list `QUALIFIED_UNITS` (`normalize/dose.py`) and is the API unit followed by a space and a qualifier (compared after the Greek mu repair), the dose keeps every API number and takes the base unit. Only the unit string crosses; no number ever does. The list is **proposed: the owner confirms it in the dataset review**. It holds `mg THC` and `mg Psilocybin`, the three routes where the units of the two sources differ: Cannabis oral and smoked and Psilocybin mushrooms oral. The numbers are milligrams of the active compound, not of the material a user weighs. Plain `mg` is a mass unit the app may convert (ADR 1), so half a gram of flower or two grams of dried mushrooms would be compared with 10 mg and 50 mg and shown as far beyond heavy. With the qualifier the unit is opaque, never converted, and says what the number measures.
+
+A list, not a general rule, because a qualifier only belongs on the list when someone has checked what its numbers measure. Any other base unit of the form "API unit, space, qualifier" is reported as `unit-qualifier-not-adopted` and not used; the API unit stays and the change of unit is reported. None occurs today. An unrelated base unit (`seeds` against `mg`) is not a qualifier at all. Each adoption is reported as `unit-qualified`.
 
 ### Durations
 
@@ -112,8 +126,8 @@ Each rule has a reference case in `tests/fixtures/normalize/`: a small JSON file
 
 ## Consequences
 
-- Against the base file the dataset changes where the wiki has changed: for example Clonazolam oral (common 200 to 125 µg, strong 400 to 300, heavy 999 to 500) and N-Ethylhexedrone insufflated. The diff report of a later slice must show every such change.
+- Against the base file the dataset changes where the wiki has changed. Every such change is a `dose-changed`, `unit-changed` or `duration-changed` finding, which the diff report of a later slice prints; a higher `strongMin` or `heavyMin` is marked as risky.
 - Three substances enter the catalog from the API, without base text: no summary, no risks, no safer use advice. Tizanidine's wiki page carries the banner that it "has not been fully approved" and "may contain incorrect information, particularly with respect to dosage". The base file has an `isApproved` flag (23 substances are not approved) that the schema does not carry; whether unapproved pages should be marked in the app is open.
 - Some plain mass units do not measure what a user weighs or counts: Alcohol in `g` (ethanol, not the drink), Nitrous in `g` (gas), Nicotine in `mg` (not tobacco), Myristicin in `mg` (the compound of nutmeg). Kratom and Blue Lotus in `g` do measure plant material. These are listed for the dataset review; normalization does not change them.
-- The allow list and the class mapping are hand-maintained tables. An API entry with data that is not on the list is reported on every build until someone decides.
+- The allow list, the class mapping and the list of qualified units are hand-maintained tables. An API entry with data that is not on the list is reported on every build until someone decides.
 - 80 substances have no summary until the follow-up reads lead paragraphs from the wiki.
