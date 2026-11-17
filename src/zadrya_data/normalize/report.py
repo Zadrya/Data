@@ -59,6 +59,10 @@ class Kind(StrEnum):
     TOLERANCE_FROM_BASE = "tolerance-from-base"
     TOLERANCE_DIFFERS = "tolerance-differs"
     TOLERANCE_NOT_PARSED = "tolerance-not-parsed"
+    # Cross tolerance
+    CROSS_TOLERANCE_SOURCES_DIFFER = "cross-tolerance-sources-differ"
+    CROSS_TOLERANCE_TOKEN_DROPPED = "cross-tolerance-token-dropped"
+    CROSS_TOLERANCE_GROUP = "cross-tolerance-group"
 
 
 @dataclass(frozen=True, slots=True)

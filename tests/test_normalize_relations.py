@@ -1,9 +1,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Tolerance of the real base file with a recorded API answer. No network.
+"""Tolerance and cross tolerance of the real base file with a recorded API answer. No network.
 
 ``graphql-relations.json`` holds the whole real entries (snapshot of 2026-11-16) of the
 substances whose relations normalization does something worth pinning: 3-FMA (the API
-has no tolerance), Metizolam, Morphine, N-Methylbisfluoromodafinil and Tianeptine.
+has no tolerance and no cross tolerance), Morphine (a token only the API has),
+N-Methylbisfluoromodafinil (``modafanil`` and ``analog``), Metizolam and Tianeptine
+(misspelled tokens).
 """
 
 from typing import Any
@@ -12,7 +14,13 @@ import pytest
 
 from tests.test_normalize_real import BASE_FILE, _snapshot
 from zadrya_data.base import load_base
-from zadrya_data.normalize import Kind, Normalized, normalize
+from zadrya_data.normalize import Kind, Normalized, Report, normalize
+from zadrya_data.normalize.cross_tolerance import (
+    CROSS_TOLERANCE_GROUPS,
+    DROPPED_TOKENS,
+    TOKEN_TO_GROUP,
+    cross_tolerance_groups,
+)
 from zadrya_data.normalize.tolerance import minutes
 from zadrya_data.snapshot import dump_json
 
@@ -69,6 +77,71 @@ def test_real_tolerances(relations: Normalized) -> None:
         _details(relations, Kind.TOLERANCE_FROM_BASE)
     )
     assert relations.report.of(Kind.TOLERANCE_DIFFERS) == []
+
+
+def test_real_cross_tolerances(relations: Normalized) -> None:
+    assert _substance(relations, "3-FMA")["crossTolerances"] == [
+        "dopaminergic",
+        "serotonergic",
+        "stimulants",
+    ]
+    assert _substance(relations, "Metizolam")["crossTolerances"] == [
+        "benzodiazepines",
+        "thienodiazepines",
+    ]
+    assert _substance(relations, "Tianeptine")["crossTolerances"] == [
+        "opioids",
+        "tricyclic-antidepressants",
+    ]
+    assert _substance(relations, "N-Methylbisfluoromodafinil")["crossTolerances"] == [
+        "modafinil-analogs"
+    ]
+    assert _details(relations, Kind.CROSS_TOLERANCE_TOKEN_DROPPED) == [
+        (
+            "N-Methylbisfluoromodafinil",
+            "the token 'analog' names no group: it only qualifies the token next to it",
+        )
+    ]
+    assert ("Morphine", "the token 'opioids' is only in the API") in _details(
+        relations, Kind.CROSS_TOLERANCE_SOURCES_DIFFER
+    )
+
+
+def test_real_cross_tolerance_groups(relations: Normalized) -> None:
+    groups = {group["id"]: group for group in relations.document["crossToleranceGroups"]}
+
+    assert list(groups) == sorted(CROSS_TOLERANCE_GROUPS)
+    assert groups["modafinil-analogs"] == {
+        "id": "modafinil-analogs",
+        "name": "Modafinil and its benzhydryl analogs",
+        "members": ["Adrafinil", "Armodafinil", "Modafinil", "N-Methylbisfluoromodafinil"],
+    }
+    assert groups["thienodiazepines"]["members"] == ["Deschloroetizolam", "Etizolam", "Metizolam"]
+    for group in groups.values():
+        assert group["members"] == sorted(group["members"])
+        for member in group["members"]:
+            assert group["id"] in _substance(relations, member)["crossTolerances"]
+    assert len(relations.report.of(Kind.CROSS_TOLERANCE_GROUP)) == len(groups)
+
+
+def test_the_token_table_is_lower_case_and_names_known_groups() -> None:
+    for token, group in TOKEN_TO_GROUP.items():
+        assert token == token.casefold()
+        assert group in CROSS_TOLERANCE_GROUPS or (group is None and token in DROPPED_TOKENS)
+    assert set(CROSS_TOLERANCE_GROUPS) == {g for g in TOKEN_TO_GROUP.values() if g is not None}
+
+
+def test_group_members_are_sorted_whatever_the_order_of_the_substances() -> None:
+    report = Report()
+    substances = [
+        {"name": "b", "crossTolerances": ["opioids"]},
+        {"name": "a", "crossTolerances": ["opioids"]},
+    ]
+
+    groups = cross_tolerance_groups(substances, report)
+
+    assert groups == [{"id": "opioids", "name": "Opioids", "members": ["a", "b"]}]
+    assert [(f.substance, f.detail) for f in report.findings] == [(None, "opioids (2): a, b")]
 
 
 @pytest.mark.parametrize(

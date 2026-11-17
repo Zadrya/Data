@@ -9,13 +9,12 @@ same document and the same report. One module holds each concern:
 - ``fields``: summary, risks, safer use, addiction potential, toxicities;
 - ``categories`` and ``classes``;
 - ``routes`` with ``dose``, ``duration`` and ``bioavailability``, merged by ``blocks``;
-- ``tolerance``;
+- ``tolerance`` and ``cross_tolerance``;
 - ``report``: every drop, fallback and repair.
 
-Cross tolerance and interactions are not normalized yet. Until they are, every
-substance has empty ``crossTolerances`` and interaction lists, and both group lists
-are empty, so the document already has the shape of the schema.
-``_not_yet_normalized`` is the one place that says so.
+Interactions are not normalized yet. Until they are, every substance has empty
+interaction lists and ``interactionGroups`` is empty, so the document already has the
+shape of the schema. ``_not_yet_normalized`` is the one place that says so.
 """
 
 from dataclasses import dataclass
@@ -25,6 +24,10 @@ from zadrya_data.base import BaseFile
 from zadrya_data.normalize.catalog import Entry, build_catalog
 from zadrya_data.normalize.categories import category_list, substance_categories
 from zadrya_data.normalize.classes import substance_classes
+from zadrya_data.normalize.cross_tolerance import (
+    cross_tolerance_groups,
+    substance_cross_tolerances,
+)
 from zadrya_data.normalize.errors import NormalizationError
 from zadrya_data.normalize.fields import substance_fields
 from zadrya_data.normalize.names import aliases
@@ -54,10 +57,7 @@ class Normalized:
 
 def _not_yet_normalized() -> dict[str, Any]:
     """Return the parts of a substance that the next slice fills in."""
-    return {
-        "crossTolerances": [],
-        "interactions": {"dangerous": [], "unsafe": [], "uncertain": []},
-    }
+    return {"interactions": {"dangerous": [], "unsafe": [], "uncertain": []}}
 
 
 def _has_number(routes: list[dict[str, Any]]) -> bool:
@@ -88,6 +88,7 @@ def _substance(entry: Entry, known_categories: set[str], report: Report) -> dict
     tolerance = substance_tolerance(entry.name, base, api, report)
     if tolerance is not None:
         substance["tolerance"] = tolerance
+    substance["crossTolerances"] = substance_cross_tolerances(entry.name, base, api, report)
     substance |= _not_yet_normalized()
     return substance
 
@@ -111,7 +112,7 @@ def normalize(base: BaseFile, snapshot: Snapshot) -> Normalized:
     document = {
         "categories": categories,
         "interactionGroups": [],
-        "crossToleranceGroups": [],
+        "crossToleranceGroups": cross_tolerance_groups(substances, report),
         "substances": substances,
     }
     return Normalized(document, report)
