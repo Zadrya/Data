@@ -43,12 +43,20 @@ class ReleaseSchemaError(ReleaseRejectedError):
 
 @dataclass(frozen=True)
 class VerifiedRelease:
-    """What an accepted release is, and the pinned key that signed it."""
+    """What an accepted release is, and the pinned key that signed it.
+
+    ``dataset_version``, ``schema_version`` and ``sha256`` are covered by the
+    signature: they come from, or are computed over, the signed bytes.
+    ``unsigned_min_app_version`` is not. It exists only in the manifest, which
+    anyone who can replace that file can edit, so it may be used to refuse a
+    release and never as the reason to accept one. The date of the manifest is
+    not authenticated either and is not exposed here.
+    """
 
     key: PinnedKey
     dataset_version: str
     schema_version: str
-    min_app_version: str
+    unsigned_min_app_version: str
     sha256: str
 
 
@@ -79,14 +87,15 @@ def verify_release(
     check_hash(manifest_document, substances)
 
     _require_valid(manifest_document, SchemaName.MANIFEST)
-    _require_valid(parse_substances(substances), SchemaName.SUBSTANCES)
+    signed = parse_substances(substances)
+    _require_valid(signed, SchemaName.SUBSTANCES)
 
     check_versions(manifest_document, substances)
 
     return VerifiedRelease(
         key=key,
-        dataset_version=str(manifest_document["datasetVersion"]),
-        schema_version=str(manifest_document["schemaVersion"]),
-        min_app_version=str(manifest_document["minAppVersion"]),
+        dataset_version=str(signed["datasetVersion"]),
+        schema_version=str(signed["schemaVersion"]),
+        unsigned_min_app_version=str(manifest_document["minAppVersion"]),
         sha256=sha256_hex(substances),
     )
