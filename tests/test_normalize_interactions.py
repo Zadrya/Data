@@ -15,7 +15,7 @@ from tests.test_normalize_real import BASE_FILE, _snapshot
 from zadrya_data.base import load_base
 from zadrya_data.normalize import Kind, Normalized, normalize
 from zadrya_data.normalize.interaction_groups import GROUPS, NAME_TO_GROUP, group_of
-from zadrya_data.normalize.interactions import SEVERITIES
+from zadrya_data.normalize.interactions import SEVERITIES, TARGET_NAMES
 
 EMPTY_GROUPS = {"aldh2-inhibitors", "hepatotoxic-drugs", "protease-inhibitors", "snris", "ssris"}
 
@@ -124,6 +124,13 @@ def test_spelling_variants_of_the_data_name_one_group(spelling: str, group: str 
     assert group_of(spelling) == group
 
 
+def test_the_target_name_table_names_catalog_substances(relations: Normalized) -> None:
+    catalog = {substance["name"] for substance in relations.document["substances"]}
+
+    assert all(name == name.casefold() for name in TARGET_NAMES)
+    assert set(TARGET_NAMES.values()) <= catalog
+
+
 def test_the_name_table_is_lower_case_and_names_known_groups() -> None:
     assert all(name == name.casefold() for name in NAME_TO_GROUP)
     assert set(NAME_TO_GROUP.values()) == set(GROUPS)
@@ -138,7 +145,7 @@ def test_real_resolutions(relations: Normalized) -> None:
     assert {"kind": "group", "groupId": "antihistamines"} in dxm["dangerous"]
     assert {"kind": "other", "name": "Bupropion"} in dxm["unsafe"]
     assert {"kind": "substance", "name": "Psilocybin mushrooms"} in cannabis["uncertain"]
-    assert {"kind": "other", "name": "Mushrooms"} in cannabis["uncertain"]
+    assert {"kind": "other", "name": "Mushrooms"} not in cannabis["uncertain"]
     assert {"kind": "group", "groupId": "ssris"} in pregabalin["uncertain"]
     assert {"kind": "substance", "name": "Diphenhydramine"} in (
         substances["Myristicin"]["interactions"]["dangerous"]
@@ -150,7 +157,7 @@ def test_real_resolutions(relations: Normalized) -> None:
         for target in substance["interactions"][severity]
         if target["kind"] == "other"
     }
-    assert others == {"Bupropion", "Grapefruit", "Lithium", "Mushrooms", "Ritonavir", "Trazodone"}
+    assert others == {"Bupropion", "Grapefruit", "Lithium", "Ritonavir", "Trazodone"}
     assert relations.report.of(Kind.INTERACTION_TARGET_DROPPED) == []
 
 
@@ -160,7 +167,7 @@ def test_real_findings(relations: Normalized) -> None:
 
     assert counts[Kind.INTERACTION_SEVERITY_CONFLICT] == 14
     assert counts[Kind.INTERACTION_SYMMETRY_RAISED] == 3
-    assert counts[Kind.INTERACTION_TARGET_OTHER] == 6
+    assert counts[Kind.INTERACTION_TARGET_OTHER] == 5
     assert (
         "Acetylfentanyl",
         "'maois' is listed as dangerous in base 'MAOI', API 'MAOIs'; "
@@ -179,6 +186,6 @@ def test_real_findings(relations: Normalized) -> None:
     ) in details
     assert (
         None,
-        "'Mushrooms' is neither a catalog substance nor a group: kept as other "
+        "'Mushrooms' is the substance 'Psilocybin mushrooms' by the target name table "
         "(listed by 1 substance)",
     ) in details

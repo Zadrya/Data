@@ -1,0 +1,113 @@
+{
+  "rule": "Before the generic resolution, a target name is looked up, without case, in the explicit table TARGET_NAMES of colloquial names of the data (Mushrooms is Psilocybin mushrooms). The result is a substance target, reported as a resolution that is not an exact name, so the API spelling and the base spelling become one target and no warning depends on either list surviving.",
+  "base": [
+    {
+      "name": "Psilocybin mushrooms",
+      "url": "https://psychonautwiki.org/wiki/Psilocybin_mushrooms"
+    },
+    {
+      "name": "Cannabis",
+      "interactions": {
+        "dangerous": [],
+        "unsafe": [],
+        "uncertain": [
+          "Psilocybin mushrooms"
+        ]
+      }
+    },
+    {
+      "name": "Cocaine"
+    }
+  ],
+  "api": [
+    {
+      "name": "Cannabis",
+      "uncertainInteractions": [
+        {
+          "name": "Mushrooms"
+        }
+      ]
+    },
+    {
+      "name": "Cocaine",
+      "uncertainInteractions": [
+        {
+          "name": "mushrooms"
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "interactions"
+  ],
+  "reportKinds": [
+    "interaction-target-resolved",
+    "interaction-target-other",
+    "interaction-only-in-one-source"
+  ],
+  "expected": [
+    {
+      "name": "Cannabis",
+      "interactions": {
+        "dangerous": [],
+        "unsafe": [],
+        "uncertain": [
+          {
+            "kind": "substance",
+            "name": "Psilocybin mushrooms"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Cocaine",
+      "interactions": {
+        "dangerous": [],
+        "unsafe": [],
+        "uncertain": [
+          {
+            "kind": "substance",
+            "name": "Psilocybin mushrooms"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Psilocybin mushrooms",
+      "interactions": {
+        "dangerous": [],
+        "unsafe": [],
+        "uncertain": [
+          {
+            "kind": "substance",
+            "name": "Cannabis"
+          },
+          {
+            "kind": "substance",
+            "name": "Cocaine"
+          }
+        ]
+      }
+    }
+  ],
+  "report": [
+    {
+      "kind": "interaction-only-in-one-source",
+      "substance": "Cocaine",
+      "route": null,
+      "detail": "the base lists no interactions: every target (1) is from the API"
+    },
+    {
+      "kind": "interaction-target-resolved",
+      "substance": null,
+      "route": null,
+      "detail": "'Mushrooms' is the substance 'Psilocybin mushrooms' by the target name table (listed by 1 substance)"
+    },
+    {
+      "kind": "interaction-target-resolved",
+      "substance": null,
+      "route": null,
+      "detail": "'mushrooms' is the substance 'Psilocybin mushrooms' by the target name table (listed by 1 substance)"
+    }
+  ]
+}
