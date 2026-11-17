@@ -300,3 +300,116 @@ def test_retry_after_is_not_waited_for_after_the_last_attempt() -> None:
 
     assert len(seen) == MAX_ATTEMPTS
     assert fake.sleeps == [7, 7]
+
+
+ASSET_URL = "https://github.example.test/releases/download/v1/file"
+ASSET_HOSTS = frozenset({"assets.example.test"})
+
+
+def test_get_bytes_returns_the_body_as_it_came() -> None:
+    transport, seen = _answers(httpx.Response(200, content=b"\x00raw bytes\n"))
+
+    with _client(transport) as client:
+        assert client.get_bytes(ASSET_URL) == b"\x00raw bytes\n"
+
+    assert seen[0].method == "GET"
+    assert seen[0].headers["user-agent"] == USER_AGENT
+
+
+def test_get_bytes_follows_one_redirect_to_an_allowed_host() -> None:
+    target = "https://assets.example.test/file?token=temporary"
+    transport, seen = _answers(
+        httpx.Response(302, headers={"location": target}), httpx.Response(200, content=b"data")
+    )
+
+    with _client(transport) as client:
+        assert client.get_bytes(ASSET_URL, redirect_hosts=ASSET_HOSTS) == b"data"
+
+    assert [str(request.url) for request in seen] == [ASSET_URL, target]
+
+
+@pytest.mark.parametrize(
+    ("location", "shown"),
+    [
+        ("https://elsewhere.test/file", "elsewhere.test"),
+        ("http://assets.example.test/file", "assets.example.test"),
+        ("https://assets.example.test:8443/file", "assets.example.test"),
+        ("https://user@assets.example.test/file", "assets.example.test"),
+        ("https://assets.example.test.evil.test/file", "assets.example.test.evil.test"),
+        ("/relative/file", "an invalid address"),
+        ("", "an invalid address"),
+    ],
+)
+def test_get_bytes_refuses_a_redirect_anywhere_else(location: str, shown: str) -> None:
+    transport, seen = _answers(httpx.Response(302, headers={"location": location}))
+
+    with _client(transport) as client, pytest.raises(FetchError) as error:
+        client.get_bytes(ASSET_URL, redirect_hosts=ASSET_HOSTS)
+
+    assert str(error.value) == (
+        f"{ASSET_URL}: redirects to {shown}, which is not an allowed download host"
+    )
+    assert len(seen) == 1
+
+
+def test_get_bytes_fails_on_a_redirect_to_an_address_that_cannot_be_parsed() -> None:
+    location = "https://assets.example.test:x/file"
+    transport, seen = _answers(httpx.Response(302, headers={"location": location}))
+
+    with _client(transport) as client, pytest.raises(FetchError, match="Invalid URL in location"):
+        client.get_bytes(ASSET_URL, redirect_hosts=ASSET_HOSTS)
+
+    assert len(seen) == 1
+
+
+def test_get_bytes_follows_no_redirect_without_allowed_hosts() -> None:
+    transport, seen = _answers(
+        httpx.Response(302, headers={"location": "https://assets.example.test/file"})
+    )
+
+    with _client(transport) as client, pytest.raises(FetchError, match="not an allowed"):
+        client.get_bytes(ASSET_URL)
+
+    assert len(seen) == 1
+
+
+def test_get_bytes_refuses_a_second_redirect_and_hides_the_token() -> None:
+    transport, seen = _answers(
+        httpx.Response(302, headers={"location": "https://assets.example.test/f?token=secret"}),
+        httpx.Response(302, headers={"location": "https://assets.example.test/again"}),
+    )
+
+    with _client(transport) as client, pytest.raises(FetchError) as error:
+        client.get_bytes(ASSET_URL, redirect_hosts=ASSET_HOSTS)
+
+    assert str(error.value) == f"{ASSET_URL} (via assets.example.test): HTTP 302"
+    assert len(seen) == 2
+
+
+def test_get_bytes_keeps_the_size_cap_after_a_redirect() -> None:
+    headers = {"content-length": str(MAX_RESPONSE_BYTES + 1)}
+    transport, _ = _answers(
+        httpx.Response(302, headers={"location": "https://assets.example.test/f"}),
+        httpx.Response(200, headers=headers, content=b""),
+    )
+
+    with _client(transport) as client, pytest.raises(FetchError, match="is larger than"):
+        client.get_bytes(ASSET_URL, redirect_hosts=ASSET_HOSTS)
+
+
+def test_get_redirect_returns_the_target_without_following_it() -> None:
+    transport, seen = _answers(httpx.Response(302, headers={"location": "https://x.test/tag/a"}))
+
+    with _client(transport) as client:
+        assert client.get_redirect(ASSET_URL) == "https://x.test/tag/a"
+
+    assert len(seen) == 1
+
+
+def test_get_redirect_fails_on_an_answer_that_is_not_a_redirect() -> None:
+    transport, _ = _answers(httpx.Response(200, content=b"page"))
+
+    with _client(transport) as client, pytest.raises(FetchError) as error:
+        client.get_redirect(ASSET_URL)
+
+    assert str(error.value) == f"{ASSET_URL}: expected a redirect, got HTTP 200"
