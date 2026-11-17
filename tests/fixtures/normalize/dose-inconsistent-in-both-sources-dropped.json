@@ -1,0 +1,82 @@
+{
+  "rule": "When neither source has a consistent dose block, the route has no dose and the drop is reported with both reasons. Meclofenoxate oral is real: strong starts at 800 and heavy at 600 in both sources. Its null API threshold with a light minimum would be a label difference, but nothing of a dropped block is reported as used.",
+  "base": [
+    {
+      "name": "Meclofenoxate",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg",
+            "lightMin": 50,
+            "commonMin": 400,
+            "strongMin": 800,
+            "heavyMin": 600
+          }
+        }
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "Meclofenoxate",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "common": {
+              "max": 800.0,
+              "min": 400.0
+            },
+            "heavy": 600.0,
+            "light": {
+              "max": 200.0,
+              "min": 50.0
+            },
+            "strong": {
+              "max": 1000.0,
+              "min": 800.0
+            },
+            "units": "mg"
+          }
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "roas"
+  ],
+  "reportKinds": [
+    "api-block-rejected",
+    "base-block-used",
+    "block-dropped",
+    "dose-boundary-filled",
+    "dose-fill-discarded",
+    "dose-equal-boundaries",
+    "dose-label-differs",
+    "unit-repaired",
+    "unit-not-mass",
+    "duration-rounded",
+    "api-phase-ignored",
+    "route-only-in-base",
+    "route-only-in-api"
+  ],
+  "expected": [
+    {
+      "name": "Meclofenoxate",
+      "roas": [
+        {
+          "route": "oral"
+        }
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "block-dropped",
+      "substance": "Meclofenoxate",
+      "route": "oral",
+      "detail": "dose: no consistent block (API: strongMin 800 is above heavyMin 600; base: strongMin 800 is above heavyMin 600)"
+    }
+  ]
+}

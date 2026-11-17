@@ -1,0 +1,74 @@
+{
+  "rule": "Classes come from the API as given: stripped, without exact repeats, in API order, with no change of spelling. A substance that is only in the base file, or whose API classes are null, has empty lists.",
+  "base": [
+    {
+      "name": "LSD"
+    },
+    {
+      "name": "Cannabis"
+    },
+    {
+      "name": "Oxazepam"
+    }
+  ],
+  "api": [
+    {
+      "name": "LSD",
+      "class": {
+        "psychoactive": [
+          "Psychedelic",
+          " Psychedelic ",
+          "psychedelic"
+        ],
+        "chemical": [
+          "Lysergamides"
+        ]
+      }
+    },
+    {
+      "name": "Cannabis",
+      "class": {
+        "chemical": [
+          "Cannabinoid"
+        ]
+      }
+    }
+  ],
+  "compare": [
+    "classes"
+  ],
+  "reportKinds": [
+    "text-dropped"
+  ],
+  "expected": [
+    {
+      "name": "Cannabis",
+      "classes": {
+        "psychoactive": [],
+        "chemical": [
+          "Cannabinoid"
+        ]
+      }
+    },
+    {
+      "name": "LSD",
+      "classes": {
+        "psychoactive": [
+          "Psychedelic",
+          "psychedelic"
+        ],
+        "chemical": [
+          "Lysergamides"
+        ]
+      }
+    },
+    {
+      "name": "Oxazepam",
+      "classes": {
+        "psychoactive": [],
+        "chemical": []
+      }
+    }
+  ],
+  "report": []
+}

@@ -1,0 +1,135 @@
+{
+  "rule": "A fill is used only when the direct value is absent (first route: heavy 300 wins over strong.max 250). commonMin can be filled from light.max (second route). A fill that would break the order is discarded and reported, and the rest of the block is kept (third route: strong.max 40 is below strongMin 50).",
+  "base": [],
+  "api": [
+    {
+      "name": "Tizanidine",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg",
+            "threshold": 10,
+            "light": {
+              "min": 20,
+              "max": 50
+            },
+            "common": {
+              "min": 50,
+              "max": 100
+            },
+            "strong": {
+              "min": 100,
+              "max": 250
+            },
+            "heavy": 300
+          }
+        },
+        {
+          "name": "sublingual",
+          "dose": {
+            "units": "mg",
+            "threshold": 1,
+            "light": {
+              "min": 2,
+              "max": 4
+            },
+            "strong": {
+              "min": 8,
+              "max": 12
+            }
+          }
+        },
+        {
+          "name": "insufflated",
+          "dose": {
+            "units": "mg",
+            "common": {
+              "min": 20,
+              "max": 30
+            },
+            "strong": {
+              "min": 50,
+              "max": 40
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "roas"
+  ],
+  "reportKinds": [
+    "api-block-rejected",
+    "base-block-used",
+    "block-dropped",
+    "dose-boundary-filled",
+    "dose-fill-discarded",
+    "dose-equal-boundaries",
+    "dose-label-differs",
+    "unit-repaired",
+    "unit-not-mass",
+    "duration-rounded",
+    "api-phase-ignored",
+    "route-only-in-base",
+    "route-only-in-api"
+  ],
+  "expected": [
+    {
+      "name": "Tizanidine",
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {
+            "units": "mg",
+            "thresholdMin": 10,
+            "lightMin": 20,
+            "commonMin": 50,
+            "strongMin": 100,
+            "heavyMin": 300
+          }
+        },
+        {
+          "route": "sublingual",
+          "dose": {
+            "units": "mg",
+            "thresholdMin": 1,
+            "lightMin": 2,
+            "commonMin": 4,
+            "strongMin": 8,
+            "heavyMin": 12
+          }
+        },
+        {
+          "route": "insufflated",
+          "dose": {
+            "units": "mg",
+            "commonMin": 20,
+            "strongMin": 50
+          }
+        }
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "dose-boundary-filled",
+      "substance": "Tizanidine",
+      "route": "sublingual",
+      "detail": "dose: commonMin 4 filled from light.max"
+    },
+    {
+      "kind": "dose-boundary-filled",
+      "substance": "Tizanidine",
+      "route": "sublingual",
+      "detail": "dose: heavyMin 12 filled from strong.max"
+    },
+    {
+      "kind": "dose-fill-discarded",
+      "substance": "Tizanidine",
+      "route": "insufflated",
+      "detail": "dose: heavyMin is not filled from strong.max 40: strongMin 50 is above heavyMin 40"
+    }
+  ]
+}

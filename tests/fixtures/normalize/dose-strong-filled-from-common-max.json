@@ -1,0 +1,195 @@
+{
+  "rule": "When the API states no strong range, strongMin is filled from the maximum of the common range, and the fill is reported. A fill moves one step only: heavyMin is not filled from the common range. These are real: the base file has the same number as strongMin.",
+  "base": [
+    {
+      "name": "PMA",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg",
+            "lightMin": 10,
+            "commonMin": 40,
+            "strongMin": 60
+          }
+        }
+      ]
+    },
+    {
+      "name": "Naloxone",
+      "roas": [
+        {
+          "name": "insufflated",
+          "dose": {
+            "units": "mg",
+            "commonMin": 1,
+            "strongMin": 4
+          }
+        },
+        {
+          "name": "intramuscular",
+          "dose": {
+            "units": "mg",
+            "commonMin": 0.4,
+            "strongMin": 2
+          }
+        },
+        {
+          "name": "intravenous",
+          "dose": {
+            "units": "mg",
+            "commonMin": 0.4,
+            "strongMin": 2
+          }
+        }
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "PMA",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "common": {
+              "max": 60.0,
+              "min": 40.0
+            },
+            "light": {
+              "max": 40.0,
+              "min": 20.0
+            },
+            "threshold": 10.0,
+            "units": "mg"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Naloxone",
+      "roas": [
+        {
+          "name": "insufflated",
+          "dose": {
+            "common": {
+              "max": 4.0,
+              "min": 1.0
+            },
+            "units": "mg"
+          }
+        },
+        {
+          "name": "intramuscular",
+          "dose": {
+            "common": {
+              "max": 2.0,
+              "min": 0.4
+            },
+            "units": "mg"
+          }
+        },
+        {
+          "name": "intravenous",
+          "dose": {
+            "common": {
+              "max": 2.0,
+              "min": 0.4
+            },
+            "units": "mg"
+          }
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "roas"
+  ],
+  "reportKinds": [
+    "api-block-rejected",
+    "base-block-used",
+    "block-dropped",
+    "dose-boundary-filled",
+    "dose-fill-discarded",
+    "dose-equal-boundaries",
+    "dose-label-differs",
+    "unit-repaired",
+    "unit-not-mass",
+    "duration-rounded",
+    "api-phase-ignored",
+    "route-only-in-base",
+    "route-only-in-api"
+  ],
+  "expected": [
+    {
+      "name": "Naloxone",
+      "roas": [
+        {
+          "route": "insufflated",
+          "dose": {
+            "units": "mg",
+            "commonMin": 1,
+            "strongMin": 4
+          }
+        },
+        {
+          "route": "intramuscular",
+          "dose": {
+            "units": "mg",
+            "commonMin": 0.4,
+            "strongMin": 2
+          }
+        },
+        {
+          "route": "intravenous",
+          "dose": {
+            "units": "mg",
+            "commonMin": 0.4,
+            "strongMin": 2
+          }
+        }
+      ]
+    },
+    {
+      "name": "PMA",
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {
+            "units": "mg",
+            "thresholdMin": 10,
+            "lightMin": 20,
+            "commonMin": 40,
+            "strongMin": 60
+          }
+        }
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "dose-boundary-filled",
+      "substance": "Naloxone",
+      "route": "insufflated",
+      "detail": "dose: strongMin 4 filled from common.max"
+    },
+    {
+      "kind": "dose-boundary-filled",
+      "substance": "Naloxone",
+      "route": "intramuscular",
+      "detail": "dose: strongMin 2 filled from common.max"
+    },
+    {
+      "kind": "dose-boundary-filled",
+      "substance": "Naloxone",
+      "route": "intravenous",
+      "detail": "dose: strongMin 2 filled from common.max"
+    },
+    {
+      "kind": "dose-boundary-filled",
+      "substance": "PMA",
+      "route": "oral",
+      "detail": "dose: strongMin 60 filled from common.max"
+    }
+  ]
+}

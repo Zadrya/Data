@@ -1,0 +1,76 @@
+{
+  "rule": "The API has a seventh phase named duration, which the schema does not have. It is reported and ignored, with or without a unit. MDAI oral is real: 4 to 6 with a null unit.",
+  "base": [
+    {
+      "name": "MDAI",
+      "roas": [
+        {
+          "name": "oral"
+        }
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "MDAI",
+      "roas": [
+        {
+          "name": "oral",
+          "duration": {
+            "total": {
+              "min": 4,
+              "max": 6,
+              "units": "hours"
+            },
+            "duration": {
+              "min": 4,
+              "max": 6
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "roas"
+  ],
+  "reportKinds": [
+    "api-block-rejected",
+    "base-block-used",
+    "block-dropped",
+    "dose-boundary-filled",
+    "dose-fill-discarded",
+    "dose-equal-boundaries",
+    "dose-label-differs",
+    "unit-repaired",
+    "unit-not-mass",
+    "duration-rounded",
+    "api-phase-ignored",
+    "route-only-in-base",
+    "route-only-in-api"
+  ],
+  "expected": [
+    {
+      "name": "MDAI",
+      "roas": [
+        {
+          "route": "oral",
+          "duration": {
+            "total": {
+              "min": 240,
+              "max": 360
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "api-phase-ignored",
+      "substance": "MDAI",
+      "route": "oral",
+      "detail": "the API phase 'duration' (4 to 6, no unit) is not in the schema"
+    }
+  ]
+}

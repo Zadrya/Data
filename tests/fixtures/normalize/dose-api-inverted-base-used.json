@@ -1,0 +1,90 @@
+{
+  "rule": "A dose block whose boundaries decrease is inconsistent. When the API block is inconsistent and the base block is consistent, the whole base block is used and the rejection is reported. The block is never assembled from both sources: commonMin does not come from the API here.",
+  "base": [
+    {
+      "name": "LSD",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "µg",
+            "lightMin": 15,
+            "commonMin": 75,
+            "strongMin": 150,
+            "heavyMin": 300
+          }
+        }
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "LSD",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "µg",
+            "threshold": 250,
+            "light": {
+              "min": 25,
+              "max": 75
+            },
+            "common": {
+              "min": 80,
+              "max": 150
+            },
+            "strong": {
+              "min": 150,
+              "max": 300
+            },
+            "heavy": 300
+          }
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "roas"
+  ],
+  "reportKinds": [
+    "api-block-rejected",
+    "base-block-used",
+    "block-dropped",
+    "dose-boundary-filled",
+    "dose-fill-discarded",
+    "dose-equal-boundaries",
+    "dose-label-differs",
+    "unit-repaired",
+    "unit-not-mass",
+    "duration-rounded",
+    "api-phase-ignored",
+    "route-only-in-base",
+    "route-only-in-api"
+  ],
+  "expected": [
+    {
+      "name": "LSD",
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {
+            "units": "µg",
+            "thresholdMin": 15,
+            "commonMin": 75,
+            "strongMin": 150,
+            "heavyMin": 300
+          }
+        }
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "api-block-rejected",
+      "substance": "LSD",
+      "route": "oral",
+      "detail": "dose: thresholdMin 250 is above lightMin 25; the base block is used"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "rule": "Aliases are the base common names, then the API common names: stripped, without the canonical name, without repeats. The canonical name and repeats are recognized without regard to case, and the first spelling wins. An alias that is not valid text after stripping is reported and dropped.",
+  "base": [
+    {
+      "name": "LSD",
+      "commonNames": [
+        "LSD",
+        " Acid ",
+        "Lucy",
+        "lsd"
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "LSD",
+      "commonNames": [
+        "acid",
+        "LSD-25",
+        "Tabs\tBlotter",
+        "   ",
+        "Lucy"
+      ]
+    }
+  ],
+  "compare": [
+    "aliases"
+  ],
+  "reportKinds": [
+    "alias-dropped"
+  ],
+  "expected": [
+    {
+      "name": "LSD",
+      "aliases": [
+        "Acid",
+        "Lucy",
+        "LSD-25"
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "alias-dropped",
+      "substance": "LSD",
+      "route": null,
+      "detail": "alias 'Tabs\\tBlotter' is not valid text"
+    },
+    {
+      "kind": "alias-dropped",
+      "substance": "LSD",
+      "route": null,
+      "detail": "alias (empty) is not valid text"
+    }
+  ]
+}

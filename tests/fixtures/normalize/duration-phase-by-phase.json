@@ -1,0 +1,141 @@
+{
+  "rule": "Each phase is a block of its own. A phase whose numbers have no unit or an unknown unit, or whose minimum is above its maximum, is inconsistent: the base phase is used when it is consistent (onset, peak), otherwise the phase is dropped (offset). A phase the API lacks comes from the base file (afterglow). All of it is reported. A phase with null numbers is absent, whatever its unit says (comeup).",
+  "base": [
+    {
+      "name": "MDAI",
+      "roas": [
+        {
+          "name": "oral",
+          "duration": {
+            "onset": {
+              "min": 20,
+              "max": 40,
+              "units": "minutes"
+            },
+            "peak": {
+              "min": 1,
+              "max": 2,
+              "units": "hours"
+            },
+            "offset": {
+              "min": 3,
+              "max": 2,
+              "units": "hours"
+            },
+            "afterglow": {
+              "min": 2,
+              "max": 4,
+              "units": "hours"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "MDAI",
+      "roas": [
+        {
+          "name": "oral",
+          "duration": {
+            "onset": {
+              "min": 30,
+              "max": 60
+            },
+            "comeup": {
+              "units": "minutes"
+            },
+            "peak": {
+              "min": 3,
+              "max": 2,
+              "units": "hours"
+            },
+            "offset": {
+              "min": 1,
+              "max": 2,
+              "units": "fortnights"
+            },
+            "total": {
+              "min": 4,
+              "max": 6,
+              "units": "hours"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "roas"
+  ],
+  "reportKinds": [
+    "api-block-rejected",
+    "base-block-used",
+    "block-dropped",
+    "dose-boundary-filled",
+    "dose-fill-discarded",
+    "dose-equal-boundaries",
+    "dose-label-differs",
+    "unit-repaired",
+    "unit-not-mass",
+    "duration-rounded",
+    "api-phase-ignored",
+    "route-only-in-base",
+    "route-only-in-api"
+  ],
+  "expected": [
+    {
+      "name": "MDAI",
+      "roas": [
+        {
+          "route": "oral",
+          "duration": {
+            "onset": {
+              "min": 20,
+              "max": 40
+            },
+            "peak": {
+              "min": 60,
+              "max": 120
+            },
+            "total": {
+              "min": 240,
+              "max": 360
+            },
+            "afterglow": {
+              "min": 120,
+              "max": 240
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "api-block-rejected",
+      "substance": "MDAI",
+      "route": "oral",
+      "detail": "duration onset: numbers with no unit; the base block is used"
+    },
+    {
+      "kind": "api-block-rejected",
+      "substance": "MDAI",
+      "route": "oral",
+      "detail": "duration peak: min 3 is above max 2 hours; the base block is used"
+    },
+    {
+      "kind": "block-dropped",
+      "substance": "MDAI",
+      "route": "oral",
+      "detail": "duration offset: no consistent block (API: numbers with the unknown unit 'fortnights'; base: min 3 is above max 2 hours)"
+    },
+    {
+      "kind": "base-block-used",
+      "substance": "MDAI",
+      "route": "oral",
+      "detail": "duration afterglow: the API has none; the base block is used"
+    }
+  ]
+}

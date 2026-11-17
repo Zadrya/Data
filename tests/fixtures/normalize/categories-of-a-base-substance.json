@@ -1,0 +1,49 @@
+{
+  "rule": "A base substance keeps its base categories, in base order and without repeats, whatever classes the API states. A category that is not in the category list is reported and dropped.",
+  "base": [
+    {
+      "name": "LSD",
+      "categories": [
+        "psychedelic",
+        "common",
+        "psychedelic",
+        "legendary"
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "LSD",
+      "class": {
+        "psychoactive": [
+          "Stimulants"
+        ]
+      }
+    }
+  ],
+  "compare": [
+    "categories"
+  ],
+  "reportKinds": [
+    "category-unknown",
+    "categories-derived",
+    "class-unmapped"
+  ],
+  "expected": [
+    {
+      "name": "LSD",
+      "categories": [
+        "psychedelic",
+        "common"
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "category-unknown",
+      "substance": "LSD",
+      "route": null,
+      "detail": "the base category 'legendary' is not in the category list"
+    }
+  ]
+}

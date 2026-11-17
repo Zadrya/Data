@@ -1,0 +1,45 @@
+{
+  "rule": "Safer use advice keeps its items in order. A list that is empty, or empty once blank items are gone, becomes absent.",
+  "base": [
+    {
+      "name": "LSD",
+      "saferUse": [
+        " Dose low. ",
+        "Test first."
+      ]
+    },
+    {
+      "name": "DXM",
+      "saferUse": []
+    },
+    {
+      "name": "MDMA",
+      "saferUse": [
+        "  "
+      ]
+    }
+  ],
+  "api": [],
+  "compare": [
+    "saferUse"
+  ],
+  "reportKinds": [
+    "text-dropped"
+  ],
+  "expected": [
+    {
+      "name": "DXM"
+    },
+    {
+      "name": "LSD",
+      "saferUse": [
+        "Dose low.",
+        "Test first."
+      ]
+    },
+    {
+      "name": "MDMA"
+    }
+  ],
+  "report": []
+}

@@ -1,0 +1,279 @@
+{
+  "rule": "When the API states no heavy value, heavyMin is filled from the maximum of the strong range, and the fill is reported. Without it a dose above the strong range would never be shown as heavy. These four are real: the base file has the same number as heavyMin.",
+  "base": [
+    {
+      "name": "Fentanyl",
+      "roas": [
+        {
+          "name": "insufflated",
+          "dose": {
+            "units": "µg",
+            "lightMin": 5,
+            "commonMin": 25,
+            "strongMin": 50,
+            "heavyMin": 75
+          }
+        }
+      ]
+    },
+    {
+      "name": "25I-NBOMe",
+      "roas": [
+        {
+          "name": "sublingual",
+          "dose": {
+            "units": "µg",
+            "lightMin": 50,
+            "commonMin": 500,
+            "strongMin": 700,
+            "heavyMin": 1000
+          }
+        }
+      ]
+    },
+    {
+      "name": "PCP",
+      "roas": [
+        {
+          "name": "smoked",
+          "dose": {
+            "units": "mg",
+            "lightMin": 1,
+            "commonMin": 4,
+            "strongMin": 8,
+            "heavyMin": 12
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pentobarbital",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg",
+            "lightMin": 25,
+            "commonMin": 100,
+            "strongMin": 200,
+            "heavyMin": 300
+          }
+        }
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "Fentanyl",
+      "roas": [
+        {
+          "name": "insufflated",
+          "dose": {
+            "common": {
+              "max": 50.0,
+              "min": 25.0
+            },
+            "light": {
+              "max": 25.0,
+              "min": 10.0
+            },
+            "strong": {
+              "max": 75.0,
+              "min": 50.0
+            },
+            "threshold": 5.0,
+            "units": "μg"
+          }
+        }
+      ]
+    },
+    {
+      "name": "25I-NBOMe",
+      "roas": [
+        {
+          "name": "sublingual",
+          "dose": {
+            "common": {
+              "max": 700.0,
+              "min": 500.0
+            },
+            "light": {
+              "max": 500.0,
+              "min": 200.0
+            },
+            "strong": {
+              "max": 1000.0,
+              "min": 700.0
+            },
+            "threshold": 50.0,
+            "units": "µg"
+          }
+        }
+      ]
+    },
+    {
+      "name": "PCP",
+      "roas": [
+        {
+          "name": "smoked",
+          "dose": {
+            "common": {
+              "max": 8.0,
+              "min": 4.0
+            },
+            "light": {
+              "max": 4.0,
+              "min": 2.0
+            },
+            "strong": {
+              "max": 12.0,
+              "min": 8.0
+            },
+            "threshold": 1.0,
+            "units": "mg"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pentobarbital",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "common": {
+              "max": 200.0,
+              "min": 100.0
+            },
+            "light": {
+              "max": 100.0,
+              "min": 50.0
+            },
+            "strong": {
+              "max": 300.0,
+              "min": 200.0
+            },
+            "threshold": 25.0,
+            "units": "mg"
+          }
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "roas"
+  ],
+  "reportKinds": [
+    "api-block-rejected",
+    "base-block-used",
+    "block-dropped",
+    "dose-boundary-filled",
+    "dose-fill-discarded",
+    "dose-equal-boundaries",
+    "dose-label-differs",
+    "unit-repaired",
+    "unit-not-mass",
+    "duration-rounded",
+    "api-phase-ignored",
+    "route-only-in-base",
+    "route-only-in-api"
+  ],
+  "expected": [
+    {
+      "name": "25I-NBOMe",
+      "roas": [
+        {
+          "route": "sublingual",
+          "dose": {
+            "units": "µg",
+            "thresholdMin": 50,
+            "lightMin": 200,
+            "commonMin": 500,
+            "strongMin": 700,
+            "heavyMin": 1000
+          }
+        }
+      ]
+    },
+    {
+      "name": "Fentanyl",
+      "roas": [
+        {
+          "route": "insufflated",
+          "dose": {
+            "units": "µg",
+            "thresholdMin": 5,
+            "lightMin": 10,
+            "commonMin": 25,
+            "strongMin": 50,
+            "heavyMin": 75
+          }
+        }
+      ]
+    },
+    {
+      "name": "PCP",
+      "roas": [
+        {
+          "route": "smoked",
+          "dose": {
+            "units": "mg",
+            "thresholdMin": 1,
+            "lightMin": 2,
+            "commonMin": 4,
+            "strongMin": 8,
+            "heavyMin": 12
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pentobarbital",
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {
+            "units": "mg",
+            "thresholdMin": 25,
+            "lightMin": 50,
+            "commonMin": 100,
+            "strongMin": 200,
+            "heavyMin": 300
+          }
+        }
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "dose-boundary-filled",
+      "substance": "25I-NBOMe",
+      "route": "sublingual",
+      "detail": "dose: heavyMin 1000 filled from strong.max"
+    },
+    {
+      "kind": "unit-repaired",
+      "substance": "Fentanyl",
+      "route": "insufflated",
+      "detail": "dose: units 'μg' written with the Greek letter mu"
+    },
+    {
+      "kind": "dose-boundary-filled",
+      "substance": "Fentanyl",
+      "route": "insufflated",
+      "detail": "dose: heavyMin 75 filled from strong.max"
+    },
+    {
+      "kind": "dose-boundary-filled",
+      "substance": "PCP",
+      "route": "smoked",
+      "detail": "dose: heavyMin 12 filled from strong.max"
+    },
+    {
+      "kind": "dose-boundary-filled",
+      "substance": "Pentobarbital",
+      "route": "oral",
+      "detail": "dose: heavyMin 300 filled from strong.max"
+    }
+  ]
+}

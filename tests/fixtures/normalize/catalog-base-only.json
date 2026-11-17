@@ -1,0 +1,79 @@
+{
+  "rule": "A base substance the API does not have stays in the catalog with its base data and its base URL. It is reported as base only, and as 'wiki page missing' when the snapshot says the page does not exist.",
+  "base": [
+    {
+      "name": "Oxazepam",
+      "url": "https://psychonautwiki.org/wiki/Oxazepam",
+      "categories": [
+        "depressant"
+      ],
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg",
+            "lightMin": 5,
+            "commonMin": 10,
+            "strongMin": 20,
+            "heavyMin": 30
+          }
+        }
+      ]
+    }
+  ],
+  "api": [],
+  "pages": {
+    "Oxazepam": {
+      "exists": false
+    }
+  },
+  "compare": [
+    "url",
+    "categories",
+    "roas"
+  ],
+  "reportKinds": [
+    "api-entry-dropped",
+    "api-entry-not-on-allow-list",
+    "api-only-added",
+    "base-only",
+    "name-matched",
+    "wiki-page-missing",
+    "wiki-title-differs"
+  ],
+  "expected": [
+    {
+      "name": "Oxazepam",
+      "url": "https://psychonautwiki.org/wiki/Oxazepam",
+      "categories": [
+        "depressant"
+      ],
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {
+            "units": "mg",
+            "thresholdMin": 5,
+            "commonMin": 10,
+            "strongMin": 20,
+            "heavyMin": 30
+          }
+        }
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "base-only",
+      "substance": "Oxazepam",
+      "route": null,
+      "detail": "the API has no entry: base data only"
+    },
+    {
+      "kind": "wiki-page-missing",
+      "substance": "Oxazepam",
+      "route": null,
+      "detail": "wiki page missing"
+    }
+  ]
+}

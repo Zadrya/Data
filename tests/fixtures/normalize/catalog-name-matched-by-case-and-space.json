@@ -1,0 +1,83 @@
+{
+  "rule": "An API name that differs from a base name only by case or whitespace is the same substance. It is reported and named after the wiki's canonical title, here the title of the API name's page.",
+  "base": [
+    {
+      "name": "4-HO-MiPT",
+      "commonNames": [
+        "Miprocin"
+      ],
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg",
+            "lightMin": 5
+          }
+        }
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "4-ho-mipt",
+      "commonNames": [
+        "Hats"
+      ],
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg",
+            "threshold": 6
+          }
+        }
+      ]
+    }
+  ],
+  "pages": {
+    "4-ho-mipt": {
+      "title": "4-HO-MiPT"
+    }
+  },
+  "compare": [
+    "aliases",
+    "url",
+    "roas"
+  ],
+  "reportKinds": [
+    "api-entry-dropped",
+    "api-entry-not-on-allow-list",
+    "api-only-added",
+    "base-only",
+    "name-matched",
+    "wiki-page-missing",
+    "wiki-title-differs"
+  ],
+  "expected": [
+    {
+      "name": "4-HO-MiPT",
+      "aliases": [
+        "Miprocin",
+        "Hats"
+      ],
+      "url": "https://psychonautwiki.org/wiki/4-HO-MiPT",
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {
+            "units": "mg",
+            "thresholdMin": 6
+          }
+        }
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "name-matched",
+      "substance": "4-HO-MiPT",
+      "route": null,
+      "detail": "base name '4-HO-MiPT' and API name '4-ho-mipt' are one substance, named '4-HO-MiPT'"
+    }
+  ]
+}

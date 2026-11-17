@@ -1,0 +1,120 @@
+{
+  "rule": "Durations are in minutes: seconds divide by 60, hours multiply by 60, days by 1440. Unit names match without case, in singular or plural. Values are computed exactly and kept to four decimal places: 45 seconds is 0.75, 5 seconds is 0.0833 (reported as rounded), 1.5 hours is 90. A phase with one bound is kept.",
+  "base": [
+    {
+      "name": "DMT",
+      "roas": [
+        {
+          "name": "smoked",
+          "duration": {
+            "total": {
+              "min": 5,
+              "max": 20,
+              "units": "minutes"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "DMT",
+      "roas": [
+        {
+          "name": "smoked",
+          "duration": {
+            "onset": {
+              "min": 5,
+              "max": 45,
+              "units": "seconds"
+            },
+            "comeup": {
+              "min": 1,
+              "max": 3,
+              "units": "minutes"
+            },
+            "peak": {
+              "min": 1.5,
+              "max": 2,
+              "units": "Hours"
+            },
+            "offset": {
+              "min": 1,
+              "units": "hour"
+            },
+            "total": {
+              "min": 0.5,
+              "max": 1,
+              "units": "days"
+            },
+            "afterglow": {
+              "max": 90,
+              "units": "Seconds"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "roas"
+  ],
+  "reportKinds": [
+    "api-block-rejected",
+    "base-block-used",
+    "block-dropped",
+    "dose-boundary-filled",
+    "dose-fill-discarded",
+    "dose-equal-boundaries",
+    "dose-label-differs",
+    "unit-repaired",
+    "unit-not-mass",
+    "duration-rounded",
+    "api-phase-ignored",
+    "route-only-in-base",
+    "route-only-in-api"
+  ],
+  "expected": [
+    {
+      "name": "DMT",
+      "roas": [
+        {
+          "route": "smoked",
+          "duration": {
+            "onset": {
+              "min": 0.0833,
+              "max": 0.75
+            },
+            "comeup": {
+              "min": 1,
+              "max": 3
+            },
+            "peak": {
+              "min": 90,
+              "max": 120
+            },
+            "offset": {
+              "min": 60
+            },
+            "total": {
+              "min": 720,
+              "max": 1440
+            },
+            "afterglow": {
+              "max": 1.5
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "duration-rounded",
+      "substance": "DMT",
+      "route": "smoked",
+      "detail": "duration onset: min 5 seconds is 0.0833 minutes after rounding"
+    }
+  ]
+}

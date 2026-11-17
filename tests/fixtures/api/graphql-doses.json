@@ -1,0 +1,3240 @@
+{
+ "data": {
+  "substances": [
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "1,4-Butanediol",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 2.5,
+        "min": 1.0
+       },
+       "heavy": 4.0,
+       "light": {
+        "max": 1.0,
+        "min": 0.5
+       },
+       "strong": {
+        "max": 4.0,
+        "min": 2.5
+       },
+       "threshold": 0.5,
+       "units": "mL"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/1%2C4-Butanediol"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "1P-LSD",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 150.0,
+        "min": 75.0
+       },
+       "heavy": 300.0,
+       "light": {
+        "max": 75.0,
+        "min": 25.0
+       },
+       "strong": {
+        "max": 300.0,
+        "min": 150.0
+       },
+       "threshold": 15.0,
+       "units": "µg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/1P-LSD"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "25B-NBOMe",
+    "roas": [
+     {
+      "name": "insufflated",
+      "dose": {
+       "common": {
+        "max": 350.0,
+        "min": 200.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 200.0,
+        "min": 50.0
+       },
+       "strong": {
+        "max": 500.0,
+        "min": 350.0
+       },
+       "threshold": 25.0,
+       "units": "µg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "sublingual",
+      "dose": {
+       "common": {
+        "max": 500.0,
+        "min": 300.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 300.0,
+        "min": 100.0
+       },
+       "strong": {
+        "max": 700.0,
+        "min": 500.0
+       },
+       "threshold": 50.0,
+       "units": "µg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/25B-NBOMe"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "25C-NBOH",
+    "roas": [
+     {
+      "name": "sublingual",
+      "dose": {
+       "common": {
+        "max": 750.0,
+        "min": 500.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 500.0,
+        "min": 250.0
+       },
+       "strong": {
+        "max": 1000.0,
+        "min": 750.0
+       },
+       "threshold": 100.0,
+       "units": "µg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/25C-NBOH"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "25C-NBOMe",
+    "roas": [
+     {
+      "name": "sublingual",
+      "dose": {
+       "common": {
+        "max": 700.0,
+        "min": 300.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 300.0,
+        "min": 100.0
+       },
+       "strong": {
+        "max": 1000.0,
+        "min": 700.0
+       },
+       "threshold": 50.0,
+       "units": "µg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/25C-NBOMe"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "25E-NBOH",
+    "roas": [
+     {
+      "name": "sublingual",
+      "dose": {
+       "common": {
+        "max": 1000.0,
+        "min": 600.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 600.0,
+        "min": 200.0
+       },
+       "strong": {
+        "max": 1200.0,
+        "min": 1000.0
+       },
+       "threshold": 50.0,
+       "units": "µg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/25E-NBOH"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "25I-NBOH",
+    "roas": [
+     {
+      "name": "sublingual",
+      "dose": {
+       "common": {
+        "max": 900.0,
+        "min": 500.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 500.0,
+        "min": 200.0
+       },
+       "strong": {
+        "max": 1400.0,
+        "min": 900.0
+       },
+       "threshold": 50.0,
+       "units": "µg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/25I-NBOH"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "25I-NBOMe",
+    "roas": [
+     {
+      "name": "insufflated",
+      "dose": {
+       "common": {
+        "max": 700.0,
+        "min": 500.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 500.0,
+        "min": 200.0
+       },
+       "strong": {
+        "max": null,
+        "min": 700.0
+       },
+       "threshold": 50.0,
+       "units": "µg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "sublingual",
+      "dose": {
+       "common": {
+        "max": 700.0,
+        "min": 500.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 500.0,
+        "min": 200.0
+       },
+       "strong": {
+        "max": 1000.0,
+        "min": 700.0
+       },
+       "threshold": 50.0,
+       "units": "µg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/25I-NBOMe"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "25N-NBOMe",
+    "roas": [
+     {
+      "name": "sublingual",
+      "dose": {
+       "common": {
+        "max": 800.0,
+        "min": 300.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 300.0,
+        "min": 100.0
+       },
+       "strong": {
+        "max": 1300.0,
+        "min": 800.0
+       },
+       "threshold": 100.0,
+       "units": "µg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/25N-NBOMe"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "2C-T-7",
+    "roas": [
+     {
+      "name": "insufflated",
+      "dose": {
+       "common": {
+        "max": 10.0,
+        "min": 5.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 5.0,
+        "min": 2.0
+       },
+       "strong": {
+        "max": 15.0,
+        "min": 10.0
+       },
+       "threshold": 1.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 25.0,
+        "min": 15.0
+       },
+       "heavy": 40.0,
+       "light": {
+        "max": 15.0,
+        "min": 10.0
+       },
+       "strong": {
+        "max": 40.0,
+        "min": 25.0
+       },
+       "threshold": 3.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/2C-T-7"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "2M2B",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 10.0,
+        "min": 5.0
+       },
+       "heavy": 15.0,
+       "light": {
+        "max": 5.0,
+        "min": 1.0
+       },
+       "strong": {
+        "max": 15.0,
+        "min": 10.0
+       },
+       "threshold": 0.5,
+       "units": "mL"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/2M2B"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "3-FEA",
+    "roas": [
+     {
+      "name": "insufflated",
+      "dose": {
+       "common": {
+        "max": 60.0,
+        "min": 35.0
+       },
+       "heavy": 60.0,
+       "light": {
+        "max": 35.0,
+        "min": 20.0
+       },
+       "strong": {
+        "max": 60.0,
+        "min": 50.0
+       },
+       "threshold": 15.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 70.0,
+        "min": 35.0
+       },
+       "heavy": 90.0,
+       "light": {
+        "max": 35.0,
+        "min": 20.0
+       },
+       "strong": {
+        "max": 90.0,
+        "min": 70.0
+       },
+       "threshold": 15.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/3-FEA"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "3-FPM",
+    "roas": [
+     {
+      "name": "insufflated",
+      "dose": {
+       "common": {
+        "max": 35.0,
+        "min": 20.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 20.0,
+        "min": 10.0
+       },
+       "strong": {
+        "max": 50.0,
+        "min": 35.0
+       },
+       "threshold": 5.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 60.0,
+        "min": 30.0
+       },
+       "heavy": 90.0,
+       "light": {
+        "max": 30.0,
+        "min": 10.0
+       },
+       "strong": {
+        "max": 90.0,
+        "min": 60.0
+       },
+       "threshold": 10.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/3-FPM"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "3-MeO-PCP",
+    "roas": [
+     {
+      "name": "insufflated",
+      "dose": {
+       "common": {
+        "max": 10.0,
+        "min": 5.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 5.0,
+        "min": 2.0
+       },
+       "strong": {
+        "max": 15.0,
+        "min": 10.0
+       },
+       "threshold": 1.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 15.0,
+        "min": 8.0
+       },
+       "heavy": 25.0,
+       "light": {
+        "max": 8.0,
+        "min": 4.0
+       },
+       "strong": {
+        "max": 25.0,
+        "min": 15.0
+       },
+       "threshold": 2.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "smoked",
+      "dose": {
+       "common": {
+        "max": 20.0,
+        "min": 10.0
+       },
+       "heavy": 25.0,
+       "light": {
+        "max": 10.0,
+        "min": 5.0
+       },
+       "strong": {
+        "max": 25.0,
+        "min": 20.0
+       },
+       "threshold": 2.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/3-MeO-PCP"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "4-HO-DET",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 30.0,
+        "min": 20.0
+       },
+       "heavy": 45.0,
+       "light": {
+        "max": 15.0,
+        "min": 10.0
+       },
+       "strong": {
+        "max": 45.0,
+        "min": 30.0
+       },
+       "threshold": 5.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/4-HO-DET"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "4-HO-EPT",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 40.0,
+        "min": 30.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 20.0,
+        "min": 15.0
+       },
+       "strong": {
+        "max": 60.0,
+        "min": 40.0
+       },
+       "threshold": null,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/4-HO-EPT"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "4-MeO-PCP",
+    "roas": [
+     {
+      "name": "insufflated",
+      "dose": {
+       "common": {
+        "max": 150.0,
+        "min": 75.0
+       },
+       "heavy": 150.0,
+       "light": {
+        "max": 75.0,
+        "min": 30.0
+       },
+       "strong": null,
+       "threshold": 15.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 170.0,
+        "min": 100.0
+       },
+       "heavy": 250.0,
+       "light": {
+        "max": 100.0,
+        "min": 75.0
+       },
+       "strong": {
+        "max": 250.0,
+        "min": 170.0
+       },
+       "threshold": 25.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/4-MeO-PCP"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "5-MeO-DALT",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 25.0,
+        "min": 12.0
+       },
+       "heavy": 35.0,
+       "light": {
+        "max": 12.0,
+        "min": 5.0
+       },
+       "strong": {
+        "max": 35.0,
+        "min": 25.0
+       },
+       "threshold": 4.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "smoked",
+      "dose": {
+       "common": {
+        "max": 10.0,
+        "min": 5.0
+       },
+       "heavy": null,
+       "light": null,
+       "strong": null,
+       "threshold": 3.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/5-MeO-DALT"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "5-MeO-DMT",
+    "roas": [
+     {
+      "name": "insufflated",
+      "dose": {
+       "common": {
+        "max": 15.0,
+        "min": 8.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 8.0,
+        "min": 5.0
+       },
+       "strong": {
+        "max": 25.0,
+        "min": 15.0
+       },
+       "threshold": 3.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "smoked",
+      "dose": {
+       "common": {
+        "max": 12.0,
+        "min": 6.0
+       },
+       "heavy": 20.0,
+       "light": {
+        "max": 6.0,
+        "min": 3.0
+       },
+       "strong": {
+        "max": 20.0,
+        "min": 12.0
+       },
+       "threshold": 1.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/5-MeO-DMT"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "A-PHP",
+    "roas": [
+     {
+      "name": "insufflated",
+      "dose": {
+       "common": {
+        "max": 15.0,
+        "min": 5.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 5.0,
+        "min": 1.0
+       },
+       "strong": {
+        "max": 25.0,
+        "min": 15.0
+       },
+       "threshold": 0.5,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 25.0,
+        "min": 10.0
+       },
+       "heavy": 40.0,
+       "light": {
+        "max": 10.0,
+        "min": 5.0
+       },
+       "strong": {
+        "max": 40.0,
+        "min": 25.0
+       },
+       "threshold": 1.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "smoked",
+      "dose": {
+       "common": {
+        "max": 10.0,
+        "min": 5.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 5.0,
+        "min": 2.0
+       },
+       "strong": {
+        "max": 20.0,
+        "min": 10.0
+       },
+       "threshold": 1.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/A-PHP"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Acetylfentanyl",
+    "roas": [
+     {
+      "name": "insufflated",
+      "dose": {
+       "common": {
+        "max": 15.0,
+        "min": 10.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 10.0,
+        "min": 5.0
+       },
+       "strong": {
+        "max": 20.0,
+        "min": 15.0
+       },
+       "threshold": 2.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "sublingual",
+      "dose": {
+       "common": {
+        "max": 15.0,
+        "min": 10.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 10.0,
+        "min": 5.0
+       },
+       "strong": {
+        "max": 20.0,
+        "min": 15.0
+       },
+       "threshold": 2.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Acetylfentanyl"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Clonazolam",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 300.0,
+        "min": 125.0
+       },
+       "heavy": 500.0,
+       "light": {
+        "max": 125.0,
+        "min": 75.0
+       },
+       "strong": {
+        "max": 500.0,
+        "min": 300.0
+       },
+       "threshold": 50.0,
+       "units": "µg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Clonazolam"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Clonidine",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 100.0,
+        "min": 75.0
+       },
+       "heavy": 300.0,
+       "light": {
+        "max": 75.0,
+        "min": 50.0
+       },
+       "strong": {
+        "max": 300.0,
+        "min": 100.0
+       },
+       "threshold": 25.0,
+       "units": "μg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Clonidine"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "DiPT",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 75.0,
+        "min": 30.0
+       },
+       "heavy": 150.0,
+       "light": {
+        "max": 30.0,
+        "min": 15.0
+       },
+       "strong": {
+        "max": 150.0,
+        "min": 75.0
+       },
+       "threshold": 15.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "smoked",
+      "dose": {
+       "common": {
+        "max": 20.0,
+        "min": 15.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 15.0,
+        "min": 10.0
+       },
+       "strong": {
+        "max": 30.0,
+        "min": 20.0
+       },
+       "threshold": 5.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/DiPT"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Diphenidine",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 100.0,
+        "min": 65.0
+       },
+       "heavy": 130.0,
+       "light": {
+        "max": 65.0,
+        "min": 40.0
+       },
+       "strong": {
+        "max": 130.0,
+        "min": 100.0
+       },
+       "threshold": 30.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "rectal",
+      "dose": {
+       "common": {
+        "max": 40.0,
+        "min": 20.0
+       },
+       "heavy": 80.0,
+       "light": {
+        "max": 20.0,
+        "min": 10.0
+       },
+       "strong": {
+        "max": 80.0,
+        "min": 40.0
+       },
+       "threshold": 5.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "smoked",
+      "dose": {
+       "common": {
+        "max": 40.0,
+        "min": 20.0
+       },
+       "heavy": 55.0,
+       "light": {
+        "max": 20.0,
+        "min": null
+       },
+       "strong": {
+        "max": 55.0,
+        "min": 40.0
+       },
+       "threshold": null,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Diphenidine"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "EPT",
+    "roas": [
+     {
+      "name": "insufflated",
+      "dose": {
+       "common": {
+        "max": 80.0,
+        "min": 40.0
+       },
+       "heavy": 110.0,
+       "light": {
+        "max": 40.0,
+        "min": 20.0
+       },
+       "strong": {
+        "max": 110.0,
+        "min": 80.0
+       },
+       "threshold": null,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/EPT"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Efavirenz",
+    "roas": [
+     {
+      "name": "smoked",
+      "dose": {
+       "common": {
+        "max": 1800.0,
+        "min": 600.0
+       },
+       "heavy": null,
+       "light": null,
+       "strong": null,
+       "threshold": null,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Efavirenz"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Ephylone",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 40.0,
+        "min": 20.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 20.0,
+        "min": 10.0
+       },
+       "strong": {
+        "max": 80.0,
+        "min": 40.0
+       },
+       "threshold": 5.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Ephylone"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Fentanyl",
+    "roas": [
+     {
+      "name": "insufflated",
+      "dose": {
+       "common": {
+        "max": 50.0,
+        "min": 25.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 25.0,
+        "min": 10.0
+       },
+       "strong": {
+        "max": 75.0,
+        "min": 50.0
+       },
+       "threshold": 5.0,
+       "units": "μg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "sublingual",
+      "dose": {
+       "common": {
+        "max": 50.0,
+        "min": 25.0
+       },
+       "heavy": 75.0,
+       "light": {
+        "max": 25.0,
+        "min": 10.0
+       },
+       "strong": {
+        "max": 75.0,
+        "min": 50.0
+       },
+       "threshold": 5.0,
+       "units": "μg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "transdermal",
+      "dose": {
+       "common": {
+        "max": 50.0,
+        "min": 25.0
+       },
+       "heavy": 100.0,
+       "light": {
+        "max": 25.0,
+        "min": 12.0
+       },
+       "strong": {
+        "max": 100.0,
+        "min": 50.0
+       },
+       "threshold": 5.0,
+       "units": "μg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Fentanyl"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Flubromazolam",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 250.0,
+        "min": 150.0
+       },
+       "heavy": 400.0,
+       "light": {
+        "max": 150.0,
+        "min": 100.0
+       },
+       "strong": {
+        "max": 400.0,
+        "min": 250.0
+       },
+       "threshold": 50.0,
+       "units": "μg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Flubromazolam"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "GBL",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 1.5,
+        "min": 0.9
+       },
+       "heavy": 3.0,
+       "light": {
+        "max": 0.9,
+        "min": 0.3
+       },
+       "strong": {
+        "max": 3.0,
+        "min": 1.5
+       },
+       "threshold": 0.3,
+       "units": "mL"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/GBL"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Ibogaine",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 22.0,
+        "min": 15.0
+       },
+       "heavy": null,
+       "light": null,
+       "strong": null,
+       "threshold": null,
+       "units": "mg/kg of body weight"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Ibogaine"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "JWH-018",
+    "roas": [
+     {
+      "name": "smoked",
+      "dose": {
+       "common": {
+        "max": 3.0,
+        "min": 2.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 2.0,
+        "min": 1.0
+       },
+       "strong": {
+        "max": 5.0,
+        "min": 3.0
+       },
+       "threshold": 1.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/JWH-018"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "JWH-073",
+    "roas": [
+     {
+      "name": "smoked",
+      "dose": {
+       "common": {
+        "max": 10.0,
+        "min": 5.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 5.0,
+        "min": 3.0
+       },
+       "strong": {
+        "max": 15.0,
+        "min": 10.0
+       },
+       "threshold": null,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/JWH-073"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "LAE-32",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 1500.0,
+        "min": 500.0
+       },
+       "heavy": null,
+       "light": null,
+       "strong": null,
+       "threshold": null,
+       "units": "µg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/LAE-32"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "LSA",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 250.0,
+        "min": 100.0
+       },
+       "heavy": 400.0,
+       "light": {
+        "max": 100.0,
+        "min": 50.0
+       },
+       "strong": {
+        "max": 400.0,
+        "min": 250.0
+       },
+       "threshold": 20.0,
+       "units": "seeds"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "sublingual",
+      "dose": {
+       "common": {
+        "max": 7.0,
+        "min": 5.0
+       },
+       "heavy": 12.0,
+       "light": {
+        "max": 5.0,
+        "min": 3.0
+       },
+       "strong": {
+        "max": 12.0,
+        "min": 7.0
+       },
+       "threshold": 1.0,
+       "units": "seeds"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/LSA"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "LSD",
+    "roas": [
+     {
+      "name": "sublingual",
+      "dose": {
+       "common": {
+        "max": 150.0,
+        "min": 75.0
+       },
+       "heavy": 300.0,
+       "light": {
+        "max": 75.0,
+        "min": 15.0
+       },
+       "strong": {
+        "max": 300.0,
+        "min": 150.0
+       },
+       "threshold": 15.0,
+       "units": "µg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/LSD"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Meclofenoxate",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 800.0,
+        "min": 400.0
+       },
+       "heavy": 600.0,
+       "light": {
+        "max": 200.0,
+        "min": 50.0
+       },
+       "strong": {
+        "max": 1000.0,
+        "min": 800.0
+       },
+       "threshold": null,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Meclofenoxate"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Methaqualone",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 500.0,
+        "min": 300.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 300.0,
+        "min": 150.0
+       },
+       "strong": {
+        "max": 600.0,
+        "min": 500.0
+       },
+       "threshold": 75.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "smoked",
+      "dose": {
+       "common": {
+        "max": 200.0,
+        "min": 100.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 100.0,
+        "min": 50.0
+       },
+       "strong": {
+        "max": 300.0,
+        "min": 200.0
+       },
+       "threshold": 50.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Methaqualone"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Methiopropamine",
+    "roas": [
+     {
+      "name": "insufflated",
+      "dose": {
+       "common": {
+        "max": 40.0,
+        "min": 20.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 20.0,
+        "min": 5.0
+       },
+       "strong": {
+        "max": 60.0,
+        "min": 40.0
+       },
+       "threshold": 5.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 50.0,
+        "min": 30.0
+       },
+       "heavy": 60.0,
+       "light": {
+        "max": 30.0,
+        "min": 20.0
+       },
+       "strong": {
+        "max": 60.0,
+        "min": 50.0
+       },
+       "threshold": 10.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Methiopropamine"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Methoxphenidine",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 120.0,
+        "min": 75.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 75.0,
+        "min": 50.0
+       },
+       "strong": {
+        "max": 150.0,
+        "min": 120.0
+       },
+       "threshold": 30.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Methoxphenidine"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Methylnaphthidate",
+    "roas": [
+     {
+      "name": "insufflated",
+      "dose": {
+       "common": {
+        "max": 14.0,
+        "min": 8.0
+       },
+       "heavy": 28.0,
+       "light": {
+        "max": 8.0,
+        "min": 4.0
+       },
+       "strong": {
+        "max": 28.0,
+        "min": 14.0
+       },
+       "threshold": null,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 30.0,
+        "min": 15.0
+       },
+       "heavy": 50.0,
+       "light": {
+        "max": 15.0,
+        "min": 10.0
+       },
+       "strong": {
+        "max": 50.0,
+        "min": 30.0
+       },
+       "threshold": 4.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Methylnaphthidate"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Metizolam",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 4.0,
+        "min": 2.0
+       },
+       "heavy": 6.0,
+       "light": {
+        "max": 2.0,
+        "min": 1.0
+       },
+       "strong": {
+        "max": 6.0,
+        "min": 4.0
+       },
+       "threshold": null,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Metizolam"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Mexedrone",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 250.0,
+        "min": 150.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 150.0,
+        "min": 100.0
+       },
+       "strong": {
+        "max": 350.0,
+        "min": 250.0
+       },
+       "threshold": 50.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Mexedrone"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Myristicin",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 500.0,
+        "min": 200.0
+       },
+       "heavy": 800.0,
+       "light": {
+        "max": 200.0,
+        "min": 50.0
+       },
+       "strong": {
+        "max": 800.0,
+        "min": 500.0
+       },
+       "threshold": null,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Myristicin"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "N-Ethylhexedrone",
+    "roas": [
+     {
+      "name": "insufflated",
+      "dose": {
+       "common": {
+        "max": 30.0,
+        "min": 24.0
+       },
+       "heavy": 40.0,
+       "light": {
+        "max": 24.0,
+        "min": 5.0
+       },
+       "strong": {
+        "max": 40.0,
+        "min": 30.0
+       },
+       "threshold": 5.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "smoked",
+      "dose": {
+       "common": {
+        "max": 10.0,
+        "min": 5.0
+       },
+       "heavy": 20.0,
+       "light": {
+        "max": 5.0,
+        "min": 2.0
+       },
+       "strong": {
+        "max": 20.0,
+        "min": 10.0
+       },
+       "threshold": 1.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/N-Ethylhexedrone"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Naloxone",
+    "roas": [
+     {
+      "name": "insufflated",
+      "dose": {
+       "common": {
+        "max": 4.0,
+        "min": 1.0
+       },
+       "heavy": null,
+       "light": null,
+       "strong": null,
+       "threshold": null,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "intramuscular",
+      "dose": {
+       "common": {
+        "max": 2.0,
+        "min": 0.4
+       },
+       "heavy": null,
+       "light": null,
+       "strong": null,
+       "threshold": null,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "intravenous",
+      "dose": {
+       "common": {
+        "max": 2.0,
+        "min": 0.4
+       },
+       "heavy": null,
+       "light": null,
+       "strong": null,
+       "threshold": null,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 16.0,
+        "min": 8.0
+       },
+       "heavy": 28.0,
+       "light": {
+        "max": 8.0,
+        "min": 4.0
+       },
+       "strong": {
+        "max": 28.0,
+        "min": 16.0
+       },
+       "threshold": 4.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Naloxone"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Oxycodone",
+    "roas": [
+     {
+      "name": "insufflated",
+      "dose": {
+       "common": {
+        "max": 15.0,
+        "min": 7.5
+       },
+       "heavy": 25.0,
+       "light": {
+        "max": 7.5,
+        "min": 2.5
+       },
+       "strong": {
+        "max": 25.0,
+        "min": 15.0
+       },
+       "threshold": 1.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "intravenous",
+      "dose": {
+       "common": {
+        "max": 10.0,
+        "min": 7.5
+       },
+       "heavy": 15.0,
+       "light": {
+        "max": 5.0,
+        "min": 2.5
+       },
+       "strong": {
+        "max": 15.0,
+        "min": 12.5
+       },
+       "threshold": 1.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 25.0,
+        "min": 10.0
+       },
+       "heavy": 40.0,
+       "light": {
+        "max": 10.0,
+        "min": 2.5
+       },
+       "strong": {
+        "max": 40.0,
+        "min": 25.0
+       },
+       "threshold": 1.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "smoked",
+      "dose": {
+       "common": {
+        "max": 20.0,
+        "min": 8.0
+       },
+       "heavy": 30.0,
+       "light": {
+        "max": 8.0,
+        "min": 1.5
+       },
+       "strong": {
+        "max": 35.0,
+        "min": 20.0
+       },
+       "threshold": 1.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Oxycodone"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "PCE",
+    "roas": [
+     {
+      "name": "insufflated",
+      "dose": {
+       "common": {
+        "max": 8.0,
+        "min": 4.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 4.0,
+        "min": 2.0
+       },
+       "strong": {
+        "max": 15.0,
+        "min": 8.0
+       },
+       "threshold": 1.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 10.0,
+        "min": 5.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 5.0,
+        "min": 3.0
+       },
+       "strong": {
+        "max": 15.0,
+        "min": 10.0
+       },
+       "threshold": 1.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "smoked",
+      "dose": {
+       "common": {
+        "max": 8.0,
+        "min": 4.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 4.0,
+        "min": 2.0
+       },
+       "strong": {
+        "max": 12.0,
+        "min": 8.0
+       },
+       "threshold": 1.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/PCE"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "PCP",
+    "roas": [
+     {
+      "name": "insufflated",
+      "dose": {
+       "common": {
+        "max": 8.0,
+        "min": 4.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 4.0,
+        "min": 2.0
+       },
+       "strong": {
+        "max": 15.0,
+        "min": 8.0
+       },
+       "threshold": 1.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 10.0,
+        "min": 5.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 5.0,
+        "min": 3.0
+       },
+       "strong": {
+        "max": 15.0,
+        "min": 10.0
+       },
+       "threshold": 1.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "smoked",
+      "dose": {
+       "common": {
+        "max": 8.0,
+        "min": 4.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 4.0,
+        "min": 2.0
+       },
+       "strong": {
+        "max": 12.0,
+        "min": 8.0
+       },
+       "threshold": 1.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/PCP"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "PMA",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 60.0,
+        "min": 40.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 40.0,
+        "min": 20.0
+       },
+       "strong": null,
+       "threshold": 10.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/PMA"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "PMMA",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 120.0,
+        "min": 100.0
+       },
+       "heavy": null,
+       "light": null,
+       "strong": null,
+       "threshold": null,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/PMMA"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Pentobarbital",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 200.0,
+        "min": 100.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 100.0,
+        "min": 50.0
+       },
+       "strong": {
+        "max": 300.0,
+        "min": 200.0
+       },
+       "threshold": 25.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Pentobarbital"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Pethidine",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 200.0,
+        "min": 100.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 100.0,
+        "min": 50.0
+       },
+       "strong": {
+        "max": 400.0,
+        "min": 200.0
+       },
+       "threshold": 25.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Pethidine"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Phenobarbital",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 150.0,
+        "min": 100.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 100.0,
+        "min": 50.0
+       },
+       "strong": {
+        "max": 300.0,
+        "min": 150.0
+       },
+       "threshold": 25.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Phenobarbital"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Prochlorperazine",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 20.0,
+        "min": 5.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 5.0,
+        "min": 2.5
+       },
+       "strong": {
+        "max": 40.0,
+        "min": 20.0
+       },
+       "threshold": 2.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Prochlorperazine"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Progesterone",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 400.0,
+        "min": 200.0
+       },
+       "heavy": 600.0,
+       "light": {
+        "max": 200.0,
+        "min": 100.0
+       },
+       "strong": {
+        "max": 600.0,
+        "min": 400.0
+       },
+       "threshold": null,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "rectal",
+      "dose": {
+       "common": {
+        "max": 400.0,
+        "min": 200.0
+       },
+       "heavy": 600.0,
+       "light": {
+        "max": 200.0,
+        "min": 100.0
+       },
+       "strong": {
+        "max": 600.0,
+        "min": 400.0
+       },
+       "threshold": null,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Progesterone"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Rolicyclidine",
+    "roas": [
+     {
+      "name": "insufflated",
+      "dose": {
+       "common": {
+        "max": 8.0,
+        "min": 4.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 4.0,
+        "min": 2.0
+       },
+       "strong": {
+        "max": 15.0,
+        "min": 8.0
+       },
+       "threshold": 1.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 9.0,
+        "min": 5.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 5.0,
+        "min": 3.0
+       },
+       "strong": {
+        "max": 13.0,
+        "min": 9.0
+       },
+       "threshold": 1.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "smoked",
+      "dose": {
+       "common": {
+        "max": 8.0,
+        "min": 4.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 4.0,
+        "min": 2.0
+       },
+       "strong": {
+        "max": 12.0,
+        "min": 8.0
+       },
+       "threshold": 1.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Rolicyclidine"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Secobarbital",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 150.0,
+        "min": 50.0
+       },
+       "heavy": null,
+       "light": {
+        "max": 50.0,
+        "min": 25.0
+       },
+       "strong": {
+        "max": 300.0,
+        "min": 150.0
+       },
+       "threshold": 20.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Secobarbital"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Sufentanil",
+    "roas": [
+     {
+      "name": "intravenous",
+      "dose": {
+       "common": {
+        "max": 10.0,
+        "min": 5.0
+       },
+       "heavy": 25.0,
+       "light": {
+        "max": 5.0,
+        "min": 1.0
+       },
+       "strong": {
+        "max": 25.0,
+        "min": 10.0
+       },
+       "threshold": 0.1,
+       "units": "μg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Sufentanil"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Theacrine",
+    "roas": [
+     {
+      "name": "insufflated",
+      "dose": {
+       "common": {
+        "max": 100.0,
+        "min": 25.0
+       },
+       "heavy": null,
+       "light": null,
+       "strong": null,
+       "threshold": 25.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     },
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 150.0,
+        "min": 100.0
+       },
+       "heavy": 300.0,
+       "light": {
+        "max": 100.0,
+        "min": 50.0
+       },
+       "strong": {
+        "max": 300.0,
+        "min": 150.0
+       },
+       "threshold": 25.0,
+       "units": "mg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Theacrine"
+   },
+   {
+    "addictionPotential": null,
+    "class": null,
+    "commonNames": null,
+    "crossTolerances": null,
+    "dangerousInteractions": null,
+    "featured": null,
+    "name": "Tizanidine",
+    "roas": [
+     {
+      "name": "oral",
+      "dose": {
+       "common": {
+        "max": 5.0,
+        "min": 4.0
+       },
+       "heavy": 8.0,
+       "light": {
+        "max": 3.0,
+        "min": 2.0
+       },
+       "strong": {
+        "max": 8.0,
+        "min": 6.0
+       },
+       "threshold": 25.0,
+       "units": "μg"
+      },
+      "duration": null,
+      "bioavailability": null
+     }
+    ],
+    "summary": null,
+    "systematicName": null,
+    "tolerance": null,
+    "toxicity": null,
+    "uncertainInteractions": null,
+    "unsafeInteractions": null,
+    "url": "https://psychonautwiki.org/wiki/Tizanidine"
+   }
+  ]
+ }
+}

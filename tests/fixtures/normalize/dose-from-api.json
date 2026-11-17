@@ -1,0 +1,84 @@
+{
+  "rule": "From the API each boundary is the value stated for it: thresholdMin is threshold, lightMin is light.min, commonMin is common.min, strongMin is strong.min, heavyMin is heavy. Range maxima are not stored. 1P-LSD oral: the base file has 15 as its lowest number (the wiki threshold); the API gives threshold 15 and light from 25. Whole numbers are written as integers.",
+  "base": [
+    {
+      "name": "1P-LSD",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "µg",
+            "lightMin": 15,
+            "commonMin": 75,
+            "strongMin": 150,
+            "heavyMin": 300
+          }
+        }
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "1P-LSD",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "common": {
+              "max": 150.0,
+              "min": 75.0
+            },
+            "heavy": 300.0,
+            "light": {
+              "max": 75.0,
+              "min": 25.0
+            },
+            "strong": {
+              "max": 300.0,
+              "min": 150.0
+            },
+            "threshold": 15.0,
+            "units": "µg"
+          }
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "roas"
+  ],
+  "reportKinds": [
+    "api-block-rejected",
+    "base-block-used",
+    "block-dropped",
+    "dose-boundary-filled",
+    "dose-fill-discarded",
+    "dose-equal-boundaries",
+    "dose-label-differs",
+    "unit-repaired",
+    "unit-not-mass",
+    "duration-rounded",
+    "api-phase-ignored",
+    "route-only-in-base",
+    "route-only-in-api"
+  ],
+  "expected": [
+    {
+      "name": "1P-LSD",
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {
+            "units": "µg",
+            "thresholdMin": 15,
+            "lightMin": 25,
+            "commonMin": 75,
+            "strongMin": 150,
+            "heavyMin": 300
+          }
+        }
+      ]
+    }
+  ],
+  "report": []
+}

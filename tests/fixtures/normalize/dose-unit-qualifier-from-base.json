@@ -1,0 +1,231 @@
+{
+  "rule": "The one exception to 'never mix sources'. When the API block is chosen and the base unit is exactly the API unit, one space and a qualifier, the dose keeps every API number and takes the base unit, and this is reported. These three routes are real: the numbers are milligrams of THC and of psilocybin, not of plant material, and plain mg would be a convertible mass unit.",
+  "base": [
+    {
+      "name": "Cannabis",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg THC",
+            "lightMin": 1,
+            "commonMin": 5,
+            "strongMin": 10,
+            "heavyMin": 25
+          }
+        },
+        {
+          "name": "smoked",
+          "dose": {
+            "units": "mg THC",
+            "lightMin": 0.4,
+            "commonMin": 2,
+            "strongMin": 4,
+            "heavyMin": 10
+          }
+        }
+      ]
+    },
+    {
+      "name": "Psilocybin mushrooms",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "units": "mg Psilocybin",
+            "lightMin": 2.5,
+            "commonMin": 10,
+            "strongMin": 25,
+            "heavyMin": 50
+          }
+        }
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "Cannabis",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "common": {
+              "max": 10.0,
+              "min": 5.0
+            },
+            "heavy": 25.0,
+            "light": {
+              "max": 5.0,
+              "min": 2.5
+            },
+            "strong": {
+              "max": 25.0,
+              "min": 10.0
+            },
+            "threshold": 1.0,
+            "units": "mg"
+          }
+        },
+        {
+          "name": "smoked",
+          "dose": {
+            "common": {
+              "max": 4.0,
+              "min": 2.0
+            },
+            "heavy": 10.0,
+            "light": {
+              "max": 2.0,
+              "min": 0.4
+            },
+            "strong": {
+              "max": 10.0,
+              "min": 4.0
+            },
+            "threshold": 0.4,
+            "units": "mg"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Psilocybin mushrooms",
+      "roas": [
+        {
+          "name": "oral",
+          "dose": {
+            "common": {
+              "max": 25.0,
+              "min": 10.0
+            },
+            "heavy": 50.0,
+            "light": {
+              "max": 10.0,
+              "min": 2.5
+            },
+            "strong": {
+              "max": 50.0,
+              "min": 25.0
+            },
+            "threshold": 2.5,
+            "units": "mg"
+          }
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "roas"
+  ],
+  "reportKinds": [
+    "api-block-rejected",
+    "base-block-used",
+    "block-dropped",
+    "dose-boundary-filled",
+    "dose-fill-discarded",
+    "dose-equal-boundaries",
+    "dose-label-differs",
+    "unit-repaired",
+    "unit-not-mass",
+    "duration-rounded",
+    "api-phase-ignored",
+    "route-only-in-base",
+    "route-only-in-api",
+    "unit-qualified"
+  ],
+  "expected": [
+    {
+      "name": "Cannabis",
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {
+            "units": "mg THC",
+            "thresholdMin": 1,
+            "lightMin": 2.5,
+            "commonMin": 5,
+            "strongMin": 10,
+            "heavyMin": 25
+          }
+        },
+        {
+          "route": "smoked",
+          "dose": {
+            "units": "mg THC",
+            "thresholdMin": 0.4,
+            "lightMin": 0.4,
+            "commonMin": 2,
+            "strongMin": 4,
+            "heavyMin": 10
+          }
+        }
+      ]
+    },
+    {
+      "name": "Psilocybin mushrooms",
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {
+            "units": "mg Psilocybin",
+            "thresholdMin": 2.5,
+            "lightMin": 2.5,
+            "commonMin": 10,
+            "strongMin": 25,
+            "heavyMin": 50
+          }
+        }
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "unit-qualified",
+      "substance": "Cannabis",
+      "route": "oral",
+      "detail": "dose: the API units 'mg' become the base units 'mg THC': the numbers refer to what the qualifier names"
+    },
+    {
+      "kind": "unit-not-mass",
+      "substance": "Cannabis",
+      "route": "oral",
+      "detail": "dose: units 'mg THC' are not a mass unit"
+    },
+    {
+      "kind": "unit-qualified",
+      "substance": "Cannabis",
+      "route": "smoked",
+      "detail": "dose: the API units 'mg' become the base units 'mg THC': the numbers refer to what the qualifier names"
+    },
+    {
+      "kind": "unit-not-mass",
+      "substance": "Cannabis",
+      "route": "smoked",
+      "detail": "dose: units 'mg THC' are not a mass unit"
+    },
+    {
+      "kind": "dose-equal-boundaries",
+      "substance": "Cannabis",
+      "route": "smoked",
+      "detail": "dose: thresholdMin and lightMin are both 0.4"
+    },
+    {
+      "kind": "unit-qualified",
+      "substance": "Psilocybin mushrooms",
+      "route": "oral",
+      "detail": "dose: the API units 'mg' become the base units 'mg Psilocybin': the numbers refer to what the qualifier names"
+    },
+    {
+      "kind": "unit-not-mass",
+      "substance": "Psilocybin mushrooms",
+      "route": "oral",
+      "detail": "dose: units 'mg Psilocybin' are not a mass unit"
+    },
+    {
+      "kind": "dose-equal-boundaries",
+      "substance": "Psilocybin mushrooms",
+      "route": "oral",
+      "detail": "dose: thresholdMin and lightMin are both 2.5"
+    }
+  ]
+}
