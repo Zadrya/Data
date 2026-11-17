@@ -1,5 +1,5 @@
 {
-  "rule": "A fill is used only when the direct value is absent (first route: heavy 300 wins over strong.max 250). commonMin can be filled from light.max (second route). A fill that would break the order is discarded and reported, and the rest of the block is kept (third route: strong.max 40 is below strongMin 50).",
+  "rule": "A fill is used only when the direct value is absent (first route: heavy 300 wins over strong.max 250). commonMin can be filled from light.max (second route). A fill that would break the order is discarded and reported, and the rest of the block is kept (third route: there is no strong range, and common.max 60 would put strongMin above heavyMin 50).",
   "base": [],
   "api": [
     {
@@ -46,12 +46,9 @@
             "units": "mg",
             "common": {
               "min": 20,
-              "max": 30
+              "max": 60
             },
-            "strong": {
-              "min": 50,
-              "max": 40
-            }
+            "heavy": 50
           }
         }
       ]
@@ -106,7 +103,7 @@
           "dose": {
             "units": "mg",
             "commonMin": 20,
-            "strongMin": 50
+            "heavyMin": 50
           }
         }
       ]
@@ -129,7 +126,7 @@
       "kind": "dose-fill-discarded",
       "substance": "Tizanidine",
       "route": "insufflated",
-      "detail": "dose: heavyMin is not filled from strong.max 40: strongMin 50 is above heavyMin 40"
+      "detail": "dose: strongMin is not filled from common.max 60: strongMin 60 is above heavyMin 50"
     }
   ]
 }

@@ -4,7 +4,7 @@
 Two recordings are used: ``graphql.json`` (seven whole entries) and
 ``graphql-doses.json`` (the dose blocks of every substance whose dose normalization
 does something worth pinning in the snapshot of 2026-11-16: a filled boundary, a label
-difference, an inconsistent block, a repaired or non-mass unit).
+difference, an inconsistent block or range, a repaired, qualified or non-mass unit).
 """
 
 from collections import Counter
@@ -419,6 +419,21 @@ def test_no_base_dose_boundary_is_lost_without_a_report(base: BaseFile, doses: N
                 ), f"{substance.name} {route.name}: the base {boundary} {value} is lost"
 
     assert checked > 300
+
+
+def test_an_inverted_api_range_makes_the_base_dose_win(doses: Normalized) -> None:
+    rejected = {(f.substance, f.route): f.detail for f in doses.report.of(Kind.API_BLOCK_REJECTED)}
+
+    assert rejected == {
+        ("HXE", "insufflated"): "dose: light.min 40 is above light.max 20; the base block is used"
+    }
+    assert {r["route"]: r for r in _by_name(doses)["HXE"]["roas"]}["insufflated"]["dose"] == {
+        "units": "mg",
+        "thresholdMin": 20,
+        "commonMin": 40,
+        "strongMin": 70,
+        "heavyMin": 120,
+    }
 
 
 def test_units_other_than_mass_are_reported_and_kept(doses: Normalized) -> None:

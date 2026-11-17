@@ -25,9 +25,9 @@ as far beyond heavy. When the API block is the one chosen and the base unit is e
 the API unit, one space and a qualifier, the dose takes the base unit. No number ever
 crosses.
 
-A block is consistent when it has units, every boundary is finite and not negative,
-and the boundaries do not decrease in the order above (equal neighbours are allowed
-and reported).
+A block is consistent when it has units, every API range has its minimum at or below
+its maximum, every boundary is finite and not negative, and the boundaries do not
+decrease in the order above (equal neighbours are allowed and reported).
 """
 
 from fractions import Fraction
@@ -157,10 +157,26 @@ def _bound(item: ApiRange | None, which: str) -> float | None:
     return item.min if which == "min" else item.max
 
 
+def _inverted_range(dose: ApiDose) -> str | None:
+    """Return a description of the first API range whose minimum is above its maximum."""
+    for name, item in (("light", dose.light), ("common", dose.common), ("strong", dose.strong)):
+        if item is not None and item.min is not None and item.max is not None:
+            if item.min > item.max:
+                return f"{name}.min {item.min:g} is above {name}.max {item.max:g}"
+    return None
+
+
 def from_api(dose: ApiDose | None, base: BaseDose | None) -> Candidate[Dose]:
-    """Return the dose block the API offers. The base block is only read for one report."""
+    """Return the dose block the API offers. The base block is read for its units and reports.
+
+    A range whose minimum is above its maximum makes the whole block inconsistent before
+    anything is mapped or filled: its numbers cannot be trusted for either purpose.
+    """
     if dose is None:
         return Candidate()
+    inverted = _inverted_range(dose)
+    if inverted is not None:
+        return Candidate(problem=inverted)
     direct = {
         "thresholdMin": dose.threshold,
         "lightMin": _bound(dose.light, "min"),

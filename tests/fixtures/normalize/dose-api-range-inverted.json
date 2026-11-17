@@ -1,0 +1,90 @@
+{
+  "rule": "An API range whose minimum is above its maximum makes the whole API block inconsistent, before anything is mapped or filled. HXE insufflated is real: the light range is 40 to 20. The base block is used, and the rejection is reported.",
+  "base": [
+    {
+      "name": "HXE",
+      "roas": [
+        {
+          "name": "insufflated",
+          "dose": {
+            "units": "mg",
+            "lightMin": 20,
+            "commonMin": 40,
+            "strongMin": 70,
+            "heavyMin": 120
+          }
+        }
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "HXE",
+      "roas": [
+        {
+          "name": "insufflated",
+          "dose": {
+            "common": {
+              "max": 70.0,
+              "min": 40.0
+            },
+            "heavy": 120.0,
+            "light": {
+              "max": 20.0,
+              "min": 40.0
+            },
+            "strong": {
+              "max": 120.0,
+              "min": 70.0
+            },
+            "threshold": 20.0,
+            "units": "mg"
+          }
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "roas"
+  ],
+  "reportKinds": [
+    "api-block-rejected",
+    "base-block-used",
+    "block-dropped",
+    "dose-boundary-filled",
+    "dose-fill-discarded",
+    "dose-equal-boundaries",
+    "dose-label-differs",
+    "unit-repaired",
+    "unit-not-mass",
+    "duration-rounded",
+    "api-phase-ignored",
+    "route-only-in-base",
+    "route-only-in-api"
+  ],
+  "expected": [
+    {
+      "name": "HXE",
+      "roas": [
+        {
+          "route": "insufflated",
+          "dose": {
+            "units": "mg",
+            "thresholdMin": 20,
+            "commonMin": 40,
+            "strongMin": 70,
+            "heavyMin": 120
+          }
+        }
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "api-block-rejected",
+      "substance": "HXE",
+      "route": "insufflated",
+      "detail": "dose: light.min 40 is above light.max 20; the base block is used"
+    }
+  ]
+}
