@@ -21,8 +21,9 @@ base file writes the doses of Cannabis in ``mg THC`` and of Psilocybin mushrooms
 ``mg Psilocybin``, because the numbers are milligrams of the active compound, not of
 the material a user weighs; the API writes plain ``mg``. Plain ``mg`` is a mass unit
 the app may convert, so half a gram of flower would be compared with 10 mg and shown
-as far beyond heavy. When the API block is the one chosen and the base unit is exactly
-the API unit, one space and a qualifier, the dose takes the base unit. No number ever
+as far beyond heavy. When the API block is the one chosen and the base unit is one of
+``QUALIFIED_UNITS`` and starts with the API unit and a space, the dose takes the base
+unit. Any other base unit of that form is reported and not used. No number ever
 crosses.
 
 A block is consistent when it has units, every API range has its minimum at or below
@@ -44,18 +45,43 @@ MASS_UNITS = ("µg", "mg", "g")
 GREEK_MU = "μ"
 MICRO_SIGN = "µ"
 
+# Base units that may replace a plain API unit, each with what its numbers measure.
+# PROPOSED: the owner confirms this list in the dataset review. A unit enters only
+# when its numbers are known to refer to something other than what a user weighs.
+QUALIFIED_UNITS = {
+    "mg THC": "milligrams of THC, not of cannabis material",
+    "mg Psilocybin": "milligrams of psilocybin, not of dried mushrooms",
+}
+
 type Dose = dict[str, int | float | str]
 
 
-def _qualified(units: str, base_units: str | None) -> str | None:
-    """Return the base unit when it is the given unit, one space and a qualifier."""
+def _qualified(units: str, base_units: str | None) -> tuple[str | None, list[Note]]:
+    """Return the base unit when it is an accepted qualified form of the given unit.
+
+    A base unit that is the given unit, a space and anything else, but is not in
+    ``QUALIFIED_UNITS``, is reported and not used.
+    """
     if base_units is None:
-        return None
+        return None, []
     candidate = text.line(text.strip(base_units).replace(GREEK_MU, MICRO_SIGN))
     if candidate is None or not candidate.startswith(units + " "):
-        return None
-    qualifier = candidate[len(units) + 1 :]
-    return candidate if qualifier == qualifier.strip() else None
+        return None, []
+    if candidate in QUALIFIED_UNITS:
+        return candidate, [
+            (
+                Kind.UNIT_QUALIFIED,
+                f"the API units '{units}' become the base units '{candidate}': "
+                f"{QUALIFIED_UNITS[candidate]}",
+            )
+        ]
+    return None, [
+        (
+            Kind.UNIT_QUALIFIER_NOT_ADOPTED,
+            f"the base units '{candidate}' qualify the API units '{units}' but are not "
+            "on the list of qualified units; the API units are kept",
+        )
+    ]
 
 
 def _units(raw: str | None, qualifier_from: str | None = None) -> tuple[str | None, list[Note]]:
@@ -68,16 +94,10 @@ def _units(raw: str | None, qualifier_from: str | None = None) -> tuple[str | No
         notes.append((Kind.UNIT_REPAIRED, f"units '{stripped}' written with the Greek letter mu"))
         stripped = stripped.replace(GREEK_MU, MICRO_SIGN)
     units = text.line(stripped)
-    qualified = _qualified(units, qualifier_from) if units is not None else None
-    if units is not None and qualified is not None:
-        notes.append(
-            (
-                Kind.UNIT_QUALIFIED,
-                f"the API units '{units}' become the base units '{qualified}': the numbers "
-                "refer to what the qualifier names",
-            )
-        )
-        units = qualified
+    if units is not None:
+        qualified, qualifier_notes = _qualified(units, qualifier_from)
+        notes.extend(qualifier_notes)
+        units = qualified or units
     if units is not None and units not in MASS_UNITS:
         notes.append((Kind.UNIT_NOT_MASS, f"units '{units}' are not a mass unit"))
     return units, notes

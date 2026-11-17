@@ -131,6 +131,7 @@
     "api-phase-ignored",
     "route-only-in-base",
     "route-only-in-api",
+    "unit-qualifier-not-adopted",
     "unit-qualified"
   ],
   "expected": [
@@ -183,7 +184,7 @@
       "kind": "unit-qualified",
       "substance": "Cannabis",
       "route": "oral",
-      "detail": "dose: the API units 'mg' become the base units 'mg THC': the numbers refer to what the qualifier names"
+      "detail": "dose: the API units 'mg' become the base units 'mg THC': milligrams of THC, not of cannabis material"
     },
     {
       "kind": "unit-not-mass",
@@ -195,7 +196,7 @@
       "kind": "unit-qualified",
       "substance": "Cannabis",
       "route": "smoked",
-      "detail": "dose: the API units 'mg' become the base units 'mg THC': the numbers refer to what the qualifier names"
+      "detail": "dose: the API units 'mg' become the base units 'mg THC': milligrams of THC, not of cannabis material"
     },
     {
       "kind": "unit-not-mass",
@@ -213,7 +214,7 @@
       "kind": "unit-qualified",
       "substance": "Psilocybin mushrooms",
       "route": "oral",
-      "detail": "dose: the API units 'mg' become the base units 'mg Psilocybin': the numbers refer to what the qualifier names"
+      "detail": "dose: the API units 'mg' become the base units 'mg Psilocybin': milligrams of psilocybin, not of dried mushrooms"
     },
     {
       "kind": "unit-not-mass",

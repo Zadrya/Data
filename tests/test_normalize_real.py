@@ -402,6 +402,7 @@ def test_real_dose_blocks_against_the_base_file(doses: Normalized) -> None:
         "strongMin": 70,
         "heavyMin": 120,
     }
+    assert doses.report.of(Kind.UNIT_QUALIFIER_NOT_ADOPTED) == []
 
 
 def test_units_other_than_mass_are_reported_and_kept(doses: Normalized) -> None:

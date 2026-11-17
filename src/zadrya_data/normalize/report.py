@@ -45,6 +45,7 @@ class Kind(StrEnum):
     UNIT_REPAIRED = "unit-repaired"
     UNIT_NOT_MASS = "unit-not-mass"
     UNIT_QUALIFIED = "unit-qualified"
+    UNIT_QUALIFIER_NOT_ADOPTED = "unit-qualifier-not-adopted"
     DURATION_ROUNDED = "duration-rounded"
 
 

@@ -1,5 +1,5 @@
 {
-  "rule": "A base unit is adopted only as a qualifier of the API unit. An unrelated unit (seeds against mg), a unit that merely starts with the same letters (mgs), a qualifier that is empty or only spaces, and two spaces before the qualifier are not adopted: the API unit stays. Greek mu is normalized on both sides before comparing, so the last positive example here is Fentanyl, whose base unit qualifies the API unit. A qualifier is never taken from the API into a base block (Cannabis).",
+  "rule": "A base unit is adopted only when it is on the list of qualified units (mg THC, mg Psilocybin). Any other base unit that is the API unit, a space and a qualifier is reported as not adopted (Fentanyl, 'µg per hour', compared after the Greek mu repair); a qualifier after two spaces is not on the list either, so it is reported the same way (Kava sublingual). An unrelated unit (seeds against mg), a unit that merely starts with the same letters (mgs) and a qualifier that is empty or only spaces are not qualifiers at all. In every case the API unit stays. A qualifier is never taken from the API into a base block (Cannabis).",
   "base": [
     {
       "name": "LSA",
@@ -154,6 +154,7 @@
     "api-phase-ignored",
     "route-only-in-base",
     "route-only-in-api",
+    "unit-qualifier-not-adopted",
     "unit-qualified"
   ],
   "expected": [
@@ -175,7 +176,7 @@
         {
           "route": "transdermal",
           "dose": {
-            "units": "µg per hour",
+            "units": "µg",
             "thresholdMin": 12
           }
         }
@@ -233,16 +234,16 @@
       "detail": "dose: the API states units only; the base block is used"
     },
     {
-      "kind": "unit-qualified",
+      "kind": "unit-qualifier-not-adopted",
       "substance": "Fentanyl",
       "route": "transdermal",
-      "detail": "dose: the API units 'µg' become the base units 'µg per hour': the numbers refer to what the qualifier names"
+      "detail": "dose: the base units 'µg per hour' qualify the API units 'µg' but are not on the list of qualified units; the API units are kept"
     },
     {
-      "kind": "unit-not-mass",
-      "substance": "Fentanyl",
-      "route": "transdermal",
-      "detail": "dose: units 'µg per hour' are not a mass unit"
+      "kind": "unit-qualifier-not-adopted",
+      "substance": "Kava",
+      "route": "sublingual",
+      "detail": "dose: the base units 'mg  kavalactones' qualify the API units 'mg' but are not on the list of qualified units; the API units are kept"
     }
   ]
 }
