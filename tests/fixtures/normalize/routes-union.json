@@ -68,7 +68,8 @@
     "duration-rounded",
     "api-phase-ignored",
     "route-only-in-base",
-    "route-only-in-api"
+    "route-only-in-api",
+    "unit-qualifier-not-adopted"
   ],
   "expected": [
     {
