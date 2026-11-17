@@ -40,6 +40,25 @@ KEY_PASSWORD_VARIABLE = "ZADRYA_SIGNING_KEY_PASSWORD"
 
 _ENCODED_SIGNATURE_LENGTH = 89  # 88 base64 characters and the line feed
 
+# The eight points of small order of the curve, as the y coordinate of their encoding
+# (the top bit, the sign of x, is cleared before comparing). The last two entries are
+# the non-canonical spellings of y = 0 and y = 1 (p and p + 1). With such a key
+# pinned, a fixed signature verifies for every message or for a large share of them,
+# so they are refused wherever a public key enters. The list is the one libsodium
+# uses, and the test suite recomputes the order of each point.
+_SMALL_ORDER_Y = frozenset(
+    bytes.fromhex(encoding)
+    for encoding in (
+        "0000000000000000000000000000000000000000000000000000000000000000",
+        "0100000000000000000000000000000000000000000000000000000000000000",
+        "26e8958fc2b227b045c3f489f2ef98f0d5dfac05d3c63339b13802886d53fc05",
+        "c7176a703d4dd84fba3c0b760d10670f2a2053fa2c39ccc64ec7fd7792ac037a",
+        "ecffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+        "edffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+        "eeffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+    )
+)
+
 
 class SigningError(Exception):
     """Base of every error of this module."""
@@ -97,13 +116,31 @@ def public_key_base64(public_key: Ed25519PublicKey) -> str:
     return base64.b64encode(public_key_raw(public_key)).decode("ascii")
 
 
+def is_small_order(raw: bytes) -> bool:
+    """Say whether the 32 bytes encode one of the eight points of small order."""
+    return raw[:31] + bytes([raw[31] & 0x7F]) in _SMALL_ORDER_Y
+
+
+def _refuse_small_order(public_key: Ed25519PublicKey, where: str) -> None:
+    if is_small_order(public_key_raw(public_key)):
+        raise KeyLoadError(
+            f"{where} is a point of small order, not a real Ed25519 public key: "
+            "signatures can be forged for it"
+        )
+
+
 def public_key_from_raw(raw: bytes) -> Ed25519PublicKey:
-    """Return the public key that the 32 bytes encode."""
+    """Return the public key that the 32 bytes encode. Points of small order are refused."""
     if len(raw) != PUBLIC_KEY_LENGTH:
         raise KeyLoadError(
             f"an Ed25519 public key is {PUBLIC_KEY_LENGTH} bytes, found {len(raw)} bytes"
         )
-    return Ed25519PublicKey.from_public_bytes(raw)
+    try:
+        public_key = Ed25519PublicKey.from_public_bytes(raw)
+    except ValueError:  # pragma: no cover (OpenSSL takes any 32 bytes today)
+        raise KeyLoadError("the 32 bytes are not an Ed25519 public key") from None
+    _refuse_small_order(public_key, "the public key")
+    return public_key
 
 
 def sign(data: bytes, private_key: Ed25519PrivateKey) -> bytes:
@@ -117,8 +154,9 @@ def verify(data: bytes, signature: bytes, public_keys: Sequence[PinnedKey]) -> P
     """Return the pinned key whose signature of the exact bytes this is.
 
     Raises ``NoPinnedKeysError`` when there is no key, ``TooManyPinnedKeysError``
-    when there are more than ``MAX_PINNED_KEYS``, ``SignatureFormatError`` when the
-    signature is not 64 bytes, and ``SignatureMismatchError`` when no key verifies:
+    when there are more than ``MAX_PINNED_KEYS``, ``KeyLoadError`` when a key is a
+    point of small order, ``SignatureFormatError`` when the signature is not 64
+    bytes, and ``SignatureMismatchError`` when no key verifies:
     a tampered file, a tampered signature and a key that is not pinned look the same.
     """
     if len(public_keys) == 0:
@@ -131,6 +169,8 @@ def verify(data: bytes, signature: bytes, public_keys: Sequence[PinnedKey]) -> P
         raise SignatureFormatError(
             f"an Ed25519 signature is {SIGNATURE_LENGTH} bytes, found {len(signature)} bytes"
         )
+    for pinned in public_keys:
+        _refuse_small_order(pinned.public_key, f"the pinned key {pinned.name}")
     for pinned in public_keys:
         try:
             pinned.public_key.verify(signature, data)
@@ -251,6 +291,7 @@ def _load_public_key(path: Path) -> Ed25519PublicKey:
         ) from None
     if not isinstance(key, Ed25519PublicKey):
         raise KeyLoadError(f"the public key file {path} does not hold an Ed25519 key")
+    _refuse_small_order(key, f"the key in {path}")
     canonical = key.public_bytes(
         serialization.Encoding.PEM, serialization.PublicFormat.SubjectPublicKeyInfo
     )
