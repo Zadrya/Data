@@ -412,6 +412,13 @@ def test_real_dose_blocks_against_the_base_file(doses: Normalized) -> None:
         ("N-Ethylhexedrone", "insufflated", "dose: strongMin 40 to 30 mg, lower"),
         ("N-Ethylhexedrone", "insufflated", "dose: heavyMin 50 to 40 mg, lower"),
     ]
+    # The base threshold the API block lacks is reported on the eight routes that also
+    # carry a label difference: the API states the same number as lightMin.
+    not_in_api = sorted(
+        (f.substance, f.route) for f in doses.report.of(Kind.DOSE_BOUNDARY_NOT_IN_API)
+    )
+    label = sorted((f.substance, f.route) for f in doses.report.of(Kind.DOSE_LABEL_DIFFERS))
+    assert len(not_in_api) == 8 and not_in_api == label
     assert doses.report.of(Kind.UNIT_CHANGED) == []
     assert doses.report.of(Kind.UNIT_QUALIFIER_NOT_ADOPTED) == []
 

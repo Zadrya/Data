@@ -270,14 +270,24 @@ def changes(chosen: Dose, base: Dose) -> list[Note]:
 
     Each boundary that both state with different values is one finding, with its
     direction. When the units differ, every boundary both state is listed without a
-    direction, because the numbers cannot be compared. A higher ``strongMin`` or ``heavyMin`` is the risky direction, and the
-    finding says which doses now fall in the class below.
+    direction, because the numbers cannot be compared. A higher ``strongMin`` or
+    ``heavyMin`` is the risky direction, and the finding says which doses now fall in
+    the class below. Each boundary the base states and the chosen API block does not is
+    a finding of its own, so no base value disappears without one.
     """
     notes: list[Note] = []
     units, base_units = str(chosen["units"]), str(base["units"])
     if units != base_units:
         notes.append((Kind.UNIT_CHANGED, f"units '{base_units}' to '{units}'"))
     for name in BOUNDARIES:
+        if name in base and name not in chosen:
+            notes.append(
+                (
+                    Kind.DOSE_BOUNDARY_NOT_IN_API,
+                    f"{name} {base[name]:g} {base_units}, not in the API block",
+                )
+            )
+            continue
         if name not in chosen or name not in base:
             continue
         old, new = base[name], chosen[name]

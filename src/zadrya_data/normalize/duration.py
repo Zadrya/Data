@@ -66,9 +66,20 @@ def phase(low: float | None, high: float | None, units: str | None) -> Candidate
 
 
 def changes(phase_name: str, chosen: Phase, base: Phase) -> list[Note]:
-    """Describe how the chosen API phase differs from the base phase, bound by bound."""
+    """Describe how the chosen API phase differs from the base phase, bound by bound.
+
+    A bound the base states and the API phase does not is a finding of its own.
+    """
     notes: list[Note] = []
     for bound in ("min", "max"):
+        if bound in base and bound not in chosen:
+            notes.append(
+                (
+                    Kind.DURATION_BOUND_NOT_IN_API,
+                    f"{phase_name} {bound} {base[bound]:g} minutes, not in the API phase",
+                )
+            )
+            continue
         if bound not in chosen or bound not in base or chosen[bound] == base[bound]:
             continue
         old, new = base[bound], chosen[bound]
