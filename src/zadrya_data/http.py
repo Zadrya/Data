@@ -1,21 +1,24 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """The one HTTP client of the pipeline: slow, bounded and anonymous.
 
-Only the ``fetch`` command uses the network. Every request goes through
+Two commands use the network: ``fetch`` (the PsychonautWiki API and wiki) and
+``verify --release`` (the assets of a published release). Every request goes through
 ``PoliteClient``, which waits at least one second between requests, gives up after a
 timeout, retries a few times on a timeout or a server error (5xx) and identifies
 itself as ``dataset-builder/<version>`` with nothing that names a person or a project.
-Responses are read as strict JSON.
+Answers to a POST are read as strict JSON; a GET returns the bytes as they came.
 
 It also refuses to be steered or stalled: proxy and certificate variables of the
 environment are ignored, an answer larger than ``MAX_RESPONSE_BYTES`` is dropped
 while it streams, an answer that drips in for longer than ``DEADLINE_SECONDS`` counts
 as a timeout, and a ``Retry-After`` on a 503 is honoured up to
-``MAX_RETRY_AFTER_SECONDS`` and is a failure beyond that.
+``MAX_RETRY_AFTER_SECONDS`` and is a failure beyond that. Redirects are not followed,
+except by ``get_bytes``: once, over HTTPS, and only to a host the caller names.
 """
 
 import time
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Set
+from dataclasses import dataclass
 from types import TracebackType
 from typing import Self
 
@@ -33,6 +36,7 @@ MAX_RESPONSE_BYTES = 8 * 1024 * 1024
 # The timeout above is per read. This bounds one whole request.
 DEADLINE_SECONDS = 120.0
 MAX_RETRY_AFTER_SECONDS = 60
+REDIRECT_STATUSES = frozenset({301, 302, 303, 307, 308})
 
 
 class FetchError(RuntimeError):
@@ -41,6 +45,14 @@ class FetchError(RuntimeError):
 
 class _TooSlow(Exception):
     """One request went past its overall deadline."""
+
+
+@dataclass(frozen=True)
+class _Answer:
+    """The body of a 200 answer, or the target of a redirect that the caller accepts."""
+
+    body: bytes = b""
+    location: str | None = None
 
 
 class PoliteClient:
@@ -82,34 +94,77 @@ class PoliteClient:
 
     def post_json(self, url: str, payload: Mapping[str, object]) -> object:
         """POST a JSON body and return the JSON answer."""
-        return self._request(url, json=payload)
+        return self._json(url, self._request("POST", url, json=payload).body)
 
     def post_form(self, url: str, fields: Mapping[str, str]) -> object:
         """POST form fields and return the JSON answer."""
-        return self._request(url, data=fields)
+        return self._json(url, self._request("POST", url, data=fields).body)
+
+    def get_redirect(self, url: str) -> str:
+        """GET a URL that answers with a redirect, and return its target without following it."""
+        answer = self._request("GET", url, redirect_ok=True)
+        if answer.location is None:
+            raise FetchError(f"{url}: expected a redirect, got HTTP 200")
+        return answer.location
+
+    def get_bytes(self, url: str, *, redirect_hosts: Set[str] = frozenset()) -> bytes:
+        """GET a URL and return the bytes of the answer.
+
+        One redirect is followed, and only to an ``https`` address on one of
+        ``redirect_hosts`` (exact host names, default port, no user name). Any other
+        redirect, and a second one, is a ``FetchError``. The target is never shown in
+        full, because a download address can carry a temporary token.
+        """
+        answer = self._request("GET", url, redirect_ok=True)
+        if answer.location is None:
+            return answer.body
+        # httpx has already refused a Location it cannot parse (a FetchError above).
+        target = httpx.URL(answer.location)
+        if (
+            target.scheme != "https"
+            or target.host not in redirect_hosts
+            or target.userinfo != b""
+            or target.port is not None
+        ):
+            host = target.host or "an invalid address"
+            raise FetchError(f"{url}: redirects to {host}, which is not an allowed download host")
+        return self._request("GET", str(target), shown=f"{url} (via {target.host})").body
+
+    @staticmethod
+    def _json(url: str, body: bytes) -> object:
+        try:
+            return loads(body.decode("utf-8"))
+        except (UnicodeDecodeError, StrictJsonError) as error:
+            raise FetchError(f"{url}: the answer is not JSON: {error}") from error
 
     def _request(
         self,
+        method: str,
         url: str,
         *,
         json: Mapping[str, object] | None = None,
         data: Mapping[str, str] | None = None,
-    ) -> object:
+        redirect_ok: bool = False,
+        shown: str | None = None,
+    ) -> _Answer:
+        shown = url if shown is None else shown
         failure = "no attempt was made"
         for attempt in range(1, MAX_ATTEMPTS + 1):
             self._wait_for_turn()
             self.request_count += 1
             started = self._clock()
             try:
-                with self._client.stream("POST", url, json=json, data=data) as response:
+                with self._client.stream(method, url, json=json, data=data) as response:
                     if response.status_code >= 500:
                         failure = f"HTTP {response.status_code}"
                         if attempt < MAX_ATTEMPTS:
-                            self._honour_retry_after(response, url)
+                            self._honour_retry_after(response, shown)
                         continue
+                    if redirect_ok and response.status_code in REDIRECT_STATUSES:
+                        return _Answer(location=response.headers.get("location", ""))
                     if response.status_code != 200:
-                        raise FetchError(f"{url}: HTTP {response.status_code}")
-                    body = self._read(response, url, started)
+                        raise FetchError(f"{shown}: HTTP {response.status_code}")
+                    return _Answer(body=self._read(response, shown, started))
             except httpx.TimeoutException:
                 failure = "timed out"
                 continue
@@ -117,12 +172,8 @@ class PoliteClient:
                 failure = f"took longer than {DEADLINE_SECONDS:g} seconds"
                 continue
             except httpx.HTTPError as error:
-                raise FetchError(f"{url}: {type(error).__name__}: {error}") from error
-            try:
-                return loads(body.decode("utf-8"))
-            except (UnicodeDecodeError, StrictJsonError) as error:
-                raise FetchError(f"{url}: the answer is not JSON: {error}") from error
-        raise FetchError(f"{url}: {failure}, gave up after {MAX_ATTEMPTS} attempts")
+                raise FetchError(f"{shown}: {type(error).__name__}: {error}") from error
+        raise FetchError(f"{shown}: {failure}, gave up after {MAX_ATTEMPTS} attempts")
 
     def _read(self, response: httpx.Response, url: str, started: float) -> bytes:
         """Read the body while it streams, within the size cap and the deadline."""
