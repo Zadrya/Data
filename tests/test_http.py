@@ -287,3 +287,16 @@ def test_an_answer_that_is_not_utf_8_fails() -> None:
 
     with _client(transport) as client, pytest.raises(FetchError, match="the answer is not JSON"):
         client.post_json(URL, {})
+
+
+def test_retry_after_is_not_waited_for_after_the_last_attempt() -> None:
+    fake = FakeTime()
+    transport, seen = _answers(
+        *(httpx.Response(503, headers={"retry-after": "7"}) for _ in range(MAX_ATTEMPTS))
+    )
+
+    with _client(transport, fake) as client, pytest.raises(FetchError, match="HTTP 503, gave up"):
+        client.post_json(URL, {})
+
+    assert len(seen) == MAX_ATTEMPTS
+    assert fake.sleeps == [7, 7]

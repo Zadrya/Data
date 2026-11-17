@@ -96,7 +96,7 @@ class PoliteClient:
         data: Mapping[str, str] | None = None,
     ) -> object:
         failure = "no attempt was made"
-        for _ in range(MAX_ATTEMPTS):
+        for attempt in range(1, MAX_ATTEMPTS + 1):
             self._wait_for_turn()
             self.request_count += 1
             started = self._clock()
@@ -104,7 +104,8 @@ class PoliteClient:
                 with self._client.stream("POST", url, json=json, data=data) as response:
                     if response.status_code >= 500:
                         failure = f"HTTP {response.status_code}"
-                        self._honour_retry_after(response, url)
+                        if attempt < MAX_ATTEMPTS:
+                            self._honour_retry_after(response, url)
                         continue
                     if response.status_code != 200:
                         raise FetchError(f"{url}: HTTP {response.status_code}")
