@@ -4,7 +4,8 @@
 Two recordings are used: ``graphql.json`` (seven whole entries) and
 ``graphql-doses.json`` (the dose blocks of every substance whose dose normalization
 does something worth pinning in the snapshot of 2026-11-16: a filled boundary, a label
-difference, an inconsistent block or range, a repaired, qualified or non-mass unit).
+difference, an inconsistent block or range, a change against the base file, a
+repaired, qualified or non-mass unit).
 """
 
 from collections import Counter
@@ -384,13 +385,14 @@ def test_an_allowed_api_entry_left_without_numbers_is_dropped(doses: Normalized)
 
 
 def test_real_dose_blocks_against_the_base_file(doses: Normalized) -> None:
-    """The upper-boundary rule changes no real route, and the inverted range is reported.
+    """The upper-boundary rule changes no real route; an inverted range and real changes are reported.
 
     Normalization itself stops if a base upper boundary is ever lost without a rejection
     (``test_the_guard_stops_a_route_that_lost_an_upper_boundary_of_the_base``), so a
     successful run over the real data is the regression guard.
     """
     rejected = {(f.substance, f.route): f.detail for f in doses.report.of(Kind.API_BLOCK_REJECTED)}
+    changed = [(f.substance, f.route, f.detail) for f in doses.report.of(Kind.DOSE_CHANGED)]
 
     assert rejected == {
         ("HXE", "insufflated"): "dose: light.min 40 is above light.max 20; the base block is used"
@@ -402,6 +404,15 @@ def test_real_dose_blocks_against_the_base_file(doses: Normalized) -> None:
         "strongMin": 70,
         "heavyMin": 120,
     }
+    assert changed == [
+        ("Clonazolam", "oral", "dose: commonMin 200 to 125 µg, lower"),
+        ("Clonazolam", "oral", "dose: strongMin 400 to 300 µg, lower"),
+        ("Clonazolam", "oral", "dose: heavyMin 999 to 500 µg, lower"),
+        ("N-Ethylhexedrone", "insufflated", "dose: commonMin 30 to 24 mg, lower"),
+        ("N-Ethylhexedrone", "insufflated", "dose: strongMin 40 to 30 mg, lower"),
+        ("N-Ethylhexedrone", "insufflated", "dose: heavyMin 50 to 40 mg, lower"),
+    ]
+    assert doses.report.of(Kind.UNIT_CHANGED) == []
     assert doses.report.of(Kind.UNIT_QUALIFIER_NOT_ADOPTED) == []
 
 

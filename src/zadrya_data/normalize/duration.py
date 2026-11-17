@@ -63,3 +63,17 @@ def phase(low: float | None, high: float | None, units: str | None) -> Candidate
             )
         result[name] = plain(kept)
     return Candidate(result, notes=tuple(notes))
+
+
+def changes(phase_name: str, chosen: Phase, base: Phase) -> list[Note]:
+    """Describe how the chosen API phase differs from the base phase, bound by bound."""
+    notes: list[Note] = []
+    for bound in ("min", "max"):
+        if bound not in chosen or bound not in base or chosen[bound] == base[bound]:
+            continue
+        old, new = base[bound], chosen[bound]
+        direction = "lower" if new < old else "higher"
+        notes.append(
+            (Kind.DURATION_CHANGED, f"{phase_name} {bound} {old:g} to {new:g} minutes, {direction}")
+        )
+    return notes

@@ -1,0 +1,134 @@
+{
+  "rule": "When an API duration phase is chosen and the base has a consistent phase for the same route, each bound that differs is reported in minutes with its direction. NEP insufflated is real: the API total is longer than the base total.",
+  "base": [
+    {
+      "name": "NEP",
+      "roas": [
+        {
+          "name": "insufflated",
+          "duration": {
+            "total": {
+              "min": 2,
+              "max": 4,
+              "units": "hours"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "NEP",
+      "roas": [
+        {
+          "name": "insufflated",
+          "duration": {
+            "afterglow": {
+              "max": 4.0,
+              "min": 1.0,
+              "units": "hours"
+            },
+            "comeup": {
+              "max": 15.0,
+              "min": 5.0,
+              "units": "minutes"
+            },
+            "offset": {
+              "max": 90.0,
+              "min": 30.0,
+              "units": "minutes"
+            },
+            "onset": {
+              "max": 8.0,
+              "min": 1.0,
+              "units": "minutes"
+            },
+            "peak": {
+              "max": 60.0,
+              "min": 30.0,
+              "units": "minutes"
+            },
+            "total": {
+              "max": 3.0,
+              "min": 1.0,
+              "units": "hours"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "compare": [
+    "roas"
+  ],
+  "reportKinds": [
+    "api-block-rejected",
+    "base-block-used",
+    "block-dropped",
+    "dose-boundary-filled",
+    "dose-fill-discarded",
+    "dose-equal-boundaries",
+    "dose-label-differs",
+    "unit-repaired",
+    "unit-not-mass",
+    "duration-rounded",
+    "api-phase-ignored",
+    "route-only-in-base",
+    "route-only-in-api",
+    "unit-qualifier-not-adopted",
+    "unit-changed",
+    "dose-changed",
+    "duration-changed"
+  ],
+  "expected": [
+    {
+      "name": "NEP",
+      "roas": [
+        {
+          "route": "insufflated",
+          "duration": {
+            "onset": {
+              "min": 1,
+              "max": 8
+            },
+            "comeup": {
+              "min": 5,
+              "max": 15
+            },
+            "peak": {
+              "min": 30,
+              "max": 60
+            },
+            "offset": {
+              "min": 30,
+              "max": 90
+            },
+            "total": {
+              "min": 60,
+              "max": 180
+            },
+            "afterglow": {
+              "min": 60,
+              "max": 240
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "duration-changed",
+      "substance": "NEP",
+      "route": "insufflated",
+      "detail": "duration: total min 120 to 60 minutes, lower"
+    },
+    {
+      "kind": "duration-changed",
+      "substance": "NEP",
+      "route": "insufflated",
+      "detail": "duration: total max 240 to 180 minutes, lower"
+    }
+  ]
+}

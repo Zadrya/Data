@@ -58,7 +58,10 @@
     "api-phase-ignored",
     "route-only-in-base",
     "route-only-in-api",
-    "unit-qualifier-not-adopted"
+    "unit-qualifier-not-adopted",
+    "unit-changed",
+    "dose-changed",
+    "duration-changed"
   ],
   "expected": [
     {

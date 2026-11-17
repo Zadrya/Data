@@ -9,7 +9,9 @@ merge policy in ``blocks``.
 
 For the dose, an API block that lacks an upper boundary the base block has is
 rejected before the policy runs (``dose.require_upper_boundaries``), and afterwards a
-check stops the normalization if a base upper boundary was lost anyway.
+check stops the normalization if a base upper boundary was lost anyway. Where the API
+value is chosen and the base has a consistent value for the same block, every
+difference is reported, with its direction.
 """
 
 from functools import cache
@@ -20,7 +22,9 @@ from zadrya_data.graphql import ApiRoute, ApiSubstance
 from zadrya_data.normalize import dose as dose_rules
 from zadrya_data.normalize.bioavailability import bioavailability
 from zadrya_data.normalize.blocks import Candidate, choose
+from zadrya_data.normalize.blocks import Note
 from zadrya_data.normalize.duration import PHASES, phase
+from zadrya_data.normalize.duration import changes as duration_changes
 from zadrya_data.normalize.errors import NormalizationError
 from zadrya_data.normalize.report import Kind, Report
 from zadrya_data.schema import SchemaName, load_schema
@@ -104,6 +108,10 @@ def normalize_routes(
             )
         if dose is not None:
             result["dose"] = dose
+            if dose is api_dose.value and base_dose_candidate.value is not None:
+                _report(
+                    report, name, route, "dose", dose_rules.changes(dose, base_dose_candidate.value)
+                )
 
         api_duration = api_route.duration if api_route else None
         base_duration = base_route.duration if base_route else None
@@ -130,6 +138,9 @@ def normalize_routes(
             )
             if chosen is not None:
                 duration[phase_name] = chosen
+                if chosen is api_candidate.value and base_candidate.value is not None:
+                    notes = duration_changes(phase_name, chosen, base_candidate.value)
+                    _report(report, name, route, "duration", notes)
         if duration:
             result["duration"] = duration
         if api_duration is not None and api_duration.duration is not None:
@@ -160,3 +171,8 @@ def normalize_routes(
             result["bioavailability"] = chosen_bio
         routes.append(result)
     return routes
+
+
+def _report(report: Report, name: str, route: str, what: str, notes: list[Note]) -> None:
+    for kind, detail in notes:
+        report.add(kind, f"{what}: {detail}", substance=name, route=route)
