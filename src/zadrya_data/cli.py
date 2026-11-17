@@ -2,6 +2,9 @@
 """Command line entry point: ``zadrya-data <command>``."""
 
 import argparse
+import datetime as dt
+import os
+import re
 import sys
 from datetime import UTC, datetime
 from collections.abc import Sequence
@@ -10,7 +13,9 @@ from pathlib import Path
 from zadrya_data import __version__
 from zadrya_data.base import BaseFormatError, load_base
 from zadrya_data.graphql import ApiFormatError, ApiQueryError
+from zadrya_data.errors import ReleaseRejectedError
 from zadrya_data.http import FetchError, PoliteClient
+from zadrya_data.manifest import build_manifest, parse_substances, serialize_manifest
 from zadrya_data.mediawiki import WikiFormatError
 from zadrya_data.schema import SchemaName, validate
 from zadrya_data.snapshot import SnapshotError, check_destination, fetch_raw, write_snapshot
@@ -22,6 +27,82 @@ EXIT_UNREADABLE = 2
 EXIT_FETCH_FAILED = 1
 
 DEFAULT_BASE = Path("sources/base/Substances.json")
+
+_SEMVER = re.compile(r"(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)", re.ASCII)
+_DATE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", re.ASCII)
+
+
+class _Refused(Exception):
+    """A command stops with this exit code and message."""
+
+    def __init__(self, code: int, message: str) -> None:
+        super().__init__(message)
+        self.code = code
+
+
+def _version_argument(value: str) -> str:
+    if _SEMVER.fullmatch(value) is None:
+        raise argparse.ArgumentTypeError(
+            f"{value!r} is not a version of the form MAJOR.MINOR.PATCH"
+        )
+    return value
+
+
+def _date_argument(value: str) -> dt.date:
+    try:
+        if _DATE.fullmatch(value) is None:
+            raise ValueError
+        return dt.date.fromisoformat(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError(
+            f"{value!r} is not a date of the form YYYY-MM-DD"
+        ) from None
+
+
+def _read(path: Path) -> bytes:
+    try:
+        return path.read_bytes()
+    except OSError as error:
+        raise _Refused(EXIT_UNREADABLE, f"cannot read {path}: {error.strerror}") from None
+
+
+def _write(path: Path, content: bytes, *, source: Path) -> None:
+    """Write the file whole or not at all, and never over the file it was made from."""
+    if path.resolve() == source.resolve():
+        raise _Refused(EXIT_INVALID, f"{path} is the input file: choose another output")
+    temporary = path.with_name(f".{path.name}.partial")
+    try:
+        temporary.write_bytes(content)
+        os.replace(temporary, path)
+    except OSError as error:
+        temporary.unlink(missing_ok=True)
+        raise _Refused(EXIT_UNREADABLE, f"cannot write {path}: {error.strerror}") from None
+
+
+def _release_dataset(path: Path, dataset_version: str | None) -> bytes:
+    """Return the exact bytes of a dataset that is fit to be released.
+
+    It must be strict JSON, valid against the substances schema and, when a version
+    is expected, state that ``datasetVersion``. Refusals raise ``_Refused`` or a
+    ``ReleaseRejectedError``.
+    """
+    data = _read(path)
+    document = parse_substances(data)
+    violations = validate(document, SchemaName.SUBSTANCES)
+    if violations:
+        shown = "; ".join(str(violation) for violation in violations[:5])
+        raise _Refused(
+            EXIT_INVALID,
+            f"{path} is not valid against the substances schema ({len(violations)} "
+            f"violation(s)): {shown}",
+        )
+    stated = document["datasetVersion"]
+    if dataset_version is not None and stated != dataset_version:
+        raise _Refused(
+            EXIT_INVALID,
+            f"{path} states datasetVersion {stated}, and {dataset_version} was expected",
+        )
+    return data
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -67,7 +148,61 @@ def build_parser() -> argparse.ArgumentParser:
         default=DEFAULT_BASE,
         help="the base file whose substance names are looked up too (default: %(default)s)",
     )
+
+    manifest_parser = commands.add_parser(
+        "manifest",
+        help="write the manifest.json of a release",
+        description="Write the manifest.json of a release of the exact bytes of a dataset. The "
+        "versions and the attribution are copied from the dataset, the SHA-256 is computed over "
+        "its bytes. The same inputs always give the same bytes: nothing reads the clock. "
+        "Exit code 0: written, 1: the dataset or an argument is refused, 2: a file cannot be "
+        "read or written.",
+    )
+    manifest_parser.add_argument("substances", type=Path, help="the substances.json to release")
+    manifest_parser.add_argument(
+        "--min-app-version",
+        type=_version_argument,
+        required=True,
+        help="lowest app version that can use the dataset (MAJOR.MINOR.PATCH)",
+    )
+    manifest_parser.add_argument(
+        "--date", type=_date_argument, required=True, help="release date (YYYY-MM-DD)"
+    )
+    manifest_parser.add_argument(
+        "--dataset-version",
+        type=_version_argument,
+        help="refuse a dataset that does not state this datasetVersion",
+    )
+    manifest_parser.add_argument(
+        "--output", type=Path, required=True, help="where to write manifest.json"
+    )
     return parser
+
+
+def run_manifest(
+    substances: Path,
+    min_app_version: str,
+    date: dt.date,
+    dataset_version: str | None,
+    output: Path,
+) -> int:
+    """Build and write the manifest of a release, and return the exit code."""
+    try:
+        data = _release_dataset(substances, dataset_version)
+        manifest = build_manifest(data, min_app_version=min_app_version, date=date)
+        _write(output, serialize_manifest(manifest), source=substances)
+    except _Refused as refusal:
+        print(f"error: manifest not written: {refusal}", file=sys.stderr)
+        return refusal.code
+    except ReleaseRejectedError as error:
+        print(f"error: manifest not written: {error}", file=sys.stderr)
+        return EXIT_INVALID
+    print(
+        f"{output}: manifest of dataset {manifest['datasetVersion']} (schema "
+        f"{manifest['schemaVersion']}), minAppVersion {min_app_version}, date {date}, "
+        f"sha256 {manifest['sha256']}"
+    )
+    return EXIT_OK
 
 
 def make_client() -> PoliteClient:
@@ -136,5 +271,13 @@ def main(argv: Sequence[str] | None = None) -> int:
         return run_validate(arguments.path, arguments.schema)
     if arguments.command == "fetch":
         return run_fetch(arguments.output, arguments.base)
+    if arguments.command == "manifest":
+        return run_manifest(
+            arguments.substances,
+            arguments.min_app_version,
+            arguments.date,
+            arguments.dataset_version,
+            arguments.output,
+        )
     parser.print_help()
     return EXIT_OK
