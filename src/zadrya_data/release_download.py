@@ -5,7 +5,7 @@ This is the second, and last, network path of the pipeline (``fetch`` is the
 other). It only reads public release assets of ``Zadrya/Data``, through
 ``PoliteClient``, and never decides anything: ``verify_release`` does. The
 addresses, the redirect hosts and the tag scheme are recorded in
-``docs/adr/0005-release.md``.
+``docs/adr/0006-release.md``.
 
 A dataset release is tagged ``dataset-vX.Y.Z``, where ``X.Y.Z`` is the
 ``datasetVersion`` inside the signed ``substances.json``. ``check_tag`` makes sure
