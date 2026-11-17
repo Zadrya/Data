@@ -4,8 +4,9 @@
 For each substance the dangerous, unsafe and uncertain lists of both sources are
 merged as a union. Each target name is resolved, in this order:
 
-1. a catalog substance by its exact name, then by its name without case, then by an
-   alias (without case) that only one catalog substance has: ``{kind: substance}``;
+1. a catalog substance by its exact name, then through ``TARGET_NAMES`` (colloquial
+   names of the data, without case), then by its name without case, then by an alias
+   (without case) that only one catalog substance has: ``{kind: substance}``;
 2. a class named in ``interaction_groups.NAME_TO_GROUP``: ``{kind: group, groupId}``;
 3. anything else: ``{kind: other, name}``, with the name as written, one entry per
    name without case (the first spelling, base before API, is kept).
@@ -39,6 +40,13 @@ SEVERITIES = ("dangerous", "unsafe", "uncertain")
 _RANK = {severity: rank for rank, severity in enumerate(SEVERITIES)}
 _KIND_ORDER = {"substance": 0, "group": 1, "other": 2}
 
+# Colloquial target names of the data, in lower case, to the catalog substance they
+# mean. Only names whose meaning is certain: the API writes "Mushrooms" where the base
+# file writes "Psilocybin mushrooms" (ten cannabinoids and Cocaine).
+TARGET_NAMES = {
+    "mushrooms": "Psilocybin mushrooms",
+}
+
 # A resolved target: (kind, value). The value is a canonical name, a group id, or for
 # ``other`` the name without case (the spelling shown is kept apart).
 type Key = tuple[str, str]
@@ -69,6 +77,9 @@ class _Resolver:
         folded = raw.casefold()
         if raw in self.names:
             return ("substance", raw)
+        meant = TARGET_NAMES.get(folded)
+        if meant is not None and meant in self.names:
+            return self._note(raw, "by the target name table", ("substance", meant), lister)
         named = self.by_folded_name.get(folded, [])
         if len(named) == 1:
             return self._note(raw, "by its name without case", ("substance", named[0]), lister)
