@@ -1,0 +1,159 @@
+{
+  "rule": "The cross tolerance tokens of a substance are the union of both sources, compared without case; a token only one source has is reported when the substance is in both. Each token maps, without case, through the explicit table TOKEN_TO_GROUP to a group id, and the substance is a member of every group its tokens map to. A token that names no group (analog) or is not in the table is dropped and reported, never guessed. A token that is not valid text is reported and dropped. The ids are sorted.",
+  "base": [
+    {
+      "name": "MDMA",
+      "crossTolerances": [
+        "dopaminergic",
+        "serotonergic",
+        "stimulant"
+      ]
+    },
+    {
+      "name": "3-FMA",
+      "crossTolerances": [
+        "dopamine",
+        "serotonin|serotonergic",
+        "stimulant"
+      ]
+    },
+    {
+      "name": "N-Methylbisfluoromodafinil",
+      "crossTolerances": [
+        "modafanil",
+        "analog"
+      ]
+    },
+    {
+      "name": "Morphine"
+    },
+    {
+      "name": "Kratom",
+      "crossTolerances": [
+        "Opioids",
+        "mitragynine",
+        " "
+      ]
+    }
+  ],
+  "api": [
+    {
+      "name": "MDMA",
+      "crossTolerances": [
+        "Stimulants",
+        "dopaminergic",
+        "serotonergic"
+      ]
+    },
+    {
+      "name": "3-FMA",
+      "crossTolerances": []
+    },
+    {
+      "name": "Morphine",
+      "crossTolerances": [
+        "opioids"
+      ]
+    }
+  ],
+  "compare": [
+    "crossTolerances"
+  ],
+  "reportKinds": [
+    "cross-tolerance-sources-differ",
+    "cross-tolerance-token-dropped",
+    "text-dropped"
+  ],
+  "expected": [
+    {
+      "name": "3-FMA",
+      "crossTolerances": [
+        "dopaminergic",
+        "serotonergic",
+        "stimulants"
+      ]
+    },
+    {
+      "name": "Kratom",
+      "crossTolerances": [
+        "opioids"
+      ]
+    },
+    {
+      "name": "MDMA",
+      "crossTolerances": [
+        "dopaminergic",
+        "serotonergic",
+        "stimulants"
+      ]
+    },
+    {
+      "name": "Morphine",
+      "crossTolerances": [
+        "opioids"
+      ]
+    },
+    {
+      "name": "N-Methylbisfluoromodafinil",
+      "crossTolerances": [
+        "modafinil-analogs"
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "cross-tolerance-sources-differ",
+      "substance": "3-FMA",
+      "route": null,
+      "detail": "the token 'dopamine' is only in the base file"
+    },
+    {
+      "kind": "cross-tolerance-sources-differ",
+      "substance": "3-FMA",
+      "route": null,
+      "detail": "the token 'serotonin|serotonergic' is only in the base file"
+    },
+    {
+      "kind": "cross-tolerance-sources-differ",
+      "substance": "3-FMA",
+      "route": null,
+      "detail": "the token 'stimulant' is only in the base file"
+    },
+    {
+      "kind": "text-dropped",
+      "substance": "Kratom",
+      "route": null,
+      "detail": "cross tolerance token of the base file (empty) is not valid text"
+    },
+    {
+      "kind": "cross-tolerance-token-dropped",
+      "substance": "Kratom",
+      "route": null,
+      "detail": "the token 'mitragynine' is not in the mapping table"
+    },
+    {
+      "kind": "cross-tolerance-sources-differ",
+      "substance": "MDMA",
+      "route": null,
+      "detail": "the token 'stimulant' is only in the base file"
+    },
+    {
+      "kind": "cross-tolerance-sources-differ",
+      "substance": "MDMA",
+      "route": null,
+      "detail": "the token 'Stimulants' is only in the API"
+    },
+    {
+      "kind": "cross-tolerance-sources-differ",
+      "substance": "Morphine",
+      "route": null,
+      "detail": "the token 'opioids' is only in the API"
+    },
+    {
+      "kind": "cross-tolerance-token-dropped",
+      "substance": "N-Methylbisfluoromodafinil",
+      "route": null,
+      "detail": "the token 'analog' names no group: it only qualifies the token next to it"
+    }
+  ]
+}

@@ -64,5 +64,6 @@ def test_there_are_reference_cases_for_every_concern() -> None:
         "dose",
         "duration",
         "tolerance",
+        "cross",
     } <= prefixes
     assert "bioavailability" in prefixes
