@@ -44,6 +44,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          # The whole history and the tags, to show what changed since the last release.
+          fetch-depth: 0
       - name: Install uv and Python
         uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         with:
@@ -80,6 +82,28 @@ jobs:
           uv run --locked --no-dev zadrya-data manifest dataset/substances.json
           --dataset-version "$DATASET_VERSION" --min-app-version "$MIN_APP_VERSION"
           --date "$RELEASE_DATE" --output "$RUNNER_TEMP/manifest.json"
+      - name: Show what will be signed, for the owner to read before approving
+        run: |
+          previous=$(git tag --list 'dataset-v*' --sort=-v:refname | head -n 1)
+          {
+            echo "## What the sign job will sign"
+            echo
+            echo "- Commit: \`$GITHUB_SHA\`"
+            echo "- \`dataset/substances.json\`, SHA-256: \`$(sha256sum dataset/substances.json | cut -d ' ' -f 1)\`"
+            echo "- datasetVersion: \`$(jq -r .datasetVersion "$RUNNER_TEMP/manifest.json")\`"
+            echo
+            echo "Compare the SHA-256 with the reviewed dataset pull request before approving."
+            echo
+            if [[ -z "$previous" ]]; then
+              echo "### Workflows, keys and pipeline: first release"
+            else
+              echo "### Workflows, keys and pipeline changed since $previous"
+              echo
+              echo '```text'
+              git diff --stat "$previous..HEAD" -- .github/workflows keys src uv.lock pyproject.toml
+              echo '```'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
 
   sign:
     name: sign
