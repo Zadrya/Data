@@ -85,6 +85,7 @@ jobs:
           git diff --quiet "$merged" "$GITHUB_SHA" -- dataset/substances.json \
             || { echo "dataset/substances.json changed after pull request #$DATASET_PR" >&2; exit 1; }
       - name: Check that the tag is new and the version is higher than every dataset release
+        id: releases
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -100,14 +101,18 @@ jobs:
             echo "$DATASET_VERSION is not above every dataset release ($highest)" >&2
             exit 1
           fi
+          # The latest earlier dataset release, empty for the first one.
+          echo "previous=$(printf '%s\n' "$previous" | sed '/^$/d' | sort -V | tail -n 1)" >> "$GITHUB_OUTPUT"
       - name: Check the committed dataset (schema and datasetVersion) and its manifest
         run: >-
           uv run --locked --no-dev zadrya-data manifest dataset/substances.json
           --dataset-version "$DATASET_VERSION" --min-app-version "$MIN_APP_VERSION"
           --date "$RELEASE_DATE" --output "$RUNNER_TEMP/manifest.json"
       - name: Show what will be signed, for the owner to read before approving
+        env:
+          PREVIOUS_VERSION: ${{ steps.releases.outputs.previous }}
         run: |
-          previous=$(git tag --list 'dataset-v*' --sort=-v:refname | head -n 1)
+          previous=${PREVIOUS_VERSION:+dataset-v$PREVIOUS_VERSION}
           {
             echo "## What the sign job will sign"
             echo
@@ -119,12 +124,13 @@ jobs:
             echo "Compare the SHA-256 with the reviewed dataset pull request before approving."
             echo
             if [[ -z "$previous" ]]; then
-              echo "### Workflows, keys and pipeline: first release"
+              echo "### Workflows, keys, schema and pipeline: first release"
             else
-              echo "### Workflows, keys and pipeline changed since $previous"
+              echo "### Workflows, keys, schema and pipeline changed since $previous"
               echo
               echo '```text'
-              git diff --stat "$previous..HEAD" -- .github/workflows keys src uv.lock pyproject.toml
+              git diff --stat "refs/tags/$previous" HEAD -- \
+                .github/workflows keys src schema uv.lock uv.toml pyproject.toml .python-version
               echo '```'
             fi
           } >> "$GITHUB_STEP_SUMMARY"
