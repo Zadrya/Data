@@ -11,6 +11,9 @@ merged as a union. Each target name is resolved, in this order:
 3. anything else: ``{kind: other, name}``, with the name as written, one entry per
    name without case (the first spelling, base before API, is kept).
 
+A name that is both a group name and a catalog name or alias (not exact) stops the
+normalization: picking either side could hide a warning, so a person decides.
+
 A target found under two severities keeps the higher one (dangerous over unsafe over
 uncertain), and the conflict is reported. A substance target that is the substance
 itself is dropped and reported. Every resolution that is not an exact name, and every
@@ -33,6 +36,7 @@ from typing import Any
 
 from zadrya_data.normalize import text
 from zadrya_data.normalize.catalog import Entry
+from zadrya_data.normalize.errors import NormalizationError
 from zadrya_data.normalize.interaction_groups import GROUPS, group_of, interaction_groups
 from zadrya_data.normalize.report import Kind, Report
 
@@ -81,13 +85,19 @@ class _Resolver:
         if meant is not None and meant in self.names:
             return self._note(raw, "by the target name table", ("substance", meant), lister)
         named = self.by_folded_name.get(folded, [])
+        owners = self.by_alias.get(folded, set())
+        group = group_of(raw)
+        if group is not None and (named or owners):
+            substances = ", ".join(sorted(owners | set(named)))
+            raise NormalizationError(
+                f"the interaction target '{raw}' is both a name or alias of {substances} "
+                f"and the group '{group}': resolving it either way could hide a warning"
+            )
         if len(named) == 1:
             return self._note(raw, "by its name without case", ("substance", named[0]), lister)
-        owners = self.by_alias.get(folded, set())
         if len(owners) == 1:
             (owner,) = owners
             return self._note(raw, "by an alias only it has", ("substance", owner), lister)
-        group = group_of(raw)
         if group is not None:
             return self._note(raw, "by the group table", ("group", group), lister)
         if len(owners) > 1 or len(named) > 1:
