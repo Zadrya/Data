@@ -10,7 +10,7 @@ The design is in `docs/adr/0006-release.md` (versions, tags, workflow) and `docs
 ## Who does what
 
 - **Owner (Sklyvan) only:** holds the private key, sets up the `release` environment and its secret, merges the dataset pull request, starts the release workflow and approves its `sign` job.
-- **You:** prepare and check, never sign. You never generate, read, print, copy or handle the private key, its password or the `DATASET_SIGNING_KEY` secret, and you never start the release workflow (`gh workflow run release.yml`) yourself. Give the owner the exact command instead.
+- **You:** prepare and check, never sign. You never generate, read, print, copy or handle the private key, its passphrase or the `DATASET_SIGNING_KEY` secret, and you never start the release workflow (`gh workflow run release.yml`) yourself. Give the owner the exact command instead.
 
 ## One-time setup (owner, before the first release)
 
@@ -23,7 +23,7 @@ The design is in `docs/adr/0006-release.md` (versions, tags, workflow) and `docs
      | gh secret set DATASET_SIGNING_KEY --env release --repo Zadrya/Data
    ```
 
-   `openssl` asks for the key password once; `gh secret set` reads the value from standard input and needs a `gh` login with admin rights on the repository. Use OpenSSL 3 from Homebrew: the LibreSSL that macOS ships cannot read Ed25519 keys (`keys/README.md`). The workflow never sees a password.
+   `openssl` asks for the passphrase once; `gh secret set` reads the value from standard input and needs a `gh` login with admin rights on the repository. Use OpenSSL 3 from Homebrew: the LibreSSL that macOS ships cannot read Ed25519 keys (`keys/README.md`). The workflow never sees the passphrase.
 4. Optional, recommended: turn on "Immutable releases" in the repository settings, so a published release cannot be edited.
 
 ## Each release
@@ -67,7 +67,7 @@ The design is in `docs/adr/0006-release.md` (versions, tags, workflow) and `docs
 
 ## Signing locally instead (owner only)
 
-If the owner prefers not to keep the key in GitHub, he runs on his own machine, from a clean `main`, with the encrypted key file (mode 0600, outside every repository). The password is typed without echo into the variable and removed right after signing; it never appears on a command line or in the shell history:
+If the owner prefers not to keep the key in GitHub, he runs on his own machine, from a clean `main`, with the encrypted `<encrypted.pem>` that `keys/README.md` generates (mode 0600, kept with its passphrase in the password manager, outside every repository). The passphrase is typed without echo into the variable and removed right after signing; it never appears on a command line or in the shell history:
 
 ```sh
 mkdir dist && cp dataset/substances.json dist/
