@@ -123,11 +123,15 @@ GROUPS = {
     # No class marks MAOIs. Ayahuasca contains harmala alkaloids, which are MAO
     # inhibitors. αMT (alpha-methyltryptamine), PMA and PMMA are documented MAO-A
     # inhibitors, a main reason PMA and PMMA are deadly with MDMA. The base summary of
-    # 2C-T-7 calls it a "possible MAOI". All are included because a missed MAOI warning is
-    # the unsafe direction. Syrian rue (Peganum harmala) and Banisteriopsis caapi have API
-    # entries without any number, so they are not in the catalog (ADR 4); no
-    # pharmaceutical MAOI is in the catalog.
-    "maois": GroupRule("MAOIs", names=("2C-T-7", "Ayahuasca", "PMA", "PMMA", "ΑMT")),
+    # 2C-T-7 calls it a "possible MAOI". Bromo-DragonFLY potently inhibits MAO-A (Noble et
+    # al., Toxicology Letters 2018, "Bromo-dragonfly, a psychoactive benzodifuran, is
+    # resistant to hepatic metabolism and potently inhibits monoamine oxidase A"). All are
+    # included because a missed MAOI warning is the unsafe direction. Syrian rue (Peganum
+    # harmala) and Banisteriopsis caapi have API entries without any number, so they are
+    # not in the catalog (ADR 4); no pharmaceutical MAOI is in the catalog.
+    "maois": GroupRule(
+        "MAOIs", names=("2C-T-7", "Ayahuasca", "Bromo-DragonFLY", "PMA", "PMMA", "ΑMT")
+    ),
     # Tilidin is a base-only opioid without any category.
     "opioids": GroupRule(
         "Opioids", categories=("opioid",), psychoactive=("Opioid", "Opioids"), names=("Tilidin",)
