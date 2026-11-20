@@ -154,6 +154,36 @@ def test_a_target_that_is_both_a_group_and_a_substance_stops_the_normalization(
     )
 
 
+def test_the_antihistamines_are_diphenhydramine_and_promethazine(relations: Normalized) -> None:
+    groups = {group["id"]: group["members"] for group in relations.document["interactionGroups"]}
+
+    assert groups["antihistamines"] == ["Diphenhydramine", "Promethazine"]
+
+
+def test_benzodiazepines_and_barbiturates_are_depressants_by_category_alone() -> None:
+    categories = [
+        {"name": name, "description": f"{name}.", "color": 1}
+        for name in ("depressant", "benzodiazepine", "barbiturate")
+    ]
+    lsd = {
+        "name": "LSD",
+        "interactions": {"dangerous": ["Depressants"], "unsafe": [], "uncertain": []},
+    }
+    base, snapshot = build(
+        [
+            lsd,
+            {"name": "Benzo", "categories": ["benzodiazepine"]},
+            {"name": "Barb", "categories": ["barbiturate"]},
+        ],
+        [],
+        categories=categories,
+    )
+
+    groups = normalize(base, snapshot).document["interactionGroups"]
+
+    assert groups == [{"id": "depressants", "name": "Depressants", "members": ["Barb", "Benzo"]}]
+
+
 def test_the_target_name_table_names_catalog_substances(relations: Normalized) -> None:
     catalog = {substance["name"] for substance in relations.document["substances"]}
 
