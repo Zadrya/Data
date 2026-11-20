@@ -11,9 +11,10 @@ from typing import Any
 
 import pytest
 
+from tests.normalize_cases import build
 from tests.test_normalize_real import BASE_FILE, _snapshot
 from zadrya_data.base import load_base
-from zadrya_data.normalize import Kind, Normalized, normalize
+from zadrya_data.normalize import Kind, NormalizationError, Normalized, normalize
 from zadrya_data.normalize.interaction_groups import GROUPS, NAME_TO_GROUP, group_of
 from zadrya_data.normalize.interactions import SEVERITIES, TARGET_NAMES
 
@@ -126,6 +127,31 @@ def test_the_real_groups(relations: Normalized) -> None:
 )
 def test_spelling_variants_of_the_data_name_one_group(spelling: str, group: str | None) -> None:
     assert group_of(spelling) == group
+
+
+@pytest.mark.parametrize(
+    ("other", "expected"),
+    [
+        ({"name": "Amphetamine", "commonNames": ["Stimulants"]}, "a name or alias of Amphetamine"),
+        ({"name": "stimulants"}, "a name or alias of stimulants"),
+    ],
+)
+def test_a_target_that_is_both_a_group_and_a_substance_stops_the_normalization(
+    other: dict[str, Any], expected: str
+) -> None:
+    lsd = {
+        "name": "LSD",
+        "interactions": {"dangerous": ["Stimulants"], "unsafe": [], "uncertain": []},
+    }
+    base, snapshot = build([lsd, other], [])
+
+    with pytest.raises(NormalizationError) as error:
+        normalize(base, snapshot)
+
+    assert str(error.value) == (
+        f"the interaction target 'Stimulants' is both {expected} and the group 'stimulants': "
+        "resolving it either way could hide a warning"
+    )
 
 
 def test_the_target_name_table_names_catalog_substances(relations: Normalized) -> None:
