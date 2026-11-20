@@ -121,11 +121,13 @@ GROUPS = {
     # Progesterone is a hormone used in hormonal birth control.
     "hormonal-birth-control": GroupRule("Hormonal birth control", names=("Progesterone",)),
     # No class marks MAOIs. Ayahuasca contains harmala alkaloids, which are MAO
-    # inhibitors; the base summary of 2C-T-7 calls it a "possible MAOI", included because
-    # a missed MAOI warning is the unsafe direction. Syrian rue (Peganum harmala) and
-    # Banisteriopsis caapi have API entries without any number, so they are not in the
-    # catalog (ADR 4); no pharmaceutical MAOI is in the catalog.
-    "maois": GroupRule("MAOIs", names=("2C-T-7", "Ayahuasca")),
+    # inhibitors. αMT (alpha-methyltryptamine), PMA and PMMA are documented MAO-A
+    # inhibitors, a main reason PMA and PMMA are deadly with MDMA. The base summary of
+    # 2C-T-7 calls it a "possible MAOI". All are included because a missed MAOI warning is
+    # the unsafe direction. Syrian rue (Peganum harmala) and Banisteriopsis caapi have API
+    # entries without any number, so they are not in the catalog (ADR 4); no
+    # pharmaceutical MAOI is in the catalog.
+    "maois": GroupRule("MAOIs", names=("2C-T-7", "Ayahuasca", "PMA", "PMMA", "ΑMT")),
     # Tilidin is a base-only opioid without any category.
     "opioids": GroupRule(
         "Opioids", categories=("opioid",), psychoactive=("Opioid", "Opioids"), names=("Tilidin",)
