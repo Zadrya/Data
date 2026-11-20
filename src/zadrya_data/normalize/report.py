@@ -25,6 +25,9 @@ class Kind(StrEnum):
     WIKI_TITLE_DIFFERS = "wiki-title-differs"
     # Names and text
     ALIAS_DROPPED = "alias-dropped"
+    ALIAS_REMOVED = "alias-removed"
+    ALIAS_NAMES_ANOTHER_SUBSTANCE = "alias-names-another-substance"
+    ALIAS_SHARED = "alias-shared"
     TEXT_DROPPED = "text-dropped"
     NO_SUMMARY = "no-summary"
     # Categories and classes

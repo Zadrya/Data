@@ -5,7 +5,7 @@
 same document and the same report. One module holds each concern:
 
 - ``catalog``: which substances exist and under which name;
-- ``names``: aliases;
+- ``names``: aliases, and the removal of those that name no single substance;
 - ``fields``: summary, risks, safer use, addiction potential, toxicities;
 - ``categories`` and ``classes``;
 - ``routes`` with ``dose``, ``duration`` and ``bioavailability``, merged by ``blocks``;
@@ -28,7 +28,7 @@ from zadrya_data.normalize.cross_tolerance import (
 from zadrya_data.normalize.errors import NormalizationError
 from zadrya_data.normalize.fields import substance_fields
 from zadrya_data.normalize.interactions import normalize_interactions
-from zadrya_data.normalize.names import aliases
+from zadrya_data.normalize.names import aliases, drop_ambiguous_aliases
 from zadrya_data.normalize.report import Finding, Kind, Report
 from zadrya_data.normalize.routes import normalize_routes
 from zadrya_data.normalize.tolerance import substance_tolerance
@@ -102,6 +102,7 @@ def normalize(base: BaseFile, snapshot: Snapshot) -> Normalized:
             continue
         kept.append((entry, substance))
     substances = [substance for _, substance in kept]
+    drop_ambiguous_aliases(substances, report)
     cross_tolerance = cross_tolerance_groups(substances, report)
     document = {
         "categories": categories,

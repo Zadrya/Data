@@ -20,6 +20,7 @@ from zadrya_data import graphql
 from zadrya_data.base import BaseFile, load_base
 from zadrya_data.mediawiki import WikiPage
 from zadrya_data.normalize import Kind, NormalizationError, Normalized, normalize
+from zadrya_data.normalize.names import ALIAS_REMOVALS
 from zadrya_data.normalize.routes import route_order
 from zadrya_data.schema import SCHEMA_VERSION, SchemaName, validate
 from zadrya_data.snapshot import Snapshot, dump_json
@@ -131,6 +132,44 @@ def test_routes_and_lists_are_in_their_documented_order(whole: Normalized) -> No
         lowered = [alias.casefold() for alias in substance["aliases"]]
         assert len(set(lowered)) == len(lowered)
         assert substance["name"].casefold() not in lowered
+
+
+def test_aliases_that_name_no_single_substance_are_dropped(whole: Normalized) -> None:
+    kinds = (Kind.ALIAS_REMOVED, Kind.ALIAS_NAMES_ANOTHER_SUBSTANCE, Kind.ALIAS_SHARED)
+    dropped = [
+        (finding.kind.value, finding.substance, finding.detail.split("'")[1])
+        for kind in kinds
+        for finding in whole.report.of(kind)
+    ]
+
+    # Apomorphine's "Blue Lotus" is dropped only when the API entry Blue Lotus is in
+    # the catalog, which this recording does not hold.
+    assert dropped == [
+        ("alias-removed", "Buspirone", "Dimethyltryptamine"),
+        ("alias-removed", "Buspirone", "Dmitri"),
+        ("alias-names-another-substance", "Buspirone", "DMT"),
+        ("alias-shared", "Amphetamine", "Speed"),
+        ("alias-shared", "Creatine", "Methylguanidoacetic acid"),
+        ("alias-shared", "Dextroamphetamine", "Dex"),
+        ("alias-shared", "Dextromethorphan", "Dex"),
+        ("alias-shared", "MDA", "Sally"),
+        ("alias-shared", "Mephedrone", "Drone"),
+        ("alias-shared", "Methamphetamine", "Speed"),
+        ("alias-shared", "Pentedrone", "Drone"),
+        ("alias-shared", "SAM-e", "Methylguanidoacetic Acid"),
+        ("alias-shared", "Salvinorin A", "Sally"),
+    ]
+    assert _by_name(whole)["Buspirone"]["aliases"] == []
+
+
+def test_every_entry_of_the_alias_removal_table_matches_the_base_file(base: BaseFile) -> None:
+    present = {
+        (substance.name, alias.strip().casefold())
+        for substance in base.substances
+        for alias in substance.common_names
+    }
+
+    assert set(ALIAS_REMOVALS) <= present
 
 
 def test_lsd_is_merged_from_both_sources(whole: Normalized) -> None:

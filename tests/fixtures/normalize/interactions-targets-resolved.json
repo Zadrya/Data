@@ -1,5 +1,5 @@
 {
-  "rule": "A target name is resolved in this order: a catalog substance by exact name, by name without case, or by an alias (without case) that only one catalog substance has; a class named in the group table NAME_TO_GROUP; anything else is other, with the name as written and one entry per name without case (first spelling kept). An alias several substances share is other. Every resolution that is not an exact name, and every other, is reported once per spelling with the number of substances listing it. A target that is the substance itself, and a name that is not valid text, are reported and dropped. Within a severity, targets are sorted by kind (substance, group, other), then by name or group id.",
+  "rule": "A target name is resolved in this order: a catalog substance by exact name, by name without case, or by an alias (without case) that only one catalog substance has; a class named in the group table NAME_TO_GROUP; anything else is other, with the name as written and one entry per name without case (first spelling kept). An alias several substances share is dropped from all of them before resolution (case aliases-shared-or-naming-another-substance), so it is other. Every resolution that is not an exact name, and every other, is reported once per spelling with the number of substances listing it. A target that is the substance itself, and a name that is not valid text, are reported and dropped. Within a severity, targets are sorted by kind (substance, group, other), then by name or group id.",
   "base": [
     {
       "name": "Dextromethorphan",
@@ -156,7 +156,7 @@
       "kind": "interaction-target-other",
       "substance": null,
       "route": null,
-      "detail": "'Dex' is an alias or name of several substances (Dextroamphetamine, Dextromethorphan): kept as other (listed by 1 substance)"
+      "detail": "'Dex' is neither a catalog substance nor a group: kept as other (listed by 1 substance)"
     },
     {
       "kind": "interaction-target-resolved",

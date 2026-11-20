@@ -1,0 +1,86 @@
+{
+  "rule": "An alias that is, without case, the canonical name of another substance is dropped from the substance that carries it. An alias that several substances carry, without case, is dropped from all of them. Each drop is reported on the substance that loses the alias, after the findings of every substance, in catalog order.",
+  "base": [
+    {
+      "name": "Amphetamine",
+      "commonNames": [
+        "Speed",
+        "Adderall"
+      ]
+    },
+    {
+      "name": "Apomorphine",
+      "commonNames": [
+        "blue lotus",
+        "APO-go"
+      ]
+    },
+    {
+      "name": "Blue Lotus",
+      "commonNames": [
+        "Nymphaea caerulea"
+      ]
+    },
+    {
+      "name": "Methamphetamine",
+      "commonNames": [
+        "Meth",
+        "speed"
+      ]
+    }
+  ],
+  "api": [],
+  "compare": [
+    "aliases"
+  ],
+  "reportKinds": [
+    "alias-names-another-substance",
+    "alias-shared"
+  ],
+  "expected": [
+    {
+      "name": "Amphetamine",
+      "aliases": [
+        "Adderall"
+      ]
+    },
+    {
+      "name": "Apomorphine",
+      "aliases": [
+        "APO-go"
+      ]
+    },
+    {
+      "name": "Blue Lotus",
+      "aliases": [
+        "Nymphaea caerulea"
+      ]
+    },
+    {
+      "name": "Methamphetamine",
+      "aliases": [
+        "Meth"
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "alias-shared",
+      "substance": "Amphetamine",
+      "route": null,
+      "detail": "alias 'Speed' dropped: Methamphetamine carries it too, so it names no single substance"
+    },
+    {
+      "kind": "alias-names-another-substance",
+      "substance": "Apomorphine",
+      "route": null,
+      "detail": "alias 'blue lotus' dropped: it is the name of the substance Blue Lotus"
+    },
+    {
+      "kind": "alias-shared",
+      "substance": "Methamphetamine",
+      "route": null,
+      "detail": "alias 'speed' dropped: Amphetamine carries it too, so it names no single substance"
+    }
+  ]
+}

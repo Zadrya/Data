@@ -1,0 +1,62 @@
+{
+  "rule": "An alias listed for its substance in the table ALIAS_REMOVALS (compared without case) is removed and reported with the reason the table gives. Today the table holds only the two base aliases of Buspirone that name DMT. The table applies before the catalog-wide rule, so DMT, which the other rule drops, is not in it.",
+  "base": [
+    {
+      "name": "Buspirone",
+      "commonNames": [
+        "DMT",
+        "dimethyltryptamine",
+        "Dmitri",
+        "Buspar"
+      ]
+    },
+    {
+      "name": "DMT",
+      "commonNames": [
+        "N,N-DMT"
+      ]
+    }
+  ],
+  "api": [],
+  "compare": [
+    "aliases"
+  ],
+  "reportKinds": [
+    "alias-removed",
+    "alias-names-another-substance"
+  ],
+  "expected": [
+    {
+      "name": "Buspirone",
+      "aliases": [
+        "Buspar"
+      ]
+    },
+    {
+      "name": "DMT",
+      "aliases": [
+        "N,N-DMT"
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "alias-removed",
+      "substance": "Buspirone",
+      "route": null,
+      "detail": "alias 'dimethyltryptamine' removed by the table: it is the chemical name of DMT, a different substance; matching it could attach DMT warnings to Buspirone"
+    },
+    {
+      "kind": "alias-removed",
+      "substance": "Buspirone",
+      "route": null,
+      "detail": "alias 'Dmitri' removed by the table: it is a street name of DMT, a different substance; matching it could attach DMT warnings to Buspirone"
+    },
+    {
+      "kind": "alias-names-another-substance",
+      "substance": "Buspirone",
+      "route": null,
+      "detail": "alias 'DMT' dropped: it is the name of the substance DMT"
+    }
+  ]
+}
