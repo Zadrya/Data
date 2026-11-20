@@ -36,8 +36,22 @@ The invariants are a second, independent check over the finished document. They 
 
 **Mutation check.** `tests/test_invariants.py` has one failing case per rule, each a single change to a valid document, and shows that removing a rule from the checker lets its case pass: no rule is covered by another by accident. Edge cases that must stay valid (equal dose neighbours, `min` equal to `max`, one-sided ranges, opaque units) are pinned too. The real base file, normalized with each recorded API answer, keeps every invariant.
 
+### The build (`zadrya-data build`, `src/zadrya_data/build.py`)
+
+`zadrya-data build --dataset-version X.Y.Z` reads the base file (`--base`, default `sources/base/Substances.json`) and a snapshot directory (`--snapshot`, default `sources/api`) through `load_snapshot`, which checks the SHA-256 of each file against `snapshot.json`. It normalizes, adds `schemaVersion`, `datasetVersion` and `attribution`, validates the schema, then the invariants, and writes `--output` (default `dataset/substances.json`). It never uses the network.
+
+- **No default version.** `--dataset-version` is required: a version is a decision of the dataset pull request, not of the code.
+- **Deterministic bytes.** The text is that of `snapshot.dump_json`, the one form the pipeline writes: sorted keys, two-space indent, UTF-8 without escapes, `allow_nan=False`, line feeds and one final newline. List order is the documented order of normalization (ADR 4 and 5); nothing depends on set or dict iteration of unordered data. There is no date, path, host or hash seed in the file (the date belongs to the manifest, ADR 1). A test runs the command twice in separate processes with different `PYTHONHASHSEED` values and compares the bytes of the dataset and of the report.
+- **The bytes on disk are checked.** As ADR 1 asks, the build writes a hidden sibling of the output, reads it back, requires the same bytes, parses them with `strict_json`, validates the schema and the invariants of what was read, and only then renames it over the output. On any failure the sibling is removed and the previous output stays.
+- **Refusals.** Exit code 0 when written; 1 when the dataset is refused (normalization stops, the schema or an invariant fails, or an output would overwrite the base file, land inside the snapshot directory or coincide with the other output), with every failure printed; 2 when an input cannot be read or is not a valid base file or snapshot (a wrong hash included), or an output cannot be written. Nothing is written on 1 or 2, so the codes match the release commands.
+- **Report.** `--report PATH` writes the normalization report as tab-separated text: a header, then one finding per line (`kind`, `substance`, `route`, `detail`), with backslash, tab and line breaks escaped. One line per finding gives the dataset pull request a readable diff of the report too. The report is written before the dataset, with the same atomic write.
+- **Attribution.** Three entries, from `DATA_LICENSES.md`: PsychonautWiki contributors for the text (`CC-BY-SA-4.0`) and for the semantic data (`CC-BY-4.0`), both pointing to the wiki's Copyrights page, and PsychonautWiki Journal v11.11 by Isaak Hanimann (`GPL-3.0-or-later`), the base file. **Proposed: the owner confirms the wording when deciding the license of the derived dataset**, which is still open (`DATA_LICENSES.md`, "Open questions"). The attribution sits inside the signed bytes and the manifest repeats it, so a change is a new dataset version.
+
+No dataset is committed with this change: the first `dataset/substances.json` lands in its own pull request, after the owner's license decision.
+
 ## Consequences
 
 - A collision of names or aliases that normalization lets through stops the build instead of reaching the app.
 - A rule here can repeat a rule of normalization. That is the point: the two are written separately, so a mistake has to be made twice to ship.
 - A new cross-field rule needs a failing case and passes the mutation check, as the schema fixtures do.
+- Building with the defaults writes `dataset/substances.json` in the working tree. It must not be committed before the owner's license decision; the release workflow only ever signs the committed file (ADR 6).

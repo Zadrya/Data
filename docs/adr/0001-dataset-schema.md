@@ -72,7 +72,7 @@ Each pattern has a fixture with a trailing newline, and all patterns were run on
 
 `validate` reads documents with `zadrya_data.strict_json`: `NaN`, `Infinity`, numbers out of range such as `1e999`, and objects with a repeated key are rejected, and nesting that is too deep is an error instead of a crash. So are integers whose absolute value is above 2**53 - 1, which parsers that read numbers as IEEE 754 doubles round or read as infinity. All of them exit with code 2. The base loader has a private copy of some of these checks; the two are unified in a follow-up.
 
-This strictness lives in the reading path only. The future `build` command must write with `allow_nan=False`, so that it cannot produce what `validate` refuses, and must validate the bytes it wrote, read back through `strict_json`, not the object it had in memory: the signature and the hash cover the bytes.
+This strictness lives in the reading path only. The `build` command writes with `allow_nan=False`, so that it cannot produce what `validate` refuses, and validates the bytes it wrote, read back through `strict_json`, not the object it had in memory: the signature and the hash cover the bytes (ADR 7).
 
 ### Versions, addresses and dates
 
