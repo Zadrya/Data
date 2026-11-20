@@ -154,6 +154,23 @@ def test_a_target_that_is_both_a_group_and_a_substance_stops_the_normalization(
     )
 
 
+def test_a_name_that_several_substances_have_without_case_is_other() -> None:
+    lsd = {
+        "name": "LSD",
+        "interactions": {"dangerous": ["kava"], "unsafe": [], "uncertain": []},
+    }
+    base, snapshot = build([lsd, {"name": "Kava"}, {"name": "KAVA"}], [])
+
+    result = normalize(base, snapshot)
+
+    lists = {s["name"]: s["interactions"] for s in result.document["substances"]}
+    assert lists["LSD"]["dangerous"] == [{"kind": "other", "name": "kava"}]
+    assert [f.detail for f in result.report.of(Kind.INTERACTION_TARGET_OTHER)] == [
+        "'kava' is the name, without case, of several substances (KAVA, Kava): kept as other "
+        "(listed by 1 substance)"
+    ]
+
+
 def test_the_antihistamines_are_diphenhydramine_and_promethazine(relations: Normalized) -> None:
     groups = {group["id"]: group["members"] for group in relations.document["interactionGroups"]}
 

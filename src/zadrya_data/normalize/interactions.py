@@ -6,7 +6,8 @@ merged as a union. Each target name is resolved, in this order:
 
 1. a catalog substance by its exact name, then through ``TARGET_NAMES`` (colloquial
    names of the data, without case), then by its name without case, then by an alias
-   (without case) that only one catalog substance has: ``{kind: substance}``;
+   (without case), which names exactly one catalog substance once
+   ``names.drop_ambiguous_aliases`` has run: ``{kind: substance}``;
 2. a class named in ``interaction_groups.NAME_TO_GROUP``: ``{kind: group, groupId}``;
 3. anything else: ``{kind: other, name}``, with the name as written, one entry per
    name without case (the first spelling, base before API, is kept).
@@ -100,9 +101,11 @@ class _Resolver:
             return self._note(raw, "by an alias only it has", ("substance", owner), lister)
         if group is not None:
             return self._note(raw, "by the group table", ("group", group), lister)
-        if len(owners) > 1 or len(named) > 1:
-            several = ", ".join(sorted(owners | set(named)))
-            how = f"is an alias or name of several substances ({several})"
+        if len(named) > 1:
+            # Aliases that several substances share never get here: the catalog drops
+            # them first (``names.drop_ambiguous_aliases``). Names that differ only by
+            # case can, and the invariants of the build refuse them.
+            how = f"is the name, without case, of several substances ({', '.join(named)})"
         else:
             how = "is neither a catalog substance nor a group"
         return self._note(raw, how, ("other", folded), lister)
