@@ -16,7 +16,14 @@ The design is in `docs/adr/0006-release.md` (versions, tags, workflow) and `docs
 
 1. Generate the key pair as `keys/README.md` says, on the owner's machine, and send only the public key. You add it as `keys/<name>.pem` in a pull request and print the raw form the app pins (`keys/README.md`, "The form the app pins").
 2. Repository settings, Environments, New environment `release`: required reviewer Sklyvan, "Prevent self-review" off (he is the only reviewer), deployment branches limited to `main`.
-3. In that environment (not in the repository secrets, so only the `sign` job can read it), add the secret `DATASET_SIGNING_KEY` with the whole PEM file of the private key as its value. If the key is encrypted, signing in CI is not supported: use an unencrypted copy that exists only in this secret, or sign locally (below).
+3. In that environment (not in the repository secrets, so only the `sign` job can read it), set the secret `DATASET_SIGNING_KEY` to the unencrypted PEM of the private key, straight from a pipe so that no plaintext copy is ever written to disk or the clipboard:
+
+   ```sh
+   "$(brew --prefix openssl@3)/bin/openssl" pkey -in <encrypted.pem> \
+     | gh secret set DATASET_SIGNING_KEY --env release --repo Zadrya/Data
+   ```
+
+   `openssl` asks for the key password once; `gh secret set` reads the value from standard input and needs a `gh` login with admin rights on the repository. Use OpenSSL 3 from Homebrew: the LibreSSL that macOS ships cannot read Ed25519 keys (`keys/README.md`). The workflow never sees a password.
 4. Optional, recommended: turn on "Immutable releases" in the repository settings, so a published release cannot be edited.
 
 ## Each release
@@ -26,6 +33,7 @@ The design is in `docs/adr/0006-release.md` (versions, tags, workflow) and `docs
    - `dataset_version`: exactly the `datasetVersion` in the committed file, higher than every earlier `dataset-v*` release.
    - `min_app_version`: the lowest app version that can read this dataset (normally the one that first supports its `schemaVersion` major).
    - `date`: the release date, `YYYY-MM-DD`.
+   - `dataset_pr`: the number of the merged dataset pull request. `check` refuses one that is not merged into the commit being released, and the release notes link it and its diff report as the changelog.
 3. **Check locally** on an up-to-date `main` (no key needed):
 
    ```sh
@@ -39,13 +47,16 @@ The design is in `docs/adr/0006-release.md` (versions, tags, workflow) and `docs
 
    ```sh
    gh workflow run release.yml --repo Zadrya/Data --ref main \
-     -f dataset_version=X.Y.Z -f min_app_version=A.B.C -f date=YYYY-MM-DD
+     -f dataset_version=X.Y.Z -f min_app_version=A.B.C -f date=YYYY-MM-DD -f dataset_pr=N
    ```
 
-5. **`check` runs** without the key: inputs, new tag, higher version, schema and `datasetVersion` of the committed file. If it fails, nothing was signed: fix the cause and start again.
-6. **The owner approves** the pending deployment to `release` (the run page, "Review deployments"). Only then does `sign` read the key, sign, verify the signature against `keys/` and delete the key file.
-7. **`publish`** rebuilds the manifest, verifies the three files, creates the tag `dataset-vX.Y.Z` on the workflow's commit and the GitHub Release marked latest. **`verify-published`** downloads the assets and runs `zadrya-data verify --release dataset-vX.Y.Z` and `--release latest`.
-8. **Verify independently** from a clean clone of `main`:
+5. **`check` runs** without the key: inputs, merged dataset pull request, new tag, higher version, schema and `datasetVersion` of the committed file. If it fails, nothing was signed: fix the cause and start again.
+6. **The owner reads the `check` summary before approving** (the run page, below the jobs). It shows the commit, the SHA-256 and `datasetVersion` of `dataset/substances.json`, and the `git diff --stat` of `.github/workflows`, `keys`, `src`, `uv.lock` and `pyproject.toml` since the previous `dataset-v` tag ("first release" when there is none).
+   - The SHA-256 must equal the hash of the dataset in the reviewed pull request: `git show <last commit of the pull request>:dataset/substances.json | shasum -a 256`.
+   - Every file in the diff must be a change the owner reviewed and merged. An unexpected change to a workflow, a key or the signing code is a reason to reject.
+7. **The owner approves** the pending deployment to `release` ("Review deployments"), or rejects it if anything above does not match. Only after approval does `sign` read the key, sign, verify the signature against `keys/` and delete the key file.
+8. **`publish`** rebuilds the manifest, verifies the three files, creates the tag `dataset-vX.Y.Z` on the workflow's commit and the GitHub Release marked latest. **`verify-published`** downloads the assets and runs `zadrya-data verify --release dataset-vX.Y.Z` and `--release latest`.
+9. **Verify independently** from a clean clone of `main`:
 
    ```sh
    uv run zadrya-data verify --release dataset-vX.Y.Z --dataset-version X.Y.Z
@@ -56,12 +67,14 @@ The design is in `docs/adr/0006-release.md` (versions, tags, workflow) and `docs
 
 ## Signing locally instead (owner only)
 
-If the owner prefers not to keep the key in GitHub, he runs on his own machine, from a clean `main`:
+If the owner prefers not to keep the key in GitHub, he runs on his own machine, from a clean `main`, with the encrypted key file (mode 0600, outside every repository). The password is typed without echo into the variable and removed right after signing; it never appears on a command line or in the shell history:
 
 ```sh
 mkdir dist && cp dataset/substances.json dist/
-ZADRYA_SIGNING_KEY_FILE=<path outside every repository> \
+read -rs ZADRYA_SIGNING_KEY_PASSWORD && export ZADRYA_SIGNING_KEY_PASSWORD
+ZADRYA_SIGNING_KEY_FILE=<encrypted.pem> \
   uv run zadrya-data sign dist/substances.json --dataset-version X.Y.Z --output dist/substances.json.sig
+unset ZADRYA_SIGNING_KEY_PASSWORD
 uv run zadrya-data manifest dist/substances.json --dataset-version X.Y.Z \
   --min-app-version A.B.C --date YYYY-MM-DD --output dist/manifest.json
 uv run zadrya-data verify dist --dataset-version X.Y.Z
@@ -73,7 +86,7 @@ uv run zadrya-data verify --release dataset-vX.Y.Z --dataset-version X.Y.Z
 ## When something fails
 
 - **`sign` says the signature does not verify with any pinned key:** the secret holds another key than the one in `keys/`. Nothing was written. The owner replaces the secret; never change `keys/` to make a release pass.
-- **`sign` says the key file is not a PEM key:** the secret was pasted incompletely or with extra text. The owner pastes it again.
+- **`sign` says the key file is not a PEM key:** the secret is incomplete or holds extra text. The owner sets it again with the pipe above.
 - **`publish` or `verify-published` fails after the release exists:** stop and tell the owner. Do not delete or move tags or releases, and do not upload replacement assets: a published release is never changed. The fix is a new version.
 - **Never re-run the `sign` job with debug logging enabled**, and never add steps that print the environment, `set -x` or upload `$RUNNER_TEMP` in the job that holds the key.
 
