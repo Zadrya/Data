@@ -65,6 +65,7 @@ class Kind(StrEnum):
     CROSS_TOLERANCE_GROUP = "cross-tolerance-group"
     # Interactions
     INTERACTION_TARGET_DROPPED = "interaction-target-dropped"
+    INTERACTION_LISTS_MISSING = "interaction-lists-missing"
     INTERACTION_ONLY_IN_ONE_SOURCE = "interaction-only-in-one-source"
     INTERACTION_SEVERITY_CONFLICT = "interaction-severity-conflict"
     INTERACTION_TARGET_RESOLVED = "interaction-target-resolved"
