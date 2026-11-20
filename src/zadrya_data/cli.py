@@ -12,11 +12,14 @@ from pathlib import Path
 
 from zadrya_data import __version__
 from zadrya_data.base import BaseFormatError, load_base
+from zadrya_data.build import BuildError, build_dataset, check_bytes, report_tsv, write_verified
 from zadrya_data.graphql import ApiFormatError, ApiQueryError
 from zadrya_data.errors import ReleaseRejectedError
 from zadrya_data.http import FetchError, PoliteClient
+from zadrya_data.invariants import InvariantError
 from zadrya_data.manifest import build_manifest, parse_substances, serialize_manifest, sha256_hex
 from zadrya_data.mediawiki import WikiFormatError
+from zadrya_data.normalize import NormalizationError
 from zadrya_data.release_check import VerifiedRelease, verify_release
 from zadrya_data.release_download import (
     LATEST,
@@ -25,7 +28,7 @@ from zadrya_data.release_download import (
     download_release,
     resolve_tag,
 )
-from zadrya_data.schema import SchemaName, validate
+from zadrya_data.schema import SCHEMA_VERSION, SchemaName, validate
 from zadrya_data.signing import (
     PinnedKey,
     decode_signature,
@@ -36,7 +39,13 @@ from zadrya_data.signing import (
     sign,
     verify,
 )
-from zadrya_data.snapshot import SnapshotError, check_destination, fetch_raw, write_snapshot
+from zadrya_data.snapshot import (
+    SnapshotError,
+    check_destination,
+    fetch_raw,
+    load_snapshot,
+    write_snapshot,
+)
 from zadrya_data.strict_json import loads
 
 EXIT_OK = 0
@@ -45,6 +54,8 @@ EXIT_UNREADABLE = 2
 EXIT_FETCH_FAILED = 1
 
 DEFAULT_BASE = Path("sources/base/Substances.json")
+DEFAULT_SNAPSHOT = Path("sources/api")
+DEFAULT_DATASET = Path("dataset/substances.json")
 DEFAULT_KEYS = Path("keys")
 RELEASE_FILES = ("substances.json", "substances.json.sig", "manifest.json")
 
@@ -167,6 +178,47 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         default=DEFAULT_BASE,
         help="the base file whose substance names are looked up too (default: %(default)s)",
+    )
+
+    build_parser_ = commands.add_parser(
+        "build",
+        help="build substances.json from the base file and a snapshot (offline)",
+        description="Build the dataset from the base file and a raw snapshot, offline: read "
+        "both (the snapshot is checked against the SHA-256 of each of its files), normalize, "
+        "validate the schema and the invariants, and write substances.json deterministically "
+        "(sorted keys, UTF-8, line feeds, no date). The written bytes are read back and "
+        "checked again before they replace the output. Exit code 0: written, 1: the dataset "
+        "is refused (normalization, schema or invariants) and nothing is written, 2: an input "
+        "cannot be read or is not a valid base file or snapshot, or an output cannot be written.",
+    )
+    build_parser_.add_argument(
+        "--dataset-version",
+        type=_version_argument,
+        required=True,
+        help="the datasetVersion to state in the dataset (MAJOR.MINOR.PATCH)",
+    )
+    build_parser_.add_argument(
+        "--base",
+        type=Path,
+        default=DEFAULT_BASE,
+        help="the base file (default: %(default)s)",
+    )
+    build_parser_.add_argument(
+        "--snapshot",
+        type=Path,
+        default=DEFAULT_SNAPSHOT,
+        help="the snapshot directory written by fetch (default: %(default)s)",
+    )
+    build_parser_.add_argument(
+        "--output",
+        type=Path,
+        default=DEFAULT_DATASET,
+        help="where to write substances.json (default: %(default)s)",
+    )
+    build_parser_.add_argument(
+        "--report",
+        type=Path,
+        help="also write the normalization report there, as tab-separated text",
     )
 
     manifest_parser = commands.add_parser(
@@ -388,6 +440,58 @@ def run_manifest(
     return EXIT_OK
 
 
+def _refuse_overlap(outputs: list[Path], base: Path, snapshot: Path) -> None:
+    """Refuse outputs that would overwrite an input, land in the snapshot or each other."""
+    resolved = [output.resolve() for output in outputs]
+    if len(set(resolved)) != len(resolved):
+        raise _Refused(EXIT_INVALID, "--output and --report name the same file")
+    for output, where in zip(outputs, resolved):
+        if where == base.resolve():
+            raise _Refused(EXIT_INVALID, f"{output} is the base file: choose another output")
+        if where.parent == snapshot.resolve():
+            raise _Refused(
+                EXIT_INVALID, f"{output} is inside the snapshot directory: choose another output"
+            )
+
+
+def run_build(
+    base: Path, snapshot: Path, dataset_version: str, output: Path, report: Path | None
+) -> int:
+    """Build the dataset, write it (and the report) and return the exit code.
+
+    Nothing is written unless the dataset passed every check. The report, when asked
+    for, is written before the dataset.
+    """
+    try:
+        _refuse_overlap([output] if report is None else [output, report], base, snapshot)
+        built = build_dataset(load_base(base), load_snapshot(snapshot), dataset_version)
+        if report is not None:
+            write_verified(report, report_tsv(built.report), lambda _: None)
+        write_verified(output, built.data, check_bytes)
+    except _Refused as refusal:
+        print(f"error: dataset not written: {refusal}", file=sys.stderr)
+        return refusal.code
+    except (BaseFormatError, SnapshotError, OSError) as error:
+        print(f"error: dataset not written: {error}", file=sys.stderr)
+        return EXIT_UNREADABLE
+    except (NormalizationError, BuildError, InvariantError, ReleaseRejectedError) as error:
+        print(f"error: dataset not written: {error}", file=sys.stderr)
+        return EXIT_INVALID
+
+    document = built.document
+    routes = sum(len(substance["roas"]) for substance in document["substances"])
+    print(
+        f"{output}: dataset {dataset_version} (schema {SCHEMA_VERSION}), "
+        f"{len(document['substances'])} substances, {routes} routes, "
+        f"{len(document['interactionGroups'])} interaction groups, "
+        f"{len(document['crossToleranceGroups'])} cross tolerance groups, "
+        f"{len(built.report.findings)} report findings, sha256 {sha256_hex(built.data)}"
+    )
+    if report is not None:
+        print(f"{report}: normalization report, {len(built.report.findings)} findings")
+    return EXIT_OK
+
+
 def make_client() -> PoliteClient:
     """Return the client of ``fetch`` and ``verify --release``. Tests replace it with a replay."""
     return PoliteClient()
@@ -452,6 +556,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     arguments = parser.parse_args(argv)
     if arguments.command == "validate":
         return run_validate(arguments.path, arguments.schema)
+    if arguments.command == "build":
+        return run_build(
+            arguments.base,
+            arguments.snapshot,
+            arguments.dataset_version,
+            arguments.output,
+            arguments.report,
+        )
     if arguments.command == "fetch":
         return run_fetch(arguments.output, arguments.base)
     if arguments.command == "verify" and arguments.release is not None:
