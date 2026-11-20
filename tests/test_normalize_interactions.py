@@ -88,7 +88,8 @@ def test_the_real_groups(relations: Normalized) -> None:
     assert groups["maois"] == ["2C-T-7", "Ayahuasca"]
     assert "Βk-2C-B" in groups["2c-x"] and "2C-B-FLY" in groups["2c-x"]
     assert {"Amphetamine", "Dextroamphetamine", "3-FMA"} <= set(groups["substituted-amphetamines"])
-    assert {"3-FMA", "Ethylone", "MCPP", "NM-2-AI"} <= set(groups["serotonin-releasers"])
+    releasers = {"3-FMA", "Ethylone", "MCPP", "Mexedrone", "NM-2-AI", "Tramadol"}
+    assert releasers <= set(groups["serotonin-releasers"])
     assert not {"2C-B", "Psilocin", "Ayahuasca"} & set(groups["serotonin-releasers"])
     assert {"Chlordiazepoxide", "Cinolazepam", "Oxazepam", "Triazolam", "Etizolam"} <= set(
         groups["benzodiazepines"]

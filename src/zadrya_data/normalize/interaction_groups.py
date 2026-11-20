@@ -134,16 +134,18 @@ GROUPS = {
     "psychedelics": GroupRule(
         "Psychedelics", categories=("psychedelic",), psychoactive=("Psychedelic", "Psychedelics")
     ),
-    # The entactogen class of the API (MDMA, the cathinones, the benzofurans, αMT), and
-    # mCPP, a serotonin releaser classed as a stimulant, and Ethylone, an entactogenic
-    # cathinone like Methylone whose API classes lack the class. NM-2-AI is in the entactogen
-    # category without the class and is included because its action is not clear. The
-    # entactogen category is not used: it also holds 2C-B, 2C-T, 2C-T-7, 4-AcO-MiPT,
-    # 5-MeO-DiPT, Ayahuasca and Psilocin, which act on receptors and release no serotonin.
+    # The entactogen class of the API (MDMA, the cathinones, the benzofurans, αMT), and by
+    # name: mCPP, a serotonin releaser classed as a stimulant; Ethylone and Mexedrone,
+    # entactogenic cathinones in the entactogen category whose API classes lack the class
+    # (the base summary of Mexedrone says it acts on serotonin); Tramadol, which its base
+    # summary calls "a serotonin releasing agent". NM-2-AI is in the entactogen category
+    # without the class and is included because its action is not clear. The entactogen
+    # category is not used: it also holds 2C-B, 2C-T, 2C-T-7, 4-AcO-MiPT, 5-MeO-DiPT,
+    # Ayahuasca and Psilocin, which act on receptors and release no serotonin.
     "serotonin-releasers": GroupRule(
         "Serotonin releasers",
         psychoactive=("Entactogen", "Entactogens"),
-        names=("Ethylone", "MCPP", "NM-2-AI"),
+        names=("Ethylone", "MCPP", "Mexedrone", "NM-2-AI", "Tramadol"),
     ),
     "snris": GroupRule("SNRIs"),
     "ssris": GroupRule("SSRIs"),
