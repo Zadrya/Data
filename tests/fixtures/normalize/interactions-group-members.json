@@ -137,7 +137,7 @@
       "kind": "interaction-group",
       "substance": null,
       "route": null,
-      "detail": "maois (0), named 2C-T-7, Ayahuasca: none"
+      "detail": "maois (0), named 2C-T-7, Ayahuasca, PMA, PMMA, ΑMT: none"
     },
     {
       "kind": "interaction-group-name-missing",
@@ -150,6 +150,24 @@
       "substance": null,
       "route": null,
       "detail": "maois: the named member 'Ayahuasca' is not in the catalog"
+    },
+    {
+      "kind": "interaction-group-name-missing",
+      "substance": null,
+      "route": null,
+      "detail": "maois: the named member 'PMA' is not in the catalog"
+    },
+    {
+      "kind": "interaction-group-name-missing",
+      "substance": null,
+      "route": null,
+      "detail": "maois: the named member 'PMMA' is not in the catalog"
+    },
+    {
+      "kind": "interaction-group-name-missing",
+      "substance": null,
+      "route": null,
+      "detail": "maois: the named member 'ΑMT' is not in the catalog"
     },
     {
       "kind": "interaction-group-empty",
