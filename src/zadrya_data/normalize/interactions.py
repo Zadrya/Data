@@ -148,7 +148,15 @@ def _merge(
     heard: dict[Key, dict[str, list[str]]] = {}
     shown: dict[Key, str] = {}
     sources: dict[Key, set[str]] = {}
-    for severity, source, raw in _raw_targets(entry):
+    raw_targets = _raw_targets(entry)
+    if not raw_targets:
+        report.add(
+            Kind.INTERACTION_LISTS_MISSING,
+            "neither source lists interactions: only targets of other substances and of "
+            "groups it belongs to can warn about it",
+            substance=entry.name,
+        )
+    for severity, source, raw in raw_targets:
         cleaned = text.line(raw)
         if cleaned is None:
             report.add(

@@ -1,0 +1,90 @@
+{
+  "rule": "A substance for which neither source lists a single interaction target is reported, so that the dataset review sees which substances only receive warnings from the lists of other substances, by symmetry or through a group. Symmetry still gives it the targets of the substances that list it.",
+  "base": [
+    {
+      "name": "LSD",
+      "interactions": {
+        "dangerous": [
+          "Tramadol"
+        ],
+        "unsafe": [],
+        "uncertain": []
+      }
+    },
+    {
+      "name": "Tramadol"
+    },
+    {
+      "name": "Caffeine",
+      "interactions": {
+        "dangerous": [],
+        "unsafe": [],
+        "uncertain": []
+      }
+    }
+  ],
+  "api": [
+    {
+      "name": "Caffeine",
+      "dangerousInteractions": [],
+      "unsafeInteractions": null,
+      "uncertainInteractions": null
+    }
+  ],
+  "compare": [
+    "interactions"
+  ],
+  "reportKinds": [
+    "interaction-lists-missing"
+  ],
+  "expected": [
+    {
+      "name": "Caffeine",
+      "interactions": {
+        "dangerous": [],
+        "unsafe": [],
+        "uncertain": []
+      }
+    },
+    {
+      "name": "LSD",
+      "interactions": {
+        "dangerous": [
+          {
+            "kind": "substance",
+            "name": "Tramadol"
+          }
+        ],
+        "unsafe": [],
+        "uncertain": []
+      }
+    },
+    {
+      "name": "Tramadol",
+      "interactions": {
+        "dangerous": [
+          {
+            "kind": "substance",
+            "name": "LSD"
+          }
+        ],
+        "unsafe": [],
+        "uncertain": []
+      }
+    }
+  ],
+  "report": [
+    {
+      "kind": "interaction-lists-missing",
+      "substance": "Caffeine",
+      "route": null,
+      "detail": "neither source lists interactions: only targets of other substances and of groups it belongs to can warn about it"
+    },
+    {
+      "kind": "interaction-lists-missing",
+      "substance": "Tramadol",
+      "route": null,
+      "detail": "neither source lists interactions: only targets of other substances and of groups it belongs to can warn about it"
+    }
+  ]
+}
