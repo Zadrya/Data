@@ -394,6 +394,26 @@ def test_a_symbolic_link_at_the_target_is_replaced_never_followed(tmp_path: Path
     assert outside.read_bytes() == b"untouched"
 
 
+def test_build_renames_the_report_first_and_the_dataset_last(
+    snapshot_dir: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # ADR 7: a failure between the two renames can leave a new report next to the
+    # previous dataset, never a new dataset without its report.
+    output, report = tmp_path / "substances.json", tmp_path / "report.tsv"
+    renamed: list[str] = []
+    real = os.replace
+
+    def recording(source: str | Path, target: str | Path) -> None:
+        renamed.append(Path(target).name)
+        real(source, target)
+
+    monkeypatch.setattr(os, "replace", recording)
+
+    assert _build(snapshot_dir, output, "--report", str(report)) == 0
+
+    assert renamed == ["report.tsv", "substances.json"]
+
+
 def test_the_file_and_its_directory_are_flushed_before_and_after_the_rename(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
