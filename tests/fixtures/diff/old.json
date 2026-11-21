@@ -1,0 +1,307 @@
+{
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "1.0.0",
+  "attribution": [
+    {
+      "name": "PsychonautWiki",
+      "url": "https://psychonautwiki.org",
+      "license": "CC-BY-SA-4.0"
+    }
+  ],
+  "categories": [
+    {
+      "id": "depressant",
+      "name": "Depressants",
+      "description": "Slow the nervous system."
+    },
+    {
+      "id": "stimulant",
+      "name": "Stimulants",
+      "description": "Speed up the nervous system."
+    }
+  ],
+  "interactionGroups": [
+    {
+      "id": "depressants",
+      "name": "Depressants",
+      "members": [
+        "Alcohol"
+      ]
+    },
+    {
+      "id": "hallucinogens",
+      "name": "Hallucinogens",
+      "members": []
+    },
+    {
+      "id": "stimulants",
+      "name": "Stimulants",
+      "members": [
+        "Amphetamine",
+        "Caffeine"
+      ]
+    }
+  ],
+  "crossToleranceGroups": [
+    {
+      "id": "stimulants",
+      "name": "stimulants",
+      "members": [
+        "Amphetamine",
+        "Caffeine"
+      ]
+    }
+  ],
+  "substances": [
+    {
+      "name": "Alcohol",
+      "aliases": [
+        "Ethanol"
+      ],
+      "url": "https://psychonautwiki.org/wiki/Alcohol",
+      "categories": [
+        "depressant"
+      ],
+      "classes": {
+        "psychoactive": [
+          "Depressant"
+        ],
+        "chemical": [
+          "Alcohol"
+        ]
+      },
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {
+            "units": "mL",
+            "thresholdMin": 10,
+            "commonMin": 20
+          }
+        }
+      ],
+      "crossTolerances": [],
+      "interactions": {
+        "dangerous": [
+          {
+            "kind": "substance",
+            "name": "MDMA"
+          }
+        ],
+        "unsafe": [],
+        "uncertain": [
+          {
+            "kind": "other",
+            "name": "Grapefruit"
+          }
+        ]
+      },
+      "toxicities": []
+    },
+    {
+      "name": "Amphetamine",
+      "aliases": [],
+      "url": "https://psychonautwiki.org/wiki/Amphetamine",
+      "categories": [
+        "stimulant"
+      ],
+      "classes": {
+        "psychoactive": [
+          "Stimulants"
+        ],
+        "chemical": [
+          "Amphetamines"
+        ]
+      },
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {
+            "units": "mg",
+            "thresholdMin": 5,
+            "commonMin": 10,
+            "strongMin": 30,
+            "heavyMin": 50
+          },
+          "duration": {
+            "onset": {
+              "min": 30,
+              "max": 60
+            },
+            "total": {
+              "min": 240,
+              "max": 360
+            }
+          },
+          "bioavailability": {
+            "min": 70,
+            "max": 75
+          }
+        },
+        {
+          "route": "insufflated",
+          "dose": {
+            "units": "mg",
+            "commonMin": 10
+          }
+        }
+      ],
+      "crossTolerances": [
+        "stimulants"
+      ],
+      "interactions": {
+        "dangerous": [],
+        "unsafe": [],
+        "uncertain": [
+          {
+            "kind": "substance",
+            "name": "Caffeine"
+          }
+        ]
+      },
+      "toxicities": []
+    },
+    {
+      "name": "Caffeine",
+      "aliases": [],
+      "url": "https://psychonautwiki.org/wiki/Caffeine",
+      "categories": [
+        "stimulant"
+      ],
+      "classes": {
+        "psychoactive": [
+          "Stimulants"
+        ],
+        "chemical": [
+          "Xanthines"
+        ]
+      },
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {
+            "units": "mg",
+            "commonMin": 50,
+            "strongMin": 150
+          }
+        }
+      ],
+      "tolerance": {
+        "full": "with prolonged use",
+        "half": {
+          "text": "3 days",
+          "min": 4320,
+          "max": 4320
+        },
+        "zero": {
+          "text": "7 days",
+          "min": 10080,
+          "max": 10080
+        }
+      },
+      "crossTolerances": [
+        "stimulants"
+      ],
+      "interactions": {
+        "dangerous": [],
+        "unsafe": [],
+        "uncertain": []
+      },
+      "toxicities": []
+    },
+    {
+      "name": "MDMA",
+      "aliases": [
+        "Molly"
+      ],
+      "url": "https://psychonautwiki.org/wiki/MDMA",
+      "summary": "An entactogen.",
+      "categories": [
+        "stimulant"
+      ],
+      "classes": {
+        "psychoactive": [
+          "Entactogens"
+        ],
+        "chemical": [
+          "Amphetamines"
+        ]
+      },
+      "roas": [],
+      "crossTolerances": [],
+      "interactions": {
+        "dangerous": [],
+        "unsafe": [],
+        "uncertain": []
+      },
+      "toxicities": []
+    },
+    {
+      "name": "Methyl Thing",
+      "aliases": [],
+      "url": "https://psychonautwiki.org/wiki/Methyl_Thing",
+      "categories": [],
+      "classes": {
+        "psychoactive": [],
+        "chemical": []
+      },
+      "roas": [],
+      "crossTolerances": [],
+      "interactions": {
+        "dangerous": [],
+        "unsafe": [],
+        "uncertain": []
+      },
+      "toxicities": []
+    },
+    {
+      "name": "Old Name Drug",
+      "aliases": [],
+      "url": "https://psychonautwiki.org/wiki/Old_Name_Drug",
+      "categories": [],
+      "classes": {
+        "psychoactive": [],
+        "chemical": []
+      },
+      "roas": [
+        {
+          "route": "smoked",
+          "dose": {
+            "units": "mg",
+            "commonMin": 5
+          }
+        }
+      ],
+      "crossTolerances": [],
+      "interactions": {
+        "dangerous": [],
+        "unsafe": [
+          {
+            "kind": "substance",
+            "name": "Caffeine"
+          }
+        ],
+        "uncertain": []
+      },
+      "toxicities": []
+    },
+    {
+      "name": "Removed Drug",
+      "aliases": [],
+      "url": "https://psychonautwiki.org/wiki/Removed_Drug",
+      "categories": [],
+      "classes": {
+        "psychoactive": [],
+        "chemical": []
+      },
+      "roas": [],
+      "crossTolerances": [],
+      "interactions": {
+        "dangerous": [],
+        "unsafe": [],
+        "uncertain": []
+      },
+      "toxicities": []
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# The golden diff report folds alike rows into collapsed blocks (docs/adr/0008-diff-report.md).
+# This file replaces the root configuration here, so its two rules are repeated.
+MD013: false
+MD024:
+  siblings_only: true
+MD033:
+  allowed_elements: [details, summary]
