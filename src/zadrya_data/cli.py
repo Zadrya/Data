@@ -455,7 +455,7 @@ def _refuse_overlap(outputs: list[Path], base: Path, snapshot: Path) -> None:
     for output, where in zip(outputs, resolved):
         if where == base.resolve():
             raise _Refused(EXIT_INVALID, f"{output} is the base file: choose another output")
-        if where.parent == snapshot.resolve():
+        if snapshot.resolve() in (where, *where.parents):
             raise _Refused(
                 EXIT_INVALID, f"{output} is inside the snapshot directory: choose another output"
             )
