@@ -44,7 +44,7 @@ CROSS_TOLERANCE_GROUPS = {
     "tricyclic-antidepressants": "Tricyclic antidepressants",
 }
 
-# Every token seen in either source (snapshot of 2026-11-16 and the base file), in
+# Every token seen in either source (snapshot of 2026-11-17 and the base file), in
 # lower case, to a group id. ``None`` marks a token that names no group of its own.
 # "a|b" tokens are wiki links (target|label) and map as a whole.
 TOKEN_TO_GROUP: dict[str, str | None] = {

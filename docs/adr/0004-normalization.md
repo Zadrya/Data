@@ -9,7 +9,7 @@ The dataset is built from two sources: the base file of PsychonautWiki Journal v
 
 This ADR covers the first half of normalization: the catalog, names, text, categories, classes and routes. Tolerance, cross tolerance and interactions are normalized in the next slice, recorded in ADR 5.
 
-The figures below are from the snapshot fetched on 2026-11-16 (373 API entries) and the base file (289 substances).
+The figures below are from the snapshot fetched on 2026-11-17 (373 API entries) and the base file (289 substances).
 
 ## Decision
 
@@ -39,7 +39,7 @@ An alias must lead to exactly one substance: the app finds substances by alias, 
 - an alias that several substances carry is dropped from all of them and reported on each (`alias-shared`): "Speed" (Amphetamine, Methamphetamine), "Dex" (Dextroamphetamine, Dextromethorphan), "Drone" (Mephedrone, Pentedrone), "Sally" (MDA, Salvinorin A) and "Methylguanidoacetic acid" (Creatine, SAM-e). The rule is generic and has no exception that keeps a shared alias on one holder, in line with ADR 5, which never resolves a shared alias to one substance.
 - The table `ALIAS_REMOVALS` (`normalize/names.py`) removes, by substance, source aliases that name a different substance and that the generic rule does not catch, each with its reason, and each removal is reported (`alias-removed`). It holds Buspirone's "Dimethyltryptamine" and "Dmitri": both name DMT, and matching them could attach DMT warnings to Buspirone. The table is **proposed: the owner confirms it in the dataset review**; a test checks that every entry still matches an alias of the base file.
 
-Against the snapshot of 2026-11-16 this drops 14 aliases (2 by the table, 2 that name another substance, 10 shared) and changes no interaction: the severity of every substance pair under the app contract of ADR 5 (17,440 pairs) and every `other` target are the same before and after, because interaction resolution already preferred names to aliases and treated a shared alias as `other`. The findings come after those of every substance, in catalog order, and before the cross tolerance groups. Uniqueness of names and aliases across the catalog is also an invariant of the build, so a collision that slips through stops the build.
+Against the snapshot of 2026-11-17 this drops 14 aliases (2 by the table, 2 that name another substance, 10 shared) and changes no interaction: the severity of every substance pair under the app contract of ADR 5 (17,440 pairs) and every `other` target are the same before and after, because interaction resolution already preferred names to aliases and treated a shared alias as `other`. The findings come after those of every substance, in catalog order, and before the cross tolerance groups. Uniqueness of names and aliases across the catalog is also an invariant of the build, so a collision that slips through stops the build.
 
 ### Text
 
