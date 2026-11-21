@@ -7,14 +7,15 @@ UTF-8 without escapes, ``allow_nan=False``, line feeds, one final newline, and n
 or anything else that depends on the clock, the machine or the hash seed. The same
 inputs give the same bytes.
 
-``write_verified`` writes the bytes next to the target, reads them back through
-``strict_json``, checks them again (schema and invariants of what is on disk, not of
-the object in memory: the hash and the signature cover the bytes) and only then
-renames them over the target. See ``docs/adr/0007-invariants-and-build.md``.
+``write_outputs`` writes each file to a new hidden sibling, flushes it to disk, reads
+it back and checks it (for the dataset: ``strict_json``, schema and invariants of what
+is on disk, not of the object in memory, since the hash and the signature cover the
+bytes), and renames the siblings over their targets only when every one passed. See ``docs/adr/0007-invariants-and-build.md``.
 """
 
 import os
-from collections.abc import Callable
+import tempfile
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -139,22 +140,110 @@ def report_tsv(report: Report) -> bytes:
     return ("\n".join(lines) + "\n").encode("utf-8")
 
 
-def write_verified(path: Path, data: bytes, verify: Callable[[bytes], object]) -> None:
-    """Write the bytes to ``path`` whole or not at all, after checking what was written.
+@dataclass(frozen=True, slots=True)
+class Output:
+    """One file to write: where, the exact bytes, and the check the bytes on disk must pass."""
 
-    The bytes go to a hidden sibling first, are read back, must equal ``data`` and pass
-    ``verify``; only then the sibling is renamed over ``path``. On any failure the
-    sibling is removed and ``path`` is left as it was. ``OSError`` and whatever
-    ``verify`` raises reach the caller.
-    """
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_name(f".{path.name}.partial")
+    path: Path
+    data: bytes
+    verify: Callable[[bytes], object]
+
+
+def _umask() -> int:
+    mask = os.umask(0)
+    os.umask(mask)
+    return mask
+
+
+def _write_all(descriptor: int, data: bytes) -> None:
+    view = memoryview(data)
+    while view:
+        view = view[os.write(descriptor, view) :]
+
+
+def _read_all(descriptor: int) -> bytes:
+    os.lseek(descriptor, 0, os.SEEK_SET)
+    chunks = []
+    while chunk := os.read(descriptor, 1 << 20):
+        chunks.append(chunk)
+    return b"".join(chunks)
+
+
+def _fsync_directory(directory: Path) -> None:
+    descriptor = os.open(directory, os.O_RDONLY)
     try:
-        temporary.write_bytes(data)
-        written = temporary.read_bytes()
-        if written != data:
-            raise BuildError(f"{temporary} does not hold the bytes that were written")
-        verify(written)
-        os.replace(temporary, path)
+        os.fsync(descriptor)
     finally:
+        os.close(descriptor)
+
+
+def _make_parents(directory: Path) -> list[Path]:
+    """Create the directory and its missing parents; return those created, deepest first."""
+    missing = [path for path in (directory, *directory.parents) if not path.exists()]
+    directory.mkdir(parents=True, exist_ok=True)
+    return missing
+
+
+def _stage(output: Output) -> Path:
+    """Write the bytes to a new hidden file next to the target, durably, and check them.
+
+    The file is created by ``tempfile.mkstemp`` in the target's directory: a new name,
+    opened with ``O_EXCL``, so an existing file or symbolic link is never followed or
+    reused. The bytes are flushed to disk, read back through the same descriptor, must
+    equal what was written and must pass ``output.verify``. On any failure the file is
+    removed.
+    """
+    descriptor, name = tempfile.mkstemp(
+        dir=output.path.parent, prefix=f".{output.path.name}.", suffix=".partial"
+    )
+    temporary = Path(name)
+    try:
+        try:
+            os.fchmod(descriptor, 0o666 & ~_umask())
+            _write_all(descriptor, output.data)
+            os.fsync(descriptor)
+            written = _read_all(descriptor)
+        finally:
+            os.close(descriptor)
+        if written != output.data:
+            raise BuildError(f"{temporary} does not hold the bytes that were written")
+        output.verify(written)
+    except BaseException:
         temporary.unlink(missing_ok=True)
+        raise
+    return temporary
+
+
+def write_outputs(outputs: Sequence[Output]) -> None:
+    """Write every output whole, or leave every target as it was.
+
+    Each output is staged first (``_stage``: written, flushed, read back and checked).
+    Only when all of them passed are they renamed over their targets, in the order
+    given, each rename followed by a flush of its directory. On a failure before the
+    renames, the staged files and any directory created for them are removed, and no
+    target changes. A rename itself can fail only if the directory changes under the
+    command; callers pass the dataset last so that it is never the one left behind.
+    """
+    staged: list[tuple[Path, Path]] = []
+    created: list[Path] = []
+    try:
+        for output in outputs:
+            created.extend(_make_parents(output.path.parent))
+            staged.append((_stage(output), output.path))
+    except BaseException:
+        for temporary, _ in staged:
+            temporary.unlink(missing_ok=True)
+        for directory in created:
+            try:
+                directory.rmdir()
+            except OSError:
+                pass
+        raise
+    for temporary, path in staged:
+        os.replace(temporary, path)
+        _fsync_directory(path.parent)
+
+
+def write_verified(path: Path, data: bytes, verify: Callable[[bytes], object]) -> None:
+    """Write one file as ``write_outputs`` does."""
+    write_outputs([Output(path, data, verify)])

@@ -12,7 +12,14 @@ from pathlib import Path
 
 from zadrya_data import __version__
 from zadrya_data.base import BaseFormatError, load_base
-from zadrya_data.build import BuildError, build_dataset, check_bytes, report_tsv, write_verified
+from zadrya_data.build import (
+    BuildError,
+    Output,
+    build_dataset,
+    check_bytes,
+    report_tsv,
+    write_outputs,
+)
 from zadrya_data.graphql import ApiFormatError, ApiQueryError
 from zadrya_data.errors import ReleaseRejectedError
 from zadrya_data.http import FetchError, PoliteClient
@@ -459,15 +466,16 @@ def run_build(
 ) -> int:
     """Build the dataset, write it (and the report) and return the exit code.
 
-    Nothing is written unless the dataset passed every check. The report, when asked
-    for, is written before the dataset.
+    Nothing is written unless the dataset passed every check, and the report and the
+    dataset are both staged and checked before either replaces its target.
     """
     try:
         _refuse_overlap([output] if report is None else [output, report], base, snapshot)
         built = build_dataset(load_base(base), load_snapshot(snapshot), dataset_version)
+        outputs = [Output(output, built.data, check_bytes)]
         if report is not None:
-            write_verified(report, report_tsv(built.report), lambda _: None)
-        write_verified(output, built.data, check_bytes)
+            outputs.insert(0, Output(report, report_tsv(built.report), lambda _: None))
+        write_outputs(outputs)
     except _Refused as refusal:
         print(f"error: dataset not written: {refusal}", file=sys.stderr)
         return refusal.code

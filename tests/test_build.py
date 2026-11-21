@@ -7,6 +7,7 @@ the recorded API answer ``graphql-relations.json`` (with a wiki page for every n
 
 import json
 import os
+import stat
 import subprocess
 import sys
 from collections.abc import Iterator
@@ -24,11 +25,14 @@ from zadrya_data.build import (
     ATTRIBUTION,
     BuildError,
     DatasetInvalidError,
+    Output,
     build_dataset,
     check_bytes,
     report_tsv,
+    write_outputs,
     write_verified,
 )
+from zadrya_data import cli
 from zadrya_data.cli import main, run_validate
 from zadrya_data.graphql import parse_data
 from zadrya_data.invariants import InvariantError
@@ -343,15 +347,127 @@ def test_write_verified_leaves_the_target_when_the_check_fails(target: Path) -> 
 def test_write_verified_checks_the_bytes_on_disk_not_those_in_memory(
     target: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    real = Path.write_bytes
+    real = os.write
 
-    def truncated(self: Path, data: bytes) -> int:
-        return real(self, data[:-1])
+    def corrupting(descriptor: int, data: Any) -> int:
+        real(descriptor, bytes(data).replace(b"n", b"x"))
+        return len(data)
 
-    monkeypatch.setattr(Path, "write_bytes", truncated)
+    monkeypatch.setattr(os, "write", corrupting)
 
     with pytest.raises(BuildError, match="does not hold the bytes that were written"):
         write_verified(target, b"new", lambda _: None)
 
     monkeypatch.undo()
     assert target.read_bytes() == b"previous"
+
+
+def test_a_symbolic_link_at_the_target_is_replaced_never_followed(tmp_path: Path) -> None:
+    outside = tmp_path / "outside.txt"
+    outside.write_bytes(b"untouched")
+    target = tmp_path / "out.json"
+    target.symlink_to(outside)
+
+    write_verified(target, b"new", lambda _: None)
+
+    assert not target.is_symlink()
+    assert target.read_bytes() == b"new"
+    assert outside.read_bytes() == b"untouched"
+
+
+def test_the_file_and_its_directory_are_flushed_before_and_after_the_rename(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    flushed: list[str] = []
+    real = os.fsync
+
+    def recording(descriptor: int) -> None:
+        flushed.append("directory" if stat.S_ISDIR(os.fstat(descriptor).st_mode) else "file")
+        real(descriptor)
+
+    monkeypatch.setattr(os, "fsync", recording)
+
+    write_verified(tmp_path / "out.json", b"new", lambda _: None)
+
+    assert flushed == ["file", "directory"]
+
+
+def test_the_file_mode_follows_the_umask(tmp_path: Path) -> None:
+    previous = os.umask(0o027)
+    try:
+        write_verified(tmp_path / "out.json", b"new", lambda _: None)
+    finally:
+        os.umask(previous)
+
+    assert (tmp_path / "out.json").stat().st_mode & 0o777 == 0o640
+
+
+def test_directories_created_for_a_refused_output_are_removed(tmp_path: Path) -> None:
+    def refuse(_: bytes) -> None:
+        raise BuildError("refused")
+
+    with pytest.raises(BuildError):
+        write_verified(tmp_path / "new" / "deeper" / "out.json", b"new", refuse)
+
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_no_output_is_written_unless_every_output_passes(tmp_path: Path) -> None:
+    first, second = tmp_path / "first.tsv", tmp_path / "second.json"
+    second.write_bytes(b"previous")
+
+    def refuse(_: bytes) -> None:
+        raise BuildError("refused")
+
+    with pytest.raises(BuildError):
+        write_outputs([Output(first, b"one", lambda _: None), Output(second, b"two", refuse)])
+
+    assert not first.exists()
+    assert second.read_bytes() == b"previous"
+    assert _leftovers(tmp_path) == []
+
+
+def test_an_unwritable_output_leaves_no_report(
+    snapshot_dir: Path, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    blocker = tmp_path / "file"
+    blocker.write_text("not a directory")
+    report = tmp_path / "report.tsv"
+
+    assert _build(snapshot_dir, blocker / "substances.json", "--report", str(report)) == 2
+
+    assert not report.exists()
+    assert _leftovers(tmp_path) == []
+    assert "error: dataset not written:" in capsys.readouterr().err
+
+
+def test_a_dataset_that_fails_its_read_back_check_leaves_no_file(
+    snapshot_dir: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    output, report = tmp_path / "substances.json", tmp_path / "report.tsv"
+    output.write_bytes(b"previous")
+    report.write_bytes(b"previous report")
+
+    def refuse(_: bytes) -> None:
+        raise BuildError("the bytes on disk are not the dataset")
+
+    monkeypatch.setattr(cli, "check_bytes", refuse)
+
+    assert _build(snapshot_dir, output, "--report", str(report)) == 1
+
+    assert output.read_bytes() == b"previous"
+    assert report.read_bytes() == b"previous report"
+    assert _leftovers(tmp_path) == []
+
+
+def test_a_created_directory_that_is_no_longer_empty_is_kept(tmp_path: Path) -> None:
+    directory = tmp_path / "new"
+
+    def someone_else_writes_here(_: bytes) -> None:
+        (directory / "theirs.txt").write_text("keep me")
+        raise BuildError("refused")
+
+    with pytest.raises(BuildError):
+        write_verified(directory / "out.json", b"new", someone_else_writes_here)
+
+    assert sorted(path.name for path in directory.iterdir()) == ["theirs.txt"]
