@@ -268,22 +268,41 @@ def test_a_normalization_error_is_a_refusal(
     assert _build(snapshot_dir, tmp_path / "substances.json") == 1
 
 
-@pytest.mark.parametrize("target", ["base", "snapshot", "report"])
+@pytest.mark.parametrize(
+    ("output", "report", "reason"),
+    [
+        ("base", "report.tsv", "is the base file"),
+        ("snapshot/substances.json", "report.tsv", "is inside the snapshot directory"),
+        ("snapshot/sub/substances.json", "report.tsv", "is inside the snapshot directory"),
+        ("snapshot", "report.tsv", "is inside the snapshot directory"),
+        ("substances.json", "snapshot/sub/report.tsv", "is inside the snapshot directory"),
+        ("same.json", "same.json", "name the same file"),
+    ],
+)
 def test_outputs_never_overwrite_an_input_or_each_other(
-    snapshot_dir: Path, tmp_path: Path, target: str, capsys: pytest.CaptureFixture[str]
+    snapshot_dir: Path,
+    tmp_path: Path,
+    output: str,
+    report: str,
+    reason: str,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
-    output = {
-        "base": BASE_FILE,
-        "snapshot": snapshot_dir / "substances.json",
-        "report": tmp_path / "same.json",
-    }[target]
-    before = sorted(path.name for path in snapshot_dir.iterdir())
+    def place(name: str) -> Path:
+        if name == "base":
+            return BASE_FILE
+        if name.startswith("snapshot"):
+            return snapshot_dir / Path(name).relative_to("snapshot")
+        return tmp_path / name
 
-    code = _build(snapshot_dir, output, "--report", str(tmp_path / "same.json"))
+    before = sorted(str(path.relative_to(snapshot_dir)) for path in snapshot_dir.rglob("*"))
+
+    code = _build(snapshot_dir, place(output), "--report", str(place(report)))
 
     assert code == 1
-    assert sorted(path.name for path in snapshot_dir.iterdir()) == before
-    assert "error: dataset not written:" in capsys.readouterr().err
+    assert reason in capsys.readouterr().err
+    after = sorted(str(path.relative_to(snapshot_dir)) for path in snapshot_dir.rglob("*"))
+    assert after == before
+    assert list(tmp_path.iterdir()) == []
 
 
 def test_an_output_that_cannot_be_written_is_reported(
