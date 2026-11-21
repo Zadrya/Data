@@ -10,7 +10,7 @@ from datetime import UTC, datetime
 from collections.abc import Sequence
 from pathlib import Path
 
-from zadrya_data import __version__
+from zadrya_data import __version__, diff_command
 from zadrya_data.base import BaseFormatError, load_base
 from zadrya_data.build import (
     BuildError,
@@ -314,6 +314,7 @@ def build_parser() -> argparse.ArgumentParser:
         default=DEFAULT_KEYS,
         help="directory of the pinned public keys (default: %(default)s)",
     )
+    diff_command.register(commands)
     return parser
 
 
@@ -590,5 +591,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             arguments.dataset_version,
             arguments.output,
         )
+    if arguments.command == "diff":
+        return diff_command.run(arguments)
     parser.print_help()
     return EXIT_OK
