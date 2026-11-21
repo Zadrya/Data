@@ -21,6 +21,7 @@ import re
 from dataclasses import dataclass
 from typing import Any
 
+from zadrya_data.normalize.names import name_key
 from zadrya_data.normalize.report import Kind, Report
 
 
@@ -210,7 +211,7 @@ NAME_TO_GROUP = {
 
 def group_of(name: str) -> str | None:
     """Return the id of the group a target name stands for, or ``None``."""
-    return NAME_TO_GROUP.get(name.casefold())
+    return NAME_TO_GROUP.get(name_key(name))
 
 
 def interaction_groups(

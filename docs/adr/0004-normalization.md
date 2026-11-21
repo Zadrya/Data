@@ -31,7 +31,9 @@ The figures below are from the snapshot fetched on 2026-11-16 (373 API entries) 
 
 Aliases are the base common names followed by the API common names: stripped, without the canonical name, without repeats. Repeats and the canonical name are recognized without regard to case, and the first spelling is kept.
 
-An alias must lead to exactly one substance: the app finds substances by alias, and a name that leads to two, or to the wrong one, could attach an ingestion and its interaction warnings to the wrong substance. Once the whole catalog is known, without regard to case:
+Names are compared by one key everywhere they are matched (aliases here, interaction targets in ADR 5, and the invariants of ADR 7): format characters (Unicode category Cf, such as the zero-width space and the soft hyphen) are removed, the text is normalized with NFKC and case folded, and runs of whitespace become one space. A composed and a decomposed accent, a double space or an invisible character never make a second name. The key only compares; the spelling kept is the first one, as written.
+
+An alias must lead to exactly one substance: the app finds substances by alias, and a name that leads to two, or to the wrong one, could attach an ingestion and its interaction warnings to the wrong substance. Once the whole catalog is known, compared by that key:
 
 - an alias that is the canonical name of another substance is dropped from the substance that carries it and reported (`alias-names-another-substance`): Apomorphine's "Blue Lotus" (a catalog substance) and Buspirone's "DMT";
 - an alias that several substances carry is dropped from all of them and reported on each (`alias-shared`): "Speed" (Amphetamine, Methamphetamine), "Dex" (Dextroamphetamine, Dextromethorphan), "Drone" (Mephedrone, Pentedrone), "Sally" (MDA, Salvinorin A) and "Methylguanidoacetic acid" (Creatine, SAM-e). The rule is generic and has no exception that keeps a shared alias on one holder, in line with ADR 5, which never resolves a shared alias to one substance.
