@@ -9,7 +9,7 @@ ADR 4 normalized the catalog, the text, the classes and the routes, and left eve
 
 The sources do not have these shapes. Both write tolerance as wiki wording ("3 - 7 days"). Cross tolerance is a list of loose tokens taken from a sentence of the wiki (`psychedelic`, `psychedelics`, `GABA|gabaergic`, `trycyclic antidepressants`, `modafanil`, `analog`). Interactions are plain names that mix substances (`Tramadol`), abbreviations (`DXM`, `aMT`), classes in several spellings (`MAOI`, `MAOIs`; `2C-T-x`, `2C-T-X`; `Amphetamines`, `Substituted amphetamines`) and things outside the catalog (`Lithium`, `Grapefruit`). The lists are not symmetric: 143 substances list Tramadol without Tramadol listing them.
 
-A missed warning is the unsafe direction. An alarmist warning is the lesser harm, but warning fatigue is still a harm. Figures are from the snapshot of 2026-11-16 and the base file, as in ADR 4.
+A missed warning is the unsafe direction. An alarmist warning is the lesser harm, but warning fatigue is still a harm. Figures are from the snapshot of 2026-11-17 and the base file, as in ADR 4.
 
 ## Decision
 

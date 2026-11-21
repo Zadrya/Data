@@ -3,7 +3,7 @@
 
 Two recordings are used: ``graphql.json`` (seven whole entries) and
 ``graphql-doses.json`` (the dose blocks of every substance whose dose normalization
-does something worth pinning in the snapshot of 2026-11-16: a filled boundary, a label
+does something worth pinning in the snapshot of 2026-11-17: a filled boundary, a label
 difference, an inconsistent block or range, a change against the base file, a
 repaired, qualified or non-mass unit).
 """
