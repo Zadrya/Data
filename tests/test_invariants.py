@@ -357,6 +357,11 @@ FAILING: dict[str, tuple[str, str | None, str, Mutation]] = {
 }
 
 
+def _zero(document: dict[str, Any]) -> dict[str, Any]:
+    zero: dict[str, Any] = _alpha(document)["tolerance"]["zero"]
+    return zero
+
+
 def _append(path: Callable[[dict[str, Any]], Any], value: Any) -> Mutation:
     def mutate(document: dict[str, Any]) -> None:
         path(document).append(value)
@@ -396,7 +401,12 @@ def _alias_with_a_zero_width_space(document: dict[str, Any]) -> None:
     _alpha(document)["aliases"].append("Be\u200bta")
 
 
+def _catalog_number(document: dict[str, Any]) -> None:
+    document["interactionGroups"][0]["weight"] = float("inf")
+
+
 FAILING |= {
+    "tolerance-zero-min-above-max": ("range", "Alpha", "tolerance.zero", _set(_zero, "min", 1e6)),
     "other-is-a-substance-on-both-sides": (
         "other-outside-catalog",
         "Alpha",
@@ -416,6 +426,18 @@ FAILING |= {
         _other_is_a_group,
     ),
     "name-is-a-group-name": ("name-not-group", "Modafinil\u200b Analogs", "name", _name_is_a_group),
+    "alias-is-a-group-id": (
+        "alias-not-group",
+        "Alpha",
+        "aliases",
+        _append(lambda d: _alpha(d)["aliases"], "Modafinil-Analogs"),
+    ),
+    "alias-is-a-cross-tolerance-group-name": (
+        "alias-not-group",
+        "Beta",
+        "aliases",
+        _append(lambda d: _beta(d)["aliases"], "modafinil  analogs"),
+    ),
     "composed-and-decomposed-names": (
         "unique-name",
         "Cafe\u0301",
@@ -434,6 +456,43 @@ FAILING |= {
         "aliases",
         _alias_with_a_zero_width_space,
     ),
+    "safer-use-repeated": (
+        "unique-items",
+        "Alpha",
+        "saferUse",
+        _append(lambda d: _alpha(d)["saferUse"], "Start low."),
+    ),
+    "chemical-class-repeated": (
+        "unique-items",
+        "Alpha",
+        "classes.chemical",
+        lambda d: _alpha(d)["classes"].update(chemical=["Phenethylamines"] * 2),
+    ),
+    "cross-tolerance-repeated": (
+        "unique-items",
+        "Alpha",
+        "crossTolerances",
+        _append(lambda d: _alpha(d)["crossTolerances"], "stimulants"),
+    ),
+    "unit-full-width": (
+        "mass-unit",
+        "Alpha",
+        "roas[oral].dose.units",
+        _set(_dose, "units", "\uff4d\uff47"),
+    ),
+    "unit-mcg": (
+        "mass-unit",
+        "Beta",
+        "roas[insufflated].dose.units",
+        lambda d: _beta(d)["roas"][0]["dose"].update(units="mcg"),
+    ),
+    "number-outside-routes": (
+        "finite",
+        "Alpha",
+        "tolerance.half.max",
+        _set(_half, "max", float("inf")),
+    ),
+    "number-in-a-catalog-list": ("finite", None, "interactionGroups[0].weight", _catalog_number),
 }
 
 
