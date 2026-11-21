@@ -2,7 +2,7 @@
 """Tolerance, cross tolerance and interactions of the real base file with a recorded API answer.
 
 No network. ``graphql-relations.json`` holds the whole real entries (snapshot of
-2026-11-16) of the substances whose relations normalization does something worth
+2026-11-17) of the substances whose relations normalization does something worth
 pinning: 3-FMA (the API has no tolerance, no cross tolerance and no interactions),
 Morphine (a token only the API has), N-Methylbisfluoromodafinil (``modafanil`` and
 ``analog``), Metizolam and Tianeptine (misspelled tokens), Acetylfentanyl and
