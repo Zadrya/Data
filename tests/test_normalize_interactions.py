@@ -16,7 +16,8 @@ from tests.test_normalize_real import BASE_FILE, _snapshot
 from zadrya_data.base import load_base
 from zadrya_data.normalize import Kind, NormalizationError, Normalized, normalize
 from zadrya_data.normalize.interaction_groups import GROUPS, NAME_TO_GROUP, group_of
-from zadrya_data.normalize.interactions import SEVERITIES, TARGET_NAMES
+from zadrya_data.normalize.interactions import SEVERITIES, TARGET_NAMES, _Resolver
+from zadrya_data.normalize.report import Report
 
 EMPTY_GROUPS = {"aldh2-inhibitors", "hepatotoxic-drugs", "protease-inhibitors", "snris", "ssris"}
 
@@ -168,6 +169,23 @@ def test_a_name_that_several_substances_have_without_case_is_other() -> None:
     assert [f.detail for f in result.report.of(Kind.INTERACTION_TARGET_OTHER)] == [
         "'kava' is the name, without case, of several substances (KAVA, Kava): kept as other "
         "(listed by 1 substance)"
+    ]
+
+
+def test_a_shared_alias_that_reaches_the_resolver_names_its_holders() -> None:
+    substances = [
+        {"name": "Amphetamine", "aliases": ["Speed"]},
+        {"name": "Methamphetamine", "aliases": ["speed\u200b"]},
+    ]
+    resolver = _Resolver.of(substances)
+    report = Report()
+
+    assert resolver.resolve("SPEED", "LSD") == ("other", "speed")
+    resolver.report(report)
+
+    assert [f.detail for f in report.of(Kind.INTERACTION_TARGET_OTHER)] == [
+        "'SPEED' is an alias of several substances (Amphetamine, Methamphetamine): "
+        "kept as other (listed by 1 substance)"
     ]
 
 
