@@ -106,10 +106,12 @@ class _Resolver:
         if group is not None:
             return self._note(raw, "by the group table", ("group", group), lister)
         if len(named) > 1:
-            # Aliases that several substances share never get here: the catalog drops
-            # them first (``names.drop_ambiguous_aliases``). Names that differ only by
-            # case can, and the invariants of the build refuse them.
+            # Names with one key but different spellings; the invariants refuse them.
             how = f"is the name, without case, of several substances ({', '.join(named)})"
+        elif len(owners) > 1:
+            # The catalog drops shared aliases first (``names.drop_ambiguous_aliases``),
+            # so this only happens when the resolver is given aliases it did not drop.
+            how = f"is an alias of several substances ({', '.join(sorted(owners))})"
         else:
             how = "is neither a catalog substance nor a group"
         return self._note(raw, how, ("other", folded), lister)
