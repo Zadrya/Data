@@ -1,0 +1,105 @@
+{
+  "schemaVersion": "1.0.0",
+  "datasetVersion": "1.1.0",
+  "attribution": [
+    {"name": "PsychonautWiki", "url": "https://psychonautwiki.org", "license": "CC-BY-SA-4.0"}
+  ],
+  "categories": [
+    {"id": "depressant", "name": "Depressants", "description": "Slow down the nervous system."},
+    {"id": "opioid", "name": "Opioids", "description": "Act on opioid receptors."},
+    {"id": "stimulant", "name": "Stimulants", "description": "Speed up the nervous system."}
+  ],
+  "interactionGroups": [
+    {"id": "depressants", "name": "Depressants", "members": ["Alcohol"]},
+    {"id": "stimulants", "name": "Stimulants", "members": ["Amphetamine", "MDMA"]}
+  ],
+  "crossToleranceGroups": [
+    {"id": "stimulants", "name": "Stimulants", "members": ["Amphetamine", "MDMA"]}
+  ],
+  "substances": [
+    {
+      "name": "Added @Drug #1",
+      "aliases": [],
+      "url": "https://psychonautwiki.org/wiki/Added_Drug",
+      "categories": [],
+      "classes": {"psychoactive": [], "chemical": []},
+      "roas": [{"route": "oral", "dose": {"units": "mg", "commonMin": 1}}],
+      "crossTolerances": [],
+      "interactions": {"dangerous": [], "unsafe": [], "uncertain": []},
+      "toxicities": []
+    },
+    {
+      "name": "Alcohol",
+      "aliases": ["Ethanol"],
+      "url": "https://psychonautwiki.org/wiki/Alcohol",
+      "categories": ["depressant"],
+      "classes": {"psychoactive": ["Depressant"], "chemical": ["Alcohol"]},
+      "roas": [{"route": "oral", "dose": {"units": "mL", "thresholdMin": 10, "commonMin": 20}}],
+      "crossTolerances": [],
+      "interactions": {
+        "dangerous": [],
+        "unsafe": [{"kind": "substance", "name": "MDMA"}],
+        "uncertain": []
+      },
+      "toxicities": []
+    },
+    {
+      "name": "Amphetamine",
+      "aliases": [],
+      "url": "https://psychonautwiki.org/wiki/Amphetamine",
+      "categories": ["stimulant"],
+      "classes": {"psychoactive": ["Stimulants"], "chemical": ["Amphetamines"]},
+      "roas": [
+        {
+          "route": "oral",
+          "dose": {"units": "mg", "commonMin": 12, "strongMin": 35, "heavyMin": 50},
+          "duration": {"onset": {"min": 20, "max": 60}, "total": {"min": 240, "max": 420}},
+          "bioavailability": {"min": 70, "max": 80}
+        }
+      ],
+      "crossTolerances": ["stimulants"],
+      "interactions": {
+        "dangerous": [],
+        "unsafe": [{"kind": "substance", "name": "Caffeine"}],
+        "uncertain": []
+      },
+      "toxicities": []
+    },
+    {
+      "name": "Caffeine",
+      "aliases": [],
+      "url": "https://psychonautwiki.org/wiki/Caffeine",
+      "categories": ["stimulant"],
+      "classes": {"psychoactive": ["Stimulants"], "chemical": ["Xanthines"]},
+      "roas": [{"route": "oral", "dose": {"units": "mg caffeine", "commonMin": 50, "strongMin": 200}}],
+      "tolerance": {"full": "with prolonged use", "half": {"text": "5 days", "min": 7200, "max": 7200}},
+      "crossTolerances": [],
+      "interactions": {"dangerous": [], "unsafe": [], "uncertain": []},
+      "toxicities": []
+    },
+    {
+      "name": "MDMA",
+      "aliases": ["Molly"],
+      "url": "https://psychonautwiki.org/wiki/MDMA",
+      "summary": "An entactogen of the amphetamine class.",
+      "categories": ["stimulant", "depressant"],
+      "classes": {"psychoactive": ["Entactogens"], "chemical": ["Amphetamines"]},
+      "roas": [],
+      "crossTolerances": ["stimulants"],
+      "interactions": {"dangerous": [], "unsafe": [{"kind": "group", "groupId": "depressants"}], "uncertain": []},
+      "toxicities": [],
+      "saferUse": ["Stay hydrated."]
+    },
+    {
+      "name": "New|Name *Drug* \u2014 [x](y)",
+      "aliases": ["Old Name Drug"],
+      "url": "https://psychonautwiki.org/wiki/New_Name_Drug",
+      "categories": [],
+      "classes": {"psychoactive": [], "chemical": []},
+      "roas": [{"route": "smoked", "dose": {"units": "mg", "commonMin": 5}}],
+      "crossTolerances": [],
+      "interactions": {"dangerous": [], "unsafe": [{"kind": "substance", "name": "Caffeine"}], "uncertain": []},
+      "toxicities": []
+    }
+  ]
+}
