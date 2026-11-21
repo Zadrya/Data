@@ -81,6 +81,18 @@ def test_diff_refuses_an_invalid_dataset(
     assert "is not valid against the substances schema" in capsys.readouterr().err
 
 
+def test_diff_refuses_a_dataset_that_breaks_an_invariant(
+    capsys: pytest.CaptureFixture[str], tmp_path: Path
+) -> None:
+    document = json.loads(NEW.read_text(encoding="utf-8"))
+    document["interactionGroups"][0]["members"].append("Not In The Catalog")
+    path = tmp_path / "new.json"
+    path.write_text(json.dumps(document), encoding="utf-8")
+    assert main(["diff", str(OLD), str(path), "--output", str(tmp_path / "report.md")]) == 1
+    assert "breaks the dataset invariants" in capsys.readouterr().err
+    assert not (tmp_path / "report.md").exists()
+
+
 def test_diff_reports_an_unreadable_file(
     capsys: pytest.CaptureFixture[str], tmp_path: Path
 ) -> None:

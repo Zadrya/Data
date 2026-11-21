@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """The ``diff`` command: read two datasets, write the diff report.
 
-Exit codes: 0 written, 1 an input is not a valid dataset, 2 a file cannot be read or
-written (including an output that would replace an input).
+Exit codes: 0 written, 1 an input is not a valid dataset (schema, repeated name or id,
+invariants), 2 a file cannot be read or written (including an output that would
+replace an input).
 """
 
 import argparse
@@ -47,8 +48,8 @@ def register(commands: "argparse._SubParsersAction[argparse.ArgumentParser]") ->
         "renamed, changed doses, durations, tolerance, bioavailability and units, interaction "
         "changes (lowered first), group membership changes, and which categories and texts "
         "changed. With --old-format base, OLD is the base file, normalized without API data. "
-        "Exit code 0: written, 1: an input is not a valid dataset, 2: a file cannot be read "
-        "or written.",
+        "Both inputs must pass the schema and the invariants. Exit code 0: written, 1: an "
+        "input is not a valid dataset, 2: a file cannot be read or written.",
     )
     parser.add_argument("old", type=Path, help="the dataset before the change")
     parser.add_argument("new", type=Path, help="the dataset after the change")

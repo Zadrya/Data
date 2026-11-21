@@ -204,8 +204,18 @@
       ],
       "interactions": {
         "dangerous": [],
-        "unsafe": [],
-        "uncertain": []
+        "unsafe": [
+          {
+            "kind": "substance",
+            "name": "Old Name Drug"
+          }
+        ],
+        "uncertain": [
+          {
+            "kind": "substance",
+            "name": "Amphetamine"
+          }
+        ]
       },
       "toxicities": []
     },
@@ -230,7 +240,12 @@
       "roas": [],
       "crossTolerances": [],
       "interactions": {
-        "dangerous": [],
+        "dangerous": [
+          {
+            "kind": "substance",
+            "name": "Alcohol"
+          }
+        ],
         "unsafe": [],
         "uncertain": []
       },

@@ -18,6 +18,7 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
+from zadrya_data import invariants
 from zadrya_data.base import load_base
 from zadrya_data.mediawiki import WikiPage
 from zadrya_data.normalize import normalize
@@ -146,10 +147,11 @@ def _route_order() -> tuple[str, ...]:
 
 
 def check_dataset(document: object, where: str) -> dict[str, Any]:
-    """Return the document if it is a valid dataset with unique names, or raise.
+    """Return the document if it is a dataset the build could have made, or raise.
 
-    The schema does not check that names and ids are unique; the diff matches by
-    them, so it refuses a dataset where one repeats.
+    It must be valid against the schema, have unique names and ids (the diff matches
+    by them, so this is checked first), and break no invariant: a report about a
+    dataset that cannot be released would review the wrong thing (ADR 8).
     """
     violations = validate(document, SchemaName.SUBSTANCES)
     if violations:
@@ -166,6 +168,12 @@ def check_dataset(document: object, where: str) -> dict[str, Any]:
             if entry[label] in seen:
                 raise DiffRefusedError(f"{where}: {key} has '{entry[label]}' twice")
             seen.add(entry[label])
+    failures = invariants.check(document)
+    if failures:
+        shown = "; ".join(str(failure) for failure in failures[:5])
+        raise DiffRefusedError(
+            f"{where} breaks the dataset invariants ({len(failures)} failure(s)): {shown}"
+        )
     return document
 
 

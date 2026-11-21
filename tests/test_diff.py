@@ -533,6 +533,18 @@ def test_load_dataset_refuses_a_repeated_name_or_id(
         load_dataset(path)
 
 
+def test_load_dataset_refuses_a_dataset_that_breaks_an_invariant(tmp_path: Path) -> None:
+    path = tmp_path / "one-sided.json"
+    path.write_text(
+        json.dumps(dataset(interacting("A", "dangerous", "B"), substance("B"))), encoding="utf-8"
+    )
+    with pytest.raises(DiffRefusedError) as refusal:
+        load_dataset(path)
+    message = str(refusal.value)
+    assert message.startswith(f"{path} breaks the dataset invariants (1 failure(s)): A: ")
+    assert message.endswith("(interaction-symmetric)")
+
+
 @pytest.mark.parametrize("content", ["{", '{"a": NaN}', '{"a": 1, "a": 2}'])
 def test_load_dataset_refuses_text_that_is_not_strict_json(tmp_path: Path, content: str) -> None:
     path = tmp_path / "broken.json"

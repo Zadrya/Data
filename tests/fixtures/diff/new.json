@@ -210,7 +210,16 @@
       "crossTolerances": [],
       "interactions": {
         "dangerous": [],
-        "unsafe": [],
+        "unsafe": [
+          {
+            "kind": "substance",
+            "name": "Amphetamine"
+          },
+          {
+            "kind": "substance",
+            "name": "New|Name *Drug* \u2014 [x](y)"
+          }
+        ],
         "uncertain": []
       },
       "toxicities": []
@@ -244,6 +253,10 @@
           {
             "kind": "group",
             "groupId": "depressants"
+          },
+          {
+            "kind": "substance",
+            "name": "Alcohol"
           }
         ],
         "uncertain": []
