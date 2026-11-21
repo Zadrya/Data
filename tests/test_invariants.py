@@ -520,6 +520,39 @@ VALID_EDGES: dict[str, Mutation] = {
 }
 
 
+def _other_in_full_width(document: dict[str, Any]) -> None:
+    # "Beta" in full-width letters: only NFKC makes it the catalog substance.
+    _alpha(document)["interactions"]["uncertain"].append(
+        {"kind": "other", "name": "\uff22\uff45\uff54\uff41"}
+    )
+
+
+def _other_with_a_zero_width_space(document: dict[str, Any]) -> None:
+    # Alpha already lists Grapefruit as unsafe: only removing format characters makes
+    # this the same target.
+    _alpha(document)["interactions"]["uncertain"].append(
+        {"kind": "other", "name": "Grape\u200bfruit"}
+    )
+
+
+# The normalized name key (``_key``) in the ``other`` branches: compared as raw
+# strings, both cases would pass.
+FAILING |= {
+    "other-is-a-substance-in-full-width": (
+        "other-outside-catalog",
+        "Alpha",
+        "interactions.uncertain",
+        _other_in_full_width,
+    ),
+    "other-target-with-a-zero-width-space": (
+        "target-unique",
+        "Alpha",
+        "interactions.uncertain",
+        _other_with_a_zero_width_space,
+    ),
+}
+
+
 def _mutated(mutation: Mutation) -> dict[str, Any]:
     document = _valid()
     mutation(document)
