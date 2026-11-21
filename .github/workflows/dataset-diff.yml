@@ -1,0 +1,109 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Posts the readable diff report of dataset/substances.json on its pull request
+# (docs/adr/0007-diff-report.md). The report job reads only; the comment job can
+# only write pull request comments and runs no code from the pull request. A pull
+# request from a fork gets the report in the job summary instead of a comment.
+name: Dataset diff
+
+on:
+  pull_request:
+    paths:
+      - dataset/substances.json
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  report:
+    name: report
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    outputs:
+      body: ${{ steps.body.outputs.body }}
+    steps:
+      # The merge commit of the pull request: its first parent is the base branch.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - name: Install uv and Python
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: "0.13.7"
+          # setup-uv does not know this release yet, so the checksum is pinned here.
+          checksum: c5221ff41b7892bfc223543883600125f6a47fe845093e0f5bdff4f359196d83
+          enable-cache: false
+      - name: Install dependencies
+        run: uv sync --locked
+      - name: Build the report
+        env:
+          REPORT: ${{ runner.temp }}/report.md
+          OLD: ${{ runner.temp }}/old.json
+        run: |
+          new_label="dataset/substances.json of this pull request"
+          if git cat-file -e HEAD^1:dataset/substances.json 2>/dev/null; then
+            git show HEAD^1:dataset/substances.json > "$OLD"
+            uv run --locked zadrya-data diff "$OLD" dataset/substances.json \
+              --old-label "dataset/substances.json of the base branch" \
+              --new-label "$new_label" --output "$REPORT"
+          else
+            uv run --locked zadrya-data diff sources/base/Substances.json dataset/substances.json \
+              --old-format base \
+              --old-label "sources/base/Substances.json (v11.11 base file, normalized)" \
+              --new-label "$new_label" --output "$REPORT"
+          fi
+          cat "$REPORT" >> "$GITHUB_STEP_SUMMARY"
+      - name: Prepare the comment
+        id: body
+        env:
+          REPORT: ${{ runner.temp }}/report.md
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          delimiter="BODY_$(openssl rand -hex 16)"
+          {
+            echo "body<<$delimiter"
+            echo "<!-- zadrya-dataset-diff -->"
+            # A comment holds at most 65536 characters.
+            if [ "$(wc -c < "$REPORT")" -gt 60000 ]; then
+              echo "# Dataset diff report"
+              echo
+              echo "The report is too long for a comment: read it in the job summary of [this run]($RUN_URL)."
+            else
+              cat "$REPORT"
+              echo
+              echo "Built by [this run]($RUN_URL)."
+            fi
+            echo "$delimiter"
+          } >> "$GITHUB_OUTPUT"
+
+  comment:
+    name: comment
+    needs: report
+    # A fork's token cannot comment: its report stays in the job summary.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write # create or update the one report comment
+    steps:
+      - name: Post or update the comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BODY: ${{ needs.report.outputs.body }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          marker="<!-- zadrya-dataset-diff -->"
+          id="$(gh api --paginate "repos/$REPO/issues/$PR/comments" \
+            --jq ".[] | select(.user.login == \"github-actions[bot]\" and (.body | startswith(\"$marker\"))) | .id" \
+            | head -n 1)"
+          if [ -n "$id" ]; then
+            gh api --method PATCH "repos/$REPO/issues/comments/$id" -f body="$BODY" > /dev/null
+          else
+            gh api --method POST "repos/$REPO/issues/$PR/comments" -f body="$BODY" > /dev/null
+          fi
