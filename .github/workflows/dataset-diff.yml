@@ -1,0 +1,146 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Posts the readable diff report of dataset/substances.json on its pull request
+# (docs/adr/0008-diff-report.md). The report job reads only; the comment job can
+# only write pull request comments and runs no code from the pull request. A pull
+# request from a fork gets the report in the job summary instead of a comment.
+# This workflow and the report code come from the pull request itself, so the
+# report lists every changed path outside dataset/ at its top.
+name: Dataset diff
+
+on:
+  pull_request:
+    paths:
+      - dataset/substances.json
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  report:
+    name: report
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    outputs:
+      body: ${{ steps.body.outputs.body }}
+    env:
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      # The merge commit of the pull request: its first parent is the base branch.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - name: Install uv and Python
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: "0.13.7"
+          # setup-uv does not know this release yet, so the checksum is pinned here.
+          checksum: c5221ff41b7892bfc223543883600125f6a47fe845093e0f5bdff4f359196d83
+          enable-cache: false
+      - name: Install dependencies
+        run: uv sync --locked
+      - name: Build the report
+        env:
+          OLD: ${{ runner.temp }}/old.json
+          PATHS: ${{ runner.temp }}/paths.txt
+        run: |
+          REPORT="$RUNNER_TEMP/report.md" HEAD_FILE="$RUNNER_TEMP/head.md"
+          git diff --name-only HEAD^1 HEAD | { grep -v '^dataset/' || true; } > "$PATHS"
+          common=(--new-label "dataset/substances.json of this pull request"
+            --changed-paths "$PATHS" --head-output "$HEAD_FILE" --output "$REPORT"
+            --max-rows 100000)
+          if git cat-file -e HEAD^1:dataset/substances.json 2>/dev/null; then
+            git show HEAD^1:dataset/substances.json > "$OLD"
+            uv run --locked zadrya-data diff "$OLD" dataset/substances.json \
+              --old-label "dataset/substances.json of the base branch" "${common[@]}"
+          else
+            uv run --locked zadrya-data diff sources/base/Substances.json dataset/substances.json \
+              --old-format base \
+              --old-label "sources/base/Substances.json (v11.11 base file, normalized)" \
+              "${common[@]}"
+          fi
+      - name: Write the job summary
+        run: |
+          REPORT="$RUNNER_TEMP/report.md" HEAD_FILE="$RUNNER_TEMP/head.md"
+          # A job summary holds at most 1 MiB: past that it gets the head only.
+          if [ "$(wc -c < "$REPORT")" -le 1000000 ]; then
+            cat "$REPORT" >> "$GITHUB_STEP_SUMMARY"
+          else
+            cat "$HEAD_FILE" >> "$GITHUB_STEP_SUMMARY"
+            echo "The rest of the report is too long for a job summary:" \
+              "download the artifact dataset-diff-report of this run." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Upload the report
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dataset-diff-report
+          path: ${{ runner.temp }}/report.md
+          if-no-files-found: error
+          retention-days: 30
+      - name: Prepare the comment
+        id: body
+        run: |
+          REPORT="$RUNNER_TEMP/report.md" HEAD_FILE="$RUNNER_TEMP/head.md"
+          delimiter="BODY_$(openssl rand -hex 16)"
+          {
+            echo "body<<$delimiter"
+            echo "<!-- zadrya-dataset-diff -->"
+            echo "Report for $HEAD_SHA, built by [this run]($RUN_URL)."
+            echo
+            # A comment holds at most 65536 characters: past that it gets the head
+            # (warning and summary) only.
+            if [ "$(wc -c < "$REPORT")" -le 60000 ]; then
+              cat "$REPORT"
+            elif [ "$(wc -c < "$HEAD_FILE")" -le 60000 ]; then
+              cat "$HEAD_FILE"
+              echo
+              echo "The rest of the report is too long for a comment: read it in the job summary" \
+                "of [this run]($RUN_URL) or in its artifact dataset-diff-report."
+            else
+              echo "The report is too long for a comment, even its summary: read it in the job" \
+                "summary of [this run]($RUN_URL) or in its artifact dataset-diff-report."
+            fi
+            echo "$delimiter"
+          } >> "$GITHUB_OUTPUT"
+
+  comment:
+    name: comment
+    needs: report
+    # Also after a failed or cancelled report, so that the comment never shows a
+    # report of an older commit as current. A fork's token cannot comment: its
+    # report stays in the job summary.
+    if: always() && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write # create or update the one report comment
+    steps:
+      - name: Post or update the comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BODY: ${{ needs.report.outputs.body }}
+          RESULT: ${{ needs.report.result }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          marker="<!-- zadrya-dataset-diff -->"
+          if [ "$RESULT" != "success" ] || [ -z "$BODY" ]; then
+            BODY="$marker
+          Dataset diff report failed for $HEAD_SHA ($RESULT): see [this run]($RUN_URL). Do not review the dataset from an older report."
+          fi
+          id="$(gh api --paginate "repos/$REPO/issues/$PR/comments" \
+            --jq ".[] | select(.user.login == \"github-actions[bot]\" and (.body | startswith(\"$marker\"))) | .id" \
+            | head -n 1)"
+          if [ -n "$id" ]; then
+            gh api --method PATCH "repos/$REPO/issues/comments/$id" -f body="$BODY" > /dev/null
+          else
+            gh api --method POST "repos/$REPO/issues/$PR/comments" -f body="$BODY" > /dev/null
+          fi
