@@ -21,6 +21,7 @@ from zadrya_data import invariants
 from zadrya_data.base import load_base
 from zadrya_data.invariants import Failure, InvariantError, check, require
 from zadrya_data.normalize import normalize
+from zadrya_data.normalize.names import name_key
 
 type Mutation = Callable[[dict[str, Any]], None]
 
@@ -58,7 +59,10 @@ def _valid() -> dict[str, Any]:
                 "bioavailability": {"min": 50, "max": 70},
             }
         ],
-        tolerance={"half": {"text": "1-2 days", "min": 1440, "max": 2880}},
+        tolerance={
+            "half": {"text": "1-2 days", "min": 1440, "max": 2880},
+            "zero": {"text": "1 week", "min": 10080, "max": 10080},
+        },
         crossTolerances=["stimulants"],
         interactions={
             "dangerous": [
@@ -91,7 +95,8 @@ def _valid() -> dict[str, Any]:
         "categories": [{"id": "stimulant", "name": "stimulant", "description": "Stimulants."}],
         "interactionGroups": [{"id": "depressants", "name": "Depressants", "members": ["Beta"]}],
         "crossToleranceGroups": [
-            {"id": "stimulants", "name": "Stimulants", "members": ["Alpha", "Beta"]}
+            {"id": "stimulants", "name": "Stimulants", "members": ["Alpha", "Beta"]},
+            {"id": "modafinil-analogs", "name": "Modafinil analogs", "members": []},
         ],
         "substances": [alpha, beta],
     }
@@ -352,6 +357,86 @@ FAILING: dict[str, tuple[str, str | None, str, Mutation]] = {
 }
 
 
+def _append(path: Callable[[dict[str, Any]], Any], value: Any) -> Mutation:
+    def mutate(document: dict[str, Any]) -> None:
+        path(document).append(value)
+
+    return mutate
+
+
+def _other_on_both_sides(document: dict[str, Any]) -> None:
+    # The reviewer's case: a real substance pair turned into ``other`` on both sides.
+    _alpha(document)["interactions"]["dangerous"][0] = {"kind": "other", "name": "Beta"}
+    _beta(document)["interactions"]["dangerous"][0] = {"kind": "other", "name": "Alpha"}
+
+
+def _other_is_an_alias(document: dict[str, Any]) -> None:
+    _alpha(document)["interactions"]["unsafe"].append({"kind": "other", "name": "b1"})
+
+
+def _other_is_a_group(document: dict[str, Any]) -> None:
+    _beta(document)["interactions"]["uncertain"].append({"kind": "other", "name": "Depressants"})
+
+
+def _name_is_a_group(document: dict[str, Any]) -> None:
+    document["substances"].append(_substance("Modafinil\u200b Analogs"))
+
+
+def _composed_and_decomposed_names(document: dict[str, Any]) -> None:
+    document["substances"].append(_substance("Caf\u00e9"))
+    document["substances"].append(_substance("Cafe\u0301"))
+
+
+def _alias_with_a_double_space(document: dict[str, Any]) -> None:
+    _alpha(document)["aliases"].append("Ice Cream")
+    _beta(document)["aliases"].append("ice  cream")
+
+
+def _alias_with_a_zero_width_space(document: dict[str, Any]) -> None:
+    _alpha(document)["aliases"].append("Be\u200bta")
+
+
+FAILING |= {
+    "other-is-a-substance-on-both-sides": (
+        "other-outside-catalog",
+        "Alpha",
+        "interactions.dangerous",
+        _other_on_both_sides,
+    ),
+    "other-is-an-alias": (
+        "other-outside-catalog",
+        "Alpha",
+        "interactions.unsafe",
+        _other_is_an_alias,
+    ),
+    "other-is-a-group": (
+        "other-outside-catalog",
+        "Beta",
+        "interactions.uncertain",
+        _other_is_a_group,
+    ),
+    "name-is-a-group-name": ("name-not-group", "Modafinil\u200b Analogs", "name", _name_is_a_group),
+    "composed-and-decomposed-names": (
+        "unique-name",
+        "Cafe\u0301",
+        "name",
+        _composed_and_decomposed_names,
+    ),
+    "alias-with-a-double-space": (
+        "unique-alias",
+        "Beta",
+        "aliases",
+        _alias_with_a_double_space,
+    ),
+    "alias-with-a-zero-width-space": (
+        "unique-alias",
+        "Alpha",
+        "aliases",
+        _alias_with_a_zero_width_space,
+    ),
+}
+
+
 def _equal_dose_neighbours(document: dict[str, Any]) -> None:
     _dose(document)["lightMin"] = 5
     _dose(document)["heavyMin"] = 30
@@ -462,3 +547,23 @@ def test_the_real_base_file_with_each_recording_keeps_every_invariant(recording:
     document = normalize(base, _snapshot(base, recording)).document
 
     assert check(document) == []
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "LSD",
+        "Caf\u00e9",
+        "Cafe\u0301",
+        "Ice  Cream",
+        " ice\tcream ",
+        "Be\u200bta",
+        "AL\u00adPHA",
+        "\uff2c\uff33\uff24",
+        "\u00b5g",
+        "Stra\u00dfe",
+        "\u0391MT",
+    ],
+)
+def test_the_invariants_compare_names_as_normalization_does(name: str) -> None:
+    assert invariants._key(name) == name_key(name)

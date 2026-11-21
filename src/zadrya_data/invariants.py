@@ -12,6 +12,11 @@ breaks it, naming the substance (``None`` for the catalog lists) and the field.
 ``check`` returns all failures of all rules, sorted; ``require`` raises
 ``InvariantError`` with all of them, not just the first. The rules and why they
 hold are in ``docs/adr/0007-invariants-and-build.md``.
+
+Names (substance names, aliases, ``other`` targets, group ids and names) are compared
+by ``_key``: format characters removed, NFKC and case folding, runs of whitespace
+collapsed. Normalization compares with the same rule (``normalize.names.name_key``),
+written separately on purpose; a test keeps the two in agreement.
 """
 
 import math
@@ -26,8 +31,8 @@ BOUNDARIES = ("thresholdMin", "lightMin", "commonMin", "strongMin", "heavyMin")
 SEVERITIES = ("dangerous", "unsafe", "uncertain")
 # The three spellings of a mass unit that the app may convert between (ADR 1).
 MASS_UNITS = frozenset({"µg", "mg", "g"})
-# Other spellings of a mass unit, after NFKC (which turns the micro sign into the Greek
-# mu) and case folding. A unit written this way would look convertible to a reader
+# Other spellings of a mass unit, compared by ``_key`` (NFKC turns the micro sign into the Greek
+# mu). A unit written this way would look convertible to a reader
 # and be opaque to the app, so it is refused instead of being guessed.
 _MASS_SPELLINGS = frozenset(
     {
@@ -52,6 +57,23 @@ _MASS_SPELLINGS = frozenset(
 _GREEK_MU = "μ"
 
 type Document = Mapping[str, Any]
+
+
+def _key(name: str) -> str:
+    """Return the form in which two names count as the same name (see the module text)."""
+    visible = "".join(c for c in name if unicodedata.category(c) != "Cf")
+    folded = unicodedata.normalize("NFKC", unicodedata.normalize("NFKC", visible).casefold())
+    return " ".join(folded.split())
+
+
+def _group_labels(document: Document) -> dict[str, str]:
+    """Return the key of every group id and name, with where the group is."""
+    labels: dict[str, str] = {}
+    for key in ("interactionGroups", "crossToleranceGroups"):
+        for group in document[key]:
+            for label in (group["id"], group["name"]):
+                labels.setdefault(_key(label), f"{key}[{group['id']}]")
+    return labels
 
 
 @dataclass(frozen=True, slots=True, order=True)
@@ -147,12 +169,12 @@ def _target_exists(document: Document) -> Iterator[Failure]:
 
 
 def _target_unique(document: Document) -> Iterator[Failure]:
-    """A target appears once across the three severities (``other`` without case)."""
+    """A target appears once across the three severities (``other`` by ``_key``)."""
     for substance in _substances(document):
         seen: dict[tuple[str, str], str] = {}
         for severity, target in _targets(substance):
             value = target.get("groupId") or target["name"]
-            key = (target["kind"], value.casefold() if target["kind"] == "other" else value)
+            key = (target["kind"], _key(value) if target["kind"] == "other" else value)
             if key in seen:
                 yield Failure(
                     "target-unique",
@@ -264,13 +286,13 @@ def _unique_id(document: Document) -> Iterator[Failure]:
 
 
 def _unique_name(document: Document) -> Iterator[Failure]:
-    """Canonical names are unique without case."""
+    """Canonical names are unique, compared by ``_key``."""
     first: dict[str, str] = {}
     for substance in _substances(document):
         name = substance["name"]
-        folded = name.casefold()
+        folded = _key(name)
         if folded in first:
-            detail = f"'{name}' is also the name of '{first[folded]}' (without case)"
+            detail = f"'{name}' is also the name of '{first[folded]}' (compared without case)"
             yield Failure("unique-name", name, "name", detail)
         else:
             first[folded] = name
@@ -278,15 +300,15 @@ def _unique_name(document: Document) -> Iterator[Failure]:
 
 def _unique_alias(document: Document) -> Iterator[Failure]:
     """An alias leads to exactly one substance: no other name, no other holder, no repeat."""
-    names = {substance["name"].casefold(): substance["name"] for substance in _substances(document)}
+    names = {_key(substance["name"]): substance["name"] for substance in _substances(document)}
     holders: dict[str, list[str]] = defaultdict(list)
     for substance in _substances(document):
         for alias in substance["aliases"]:
-            holders[alias.casefold()].append(substance["name"])
+            holders[_key(alias)].append(substance["name"])
     for substance in _substances(document):
         name = substance["name"]
         for alias in substance["aliases"]:
-            folded = alias.casefold()
+            folded = _key(alias)
             others = sorted({holder for holder in holders[folded] if holder != name})
             if names.get(folded) == name:
                 detail = f"'{alias}' is the substance's own name"
@@ -295,28 +317,60 @@ def _unique_alias(document: Document) -> Iterator[Failure]:
             elif others:
                 detail = f"'{alias}' is also an alias of {', '.join(others)}"
             elif holders[folded].count(name) > 1:
-                detail = f"'{alias}' appears more than once (without case)"
+                detail = f"'{alias}' appears more than once (compared without case)"
             else:
                 continue
             yield Failure("unique-alias", name, "aliases", detail)
 
 
 def _alias_not_group(document: Document) -> Iterator[Failure]:
-    """No alias is, without case, the name or id of a group."""
-    groups: dict[str, str] = {}
-    for key in ("interactionGroups", "crossToleranceGroups"):
-        for group in document[key]:
-            for label in (group["id"], group["name"]):
-                groups.setdefault(label.casefold(), f"{key}[{group['id']}]")
+    """No alias is the name or id of a group."""
+    groups = _group_labels(document)
     for substance in _substances(document):
         for alias in substance["aliases"]:
-            if alias.casefold() in groups:
+            if _key(alias) in groups:
                 yield Failure(
                     "alias-not-group",
                     substance["name"],
                     "aliases",
-                    f"'{alias}' is the name or id of the group {groups[alias.casefold()]}",
+                    f"'{alias}' is the name or id of the group {groups[_key(alias)]}",
                 )
+
+
+def _name_not_group(document: Document) -> Iterator[Failure]:
+    """No substance name is the name or id of a group."""
+    groups = _group_labels(document)
+    for substance in _substances(document):
+        name = substance["name"]
+        if _key(name) in groups:
+            detail = f"'{name}' is the name or id of the group {groups[_key(name)]}"
+            yield Failure("name-not-group", name, "name", detail)
+
+
+def _other_outside_catalog(document: Document) -> Iterator[Failure]:
+    """An ``other`` target names nothing the catalog has: no substance, alias or group."""
+    names = {_key(substance["name"]): substance["name"] for substance in _substances(document)}
+    aliases: dict[str, set[str]] = defaultdict(set)
+    for substance in _substances(document):
+        for alias in substance["aliases"]:
+            aliases[_key(alias)].add(substance["name"])
+    groups = _group_labels(document)
+    for substance in _substances(document):
+        for severity, target in _targets(substance):
+            if target["kind"] != "other":
+                continue
+            folded = _key(target["name"])
+            if folded in names:
+                detail = f"'{target['name']}' is the substance '{names[folded]}'"
+            elif folded in aliases:
+                detail = f"'{target['name']}' is an alias of {', '.join(sorted(aliases[folded]))}"
+            elif folded in groups:
+                detail = f"'{target['name']}' is the name or id of the group {groups[folded]}"
+            else:
+                continue
+            yield Failure(
+                "other-outside-catalog", substance["name"], f"interactions.{severity}", detail
+            )
 
 
 def _repeats(values: list[Any]) -> list[Any]:
@@ -364,10 +418,7 @@ def _mass_unit(document: Document) -> Iterator[Failure]:
                     f"'{units}' holds the Greek letter mu (U+03BC): micrograms are written "
                     "with the micro sign (U+00B5)"
                 )
-            elif (
-                units not in MASS_UNITS
-                and unicodedata.normalize("NFKC", units).casefold().strip() in _MASS_SPELLINGS
-            ):
+            elif units not in MASS_UNITS and _key(units) in _MASS_SPELLINGS:
                 detail = f"'{units}' spells a mass unit another way: write µg, mg or g"
             else:
                 continue
@@ -412,6 +463,8 @@ RULES: dict[str, Callable[[Document], Iterator[Failure]]] = {
     "unique-name": _unique_name,
     "unique-alias": _unique_alias,
     "alias-not-group": _alias_not_group,
+    "name-not-group": _name_not_group,
+    "other-outside-catalog": _other_outside_catalog,
     "unique-items": _unique_items,
     "mass-unit": _mass_unit,
     "finite": _finite,

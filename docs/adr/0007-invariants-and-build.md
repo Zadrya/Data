@@ -11,25 +11,29 @@ The schema checks shape only (ADR 1, "What the schema does not check"): increasi
 
 ### Invariants (`src/zadrya_data/invariants.py`)
 
-The invariants are a second, independent check over the finished document. They import nothing from `normalize` and read only the document, so a bug in a normalization rule cannot also hide itself here. They assume a document the schema accepts: the build validates the schema first. Each rule yields every place it is broken, with the substance (or `(catalog)` for the top-level lists) and the field, and `require` raises `InvariantError` with all of them, sorted, never only the first.
+The invariants are a second, independent check over the finished document. They import nothing from `normalize` and read only the document, so a bug in a normalization rule cannot also hide itself here. They assume a document the schema accepts: the build validates the schema first.
+
+Names are compared by one **name key**, the rule of ADR 4: format characters (Unicode category Cf) removed, NFKC and case folding, runs of whitespace collapsed. The invariants have their own copy of it, so that they stay independent of normalization, and a test keeps the two copies in agreement. Each rule yields every place it is broken, with the substance (or `(catalog)` for the top-level lists) and the field, and `require` raises `InvariantError` with all of them, sorted, never only the first.
 
 | Rule | What must hold |
 | --- | --- |
 | `dose-order` | The dose boundaries present in a route never decrease, in the order `thresholdMin`, `lightMin`, `commonMin`, `strongMin`, `heavyMin`. Equal neighbours are allowed (below). |
 | `range` | `min` is not above `max` in every duration phase, every bioavailability and the tolerance times `half` and `zero`. |
 | `target-exists` | A `substance` target is another substance of the catalog, never the substance itself. |
-| `target-unique` | A target appears once across the three severities of a substance (`other` targets without case). |
+| `target-unique` | A target appears once across the three severities of a substance (`other` targets compared by the name key). |
 | `interaction-symmetric` | When A lists the substance B, B lists A with the same severity. |
 | `group-exists` | A `group` target is the id of an entry of `interactionGroups`. |
 | `member-exists` | Every member of every interaction and cross tolerance group is a substance of the catalog. |
 | `cross-tolerance` | A substance lists exactly the cross tolerance groups it is a member of, and each exists. |
 | `category-exists` | A substance's categories are ids of `categories`. |
 | `unique-id` | Ids are unique within `categories`, `interactionGroups` and `crossToleranceGroups`. |
-| `unique-name` | Canonical names are unique without case. |
-| `unique-alias` | An alias leads to exactly one substance, without case: it is not the substance's own name, not another substance's name, not carried by another substance and not repeated. |
-| `alias-not-group` | No alias is, without case, the name or the id of an interaction or cross tolerance group. |
+| `unique-name` | Canonical names are unique, compared by the name key. |
+| `unique-alias` | An alias leads to exactly one substance, compared by the name key: it is not the substance's own name, not another substance's name, not carried by another substance and not repeated. |
+| `alias-not-group` | No alias is the name or the id of an interaction or cross tolerance group. |
+| `name-not-group` | No substance name is the name or the id of an interaction or cross tolerance group. |
+| `other-outside-catalog` | An `other` target is really outside the catalog: it is not a substance name, not an alias and not the name or id of an interaction or cross tolerance group. Otherwise a warning about a catalog substance or group would show only as text and never match an ingestion. |
 | `unique-items` | No list holds an item twice: routes, categories, both class lists, cross tolerances, toxicities, safer use items and group members. |
-| `mass-unit` | A dose unit never holds the Greek letter mu (U+03BC), and a unit that spells a mass another way (`MG`, `mcg`, `ug`, `grams`, compared after NFKC and without case) is refused: the only mass spellings are `µg` (micro sign U+00B5), `mg` and `g`. Every other unit (`mL`, `mg THC`, `seeds`, `Mg#`) stays opaque. |
+| `mass-unit` | A dose unit never holds the Greek letter mu (U+03BC), and a unit that spells a mass another way (`MG`, `mcg`, `ug`, `grams`, full-width `ｍｇ`, compared by the name key) is refused: the only mass spellings are `µg` (micro sign U+00B5), `mg` and `g`. Every other unit (`mL`, `mg THC`, `seeds`, `Mg#`) stays opaque. |
 | `finite` | No number anywhere is NaN or infinite. |
 
 **Equal dose boundaries are allowed.** ADR 4 accepts equal neighbours and reports each one (`dose-equal-boundaries`, 100 in the snapshot of 2026-11-16: 98 a threshold equal to the light minimum, plus 4-MeO-PCP insufflated with `strongMin` and `heavyMin` both 150 and Theacrine insufflated with `thresholdMin` and `commonMin` both 25). The invariant enforces exactly that: boundaries never decrease. Equal boundaries are safe because the classification of ADR 1 takes each boundary as the start of its class, up to but not including the next one: between two equal boundaries the lower class is empty, and a dose at that value takes the higher class. A user who logs 150 mg of 4-MeO-PCP sees it as heavy, never as strong. A strict rule would have refused these real routes, or forced normalization to drop a boundary the wiki states.
