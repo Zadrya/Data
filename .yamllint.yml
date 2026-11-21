@@ -6,6 +6,8 @@ ignore: |
   build/
   node_modules/
   .venv/
+  # Agent worktrees are full clones of this repository: each lints itself.
+  .claude/worktrees/
 
 rules:
   document-start: disable
