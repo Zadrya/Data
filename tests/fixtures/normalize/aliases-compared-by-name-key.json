@@ -1,0 +1,86 @@
+{
+  "rule": "Names are compared after removing format characters (Unicode category Cf, such as the zero-width space and the soft hyphen), NFKC normalization, case folding and collapsing runs of whitespace. A composed and a decomposed accent, a double space and an invisible character therefore make no new name: such an alias repeats the canonical name, is shared with another substance, or is another substance's name, and is dropped as those rules say.",
+  "base": [
+    {
+      "name": "Alpha",
+      "commonNames": [
+        "Caf\u00e9",
+        "Ice  Cream",
+        "AL\u00adPHA"
+      ]
+    },
+    {
+      "name": "Beta",
+      "commonNames": [
+        "Cafe\u0301",
+        "ice cream",
+        "Bet"
+      ]
+    },
+    {
+      "name": "Gamma",
+      "commonNames": [
+        "Al\u200bpha",
+        "G"
+      ]
+    }
+  ],
+  "api": [],
+  "compare": [
+    "aliases"
+  ],
+  "reportKinds": [
+    "alias-names-another-substance",
+    "alias-shared"
+  ],
+  "expected": [
+    {
+      "name": "Alpha",
+      "aliases": []
+    },
+    {
+      "name": "Beta",
+      "aliases": [
+        "Bet"
+      ]
+    },
+    {
+      "name": "Gamma",
+      "aliases": [
+        "G"
+      ]
+    }
+  ],
+  "report": [
+    {
+      "kind": "alias-shared",
+      "substance": "Alpha",
+      "route": null,
+      "detail": "alias 'Caf\u00e9' dropped: Beta carries it too, so it names no single substance"
+    },
+    {
+      "kind": "alias-shared",
+      "substance": "Alpha",
+      "route": null,
+      "detail": "alias 'Ice  Cream' dropped: Beta carries it too, so it names no single substance"
+    },
+    {
+      "kind": "alias-shared",
+      "substance": "Beta",
+      "route": null,
+      "detail": "alias 'Cafe\u0301' dropped: Alpha carries it too, so it names no single substance"
+    },
+    {
+      "kind": "alias-shared",
+      "substance": "Beta",
+      "route": null,
+      "detail": "alias 'ice cream' dropped: Alpha carries it too, so it names no single substance"
+    },
+    {
+      "kind": "alias-names-another-substance",
+      "substance": "Gamma",
+      "route": null,
+      "detail": "alias 'Al\u200bpha' dropped: it is the name of the substance Alpha"
+    }
+  ]
+}

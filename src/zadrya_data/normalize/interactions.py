@@ -5,12 +5,15 @@ For each substance the dangerous, unsafe and uncertain lists of both sources are
 merged as a union. Each target name is resolved, in this order:
 
 1. a catalog substance by its exact name, then through ``TARGET_NAMES`` (colloquial
-   names of the data, without case), then by its name without case, then by an alias
-   (without case), which names exactly one catalog substance once
+   names of the data), then by its name, then by an alias, which names exactly one catalog substance once
    ``names.drop_ambiguous_aliases`` has run: ``{kind: substance}``;
 2. a class named in ``interaction_groups.NAME_TO_GROUP``: ``{kind: group, groupId}``;
 3. anything else: ``{kind: other, name}``, with the name as written, one entry per
-   name without case (the first spelling, base before API, is kept).
+   name (the first spelling, base before API, is kept).
+
+Apart from the exact name, names are compared by ``names.name_key``: Unicode
+normalization, case, spaces and invisible format characters do not count, as in the
+alias rules and in the invariants of the build.
 
 A name that is both a group name and a catalog name or alias (not exact) stops the
 normalization: picking either side could hide a warning, so a person decides.
@@ -39,6 +42,7 @@ from zadrya_data.normalize import text
 from zadrya_data.normalize.catalog import Entry
 from zadrya_data.normalize.errors import NormalizationError
 from zadrya_data.normalize.interaction_groups import GROUPS, group_of, interaction_groups
+from zadrya_data.normalize.names import name_key
 from zadrya_data.normalize.report import Kind, Report
 
 SEVERITIES = ("dangerous", "unsafe", "uncertain")
@@ -53,7 +57,7 @@ TARGET_NAMES = {
 }
 
 # A resolved target: (kind, value). The value is a canonical name, a group id, or for
-# ``other`` the name without case (the spelling shown is kept apart).
+# ``other`` the ``name_key`` of the name (the spelling shown is kept apart).
 type Key = tuple[str, str]
 
 
@@ -72,14 +76,14 @@ class _Resolver:
         by_folded_name: dict[str, list[str]] = defaultdict(list)
         by_alias: dict[str, set[str]] = defaultdict(set)
         for substance in substances:
-            by_folded_name[substance["name"].casefold()].append(substance["name"])
+            by_folded_name[name_key(substance["name"])].append(substance["name"])
             for alias in substance["aliases"]:
-                by_alias[alias.casefold()].add(substance["name"])
+                by_alias[name_key(alias)].add(substance["name"])
         return cls({s["name"] for s in substances}, by_folded_name, by_alias)
 
     def resolve(self, raw: str, lister: str) -> Key:
         """Return the target a name stands for."""
-        folded = raw.casefold()
+        folded = name_key(raw)
         if raw in self.names:
             return ("substance", raw)
         meant = TARGET_NAMES.get(folded)
